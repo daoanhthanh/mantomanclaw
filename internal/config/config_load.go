@@ -75,10 +75,10 @@ func parseEnvBool(value string) bool {
 // Default returns a Config with sensible defaults.
 func Default() *Config {
 	return &Config{
-		DataDir: "~/.goclaw/data",
+		DataDir: "~/.mantomanagent/data",
 		Agents: AgentsConfig{
 			Defaults: AgentDefaults{
-				Workspace:           "~/.goclaw/workspace",
+				Workspace:           "~/.mantomanagent/workspace",
 				RestrictToWorkspace: true,
 				Provider:            "anthropic",
 				Model:               "claude-sonnet-4-5-20250929",

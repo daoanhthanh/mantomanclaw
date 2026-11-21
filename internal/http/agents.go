@@ -48,7 +48,7 @@ type AgentsHandler struct {
 	secureCLI                 store.SecureCLIStore
 	secureCLIGrants           store.SecureCLIAgentGrantStore
 	secureCLIAgentCreds       store.SecureCLIAgentCredentialStore
-	defaultWorkspace          string // default workspace path template (e.g. "~/.goclaw/workspace")
+	defaultWorkspace          string // default workspace path template (e.g. "~/.mantomanagent/workspace")
 	dataDir                   string // resolved data directory (e.g. "~/.goclaw/data") — for team workspace export
 	gatewayAddr               string
 	msgBus                    *bus.MessageBus   // for cache invalidation events (nil = no events)

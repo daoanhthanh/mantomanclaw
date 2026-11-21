@@ -27,7 +27,7 @@ const workspaceNormalizeHookName = "072_normalize_agent_workspaces"
 // Stale rows are rewritten to `{configured_base}/{agent_key}`, where the
 // base is read with the same precedence used by the gateway:
 // `GOCLAW_WORKSPACE` env > config file `Agents.Defaults.Workspace` >
-// default `~/.goclaw/workspace` (with tilde expansion).
+// default `~/.mantomanagent/workspace` (with tilde expansion).
 //
 // Idempotent: rows already at the proposed value are skipped.
 // Conservative: absolute, non-stale paths are left untouched so operators
@@ -120,7 +120,7 @@ func resolveWorkspaceBase() string {
 	if err != nil {
 		slog.Warn("workspace normalization: load config failed, using default",
 			"path", cfgPath, "error", err)
-		return strings.TrimRight(config.ExpandHome("~/.goclaw/workspace"), "/")
+		return strings.TrimRight(config.ExpandHome("~/.mantomanagent/workspace"), "/")
 	}
 	return strings.TrimRight(cfg.WorkspacePath(), "/")
 }

@@ -133,7 +133,7 @@ export function AiDefaultsSection({ data, onSave, saving }: Props) {
             <Input
               value={defaults.workspace ?? ""}
               onChange={(e) => updateDefaults({ workspace: e.target.value })}
-              placeholder="~/.goclaw/workspace"
+              placeholder="~/.mantomanagent/workspace"
             />
           </div>
         </div>

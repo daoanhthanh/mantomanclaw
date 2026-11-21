@@ -20,7 +20,7 @@ const (
 )
 
 // EnsureSecrets retrieves or generates the encryption key and gateway token.
-// Primary storage: OS keyring. Fallback: file-based storage in ~/.goclaw/secrets/.
+// Primary storage: OS keyring. Fallback: file-based storage in ~/.mantomanagent/secrets/.
 func EnsureSecrets() (encKey, gwToken string, err error) {
 	encKey, err = getOrCreateSecret(keyEncKey, 32)
 	if err != nil {

@@ -1,13 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 133.54 146.33">
-  <defs>
-    <style>
-      .cls-1 {
-        fill: #00a29a;
-      }
-    </style>
-  </defs>
-  <g id="_レイヤー_1" data-name="レイヤー 1">
-    <path class="cls-1" d="M19.9,84.81V31.71c0-10.38-2.9-12.93-6.87-15.4-4.3-2.75-13.03-1.37-13.03-1.37v68.62c0,8.74,2.63,13.71,7.6,19.12,4.97,5.36,15.15,6.56,22.62,6.56s8.83-5.39,8.83-11.19c-12.06,0-19.15-4.14-19.15-13.25M120.51,16.31c-3.98,2.47-6.88,5.01-6.88,15.4v53.11c0,9.11-7.12,13.25-19.15,13.25,0,5.8,1.36,11.19,8.83,11.19s17.65-1.2,22.62-6.56c4.98-5.41,7.61-10.38,7.61-19.12V14.94s-8.75-1.38-13.03,1.37M82.95,123.02c0-5.65.22-25.31.22-25.31,0,0-5.42.91-11.53-.45-.24-.05-.47-.05-.7-.07-6.86-1.65-10.75-5.65-10.75-12.37V31.71c0-10.38-2.9-12.93-6.87-15.4-4.32-2.75-13.07-1.37-13.07-1.37v68.62c0,8.74,2.67,13.71,7.63,19.12,3.44,3.73,9.36,5.39,15.17,6.09v16.51c0,12.68,11.52,21.04,21.94,21.04h38.24c4.54,0,7.93-2.27,7.93-5.65v-7.27h-39.59c-6.12,0-8.61-4.72-8.61-10.4M103.54,69.02V0h-9.05c-5.66,0-10.86,4.98-10.86,11.78v81.65s7.02-1.11,12.69-6.76c5.64-5.68,7.23-12.69,7.23-17.64"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 578 646" width="1156" height="1292" role="img" aria-labelledby="title desc">
+<title id="title">AI Agent — company logo</title>
+<desc id="desc">Editable vector, preserving the company's distinctive asymmetric center: a left curved stroke, a shorter right descending stroke, the small central notch, and a continuous lower-right hook. No red annotations.</desc>
+<defs>
+ <linearGradient id="teal" x1="92" y1="158" x2="489" y2="597" gradientUnits="userSpaceOnUse"><stop stop-color="#55B1A5"/><stop offset="0.52" stop-color="#3AA8A4"/><stop offset="1" stop-color="#377F93"/></linearGradient>
+ <linearGradient id="face" x1="172" y1="171" x2="387" y2="302" gradientUnits="userSpaceOnUse"><stop stop-color="#315F78"/><stop offset="1" stop-color="#275775"/></linearGradient>
+</defs>
+<!-- The two outer descending strokes retain the recognizable corporate silhouette -->
+<g id="original-brand-outer-strokes" fill="url(#teal)">
+ <path id="outer-left" d="M97 209 C123 209 148 227 148 260 V413 C148 442 163 456 193 457 V470 C193 483 187 486 176 486 C121 486 90 462 90 415 V216 Q90 209 97 209 Z"/>
+ <path id="outer-right" d="M460 209 C435 209 409 230 409 261 V414 C409 443 395 455 355 455 V471 C355 485 361 491 378 491 C430 491 468 458 468 416 V216 Q468 209 460 209 Z"/>
+</g>
+<!-- Crucial red-box detail: these are two asymmetric interleaving brand strokes, NOT a symmetric U -->
+<g id="brand-shortened-middle-strokes" fill="url(#teal)">
+ <path id="middle-left-shortened" d="M199 304 H204 C230 304 249 326 249 353 V409 C249 442 267 454 307 454 V507 H289 C228 507 191 469 191 416 V313 Q191 304 199 304 Z"/>
+ <path id="middle-right-shortened" d="M358 304 H368 V408 C368 436 348 455 307 455 V357 C307 325 331 304 358 304 Z"/>
+ <!-- The underhook begins in the narrow middle stem rather than the top of the U -->
+ <path id="brand-lower-hook" d="M245 455 H307 V509 C307 531 313 540 334 540 H461 V556 C461 577 449 586 431 586 H315 C269 586 245 555 245 517 Z"/>
+</g>
+<g id="agent-helmet" fill="url(#teal)">
+ <path id="helmet-arc" d="M131 201 C140 145 187 110 250 110 H310 C372 110 417 146 426 201 L403 219 C394 169 363 141 310 141 H250 C197 141 162 169 154 219 Z"/>
+ <path id="antenna-pole" d="M269 65 H287 V119 H269 Z"/>
+ <circle id="antenna-tip" cx="278" cy="52" r="26"/>
+ <path id="left-ear" d="M78 230 H79 V325 H77 C58 325 43 309 43 289 V267 C43 246 59 230 78 230 Z"/>
+ <path id="right-ear" d="M479 230 H480 C500 230 515 246 515 267 V289 C515 309 500 325 479 325 Z"/>
+</g>
+<g id="agent-face">
+ <rect id="visor" x="173" y="172" width="211" height="121" rx="55" fill="url(#face)"/>
+ <rect id="left-eye" x="222" y="209" width="27" height="49" rx="13.5" fill="#fff"/>
+ <rect id="right-eye" x="308" y="209" width="27" height="49" rx="13.5" fill="#fff"/>
+</g>
 </svg>

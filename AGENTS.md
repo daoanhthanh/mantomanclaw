@@ -183,9 +183,9 @@ OTel and Tailscale variants are not pre-built — build from source with the app
 - **Build tag:** `//go:build sqliteonly` — desktop binary includes only SQLite, no PostgreSQL
 - **Edition system:** `internal/edition/edition.go` — `Lite` preset auto-selected for SQLite backend. Check `edition.Current()` for feature limits
 - **Entry point:** `ui/desktop/main.go` + `ui/desktop/app.go` — Wails bindings, embedded gateway
-- **Secrets:** OS keyring (`go-keyring`) with file fallback at `~/.goclaw/secrets/`
-- **Data dir:** `~/.goclaw/data/` (SQLite DB, configs)
-- **Workspace:** `~/.goclaw/workspace/` (agent files, team workspace)
+- **Secrets:** OS keyring (`go-keyring`) with file fallback at `~/.mantomanagent/secrets/`
+- **Data dir:** `~/.mantomanagent/data/` (SQLite DB, configs)
+- **Workspace:** `~/.mantomanagent/workspace/` (agent files, team workspace)
 - **Port:** 18790 (localhost only), configurable via `GOCLAW_PORT`
 - **WS params:** All WS method params use **camelCase** (`teamId`, `taskId`, `sessionKey`) — match Go struct `json:"..."` tags
 - **Version:** `cmd.Version` set via `-ldflags` at build time. Frontend calls `wails.getVersion()`
