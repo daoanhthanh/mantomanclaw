@@ -9,6 +9,7 @@
     "never": "never"
   },
   "empty": {
+    "greeting": "Good to see you again, {{user}}",
     "title": "Start a conversation",
     "description": "Send a message to begin chatting with the agent."
   },

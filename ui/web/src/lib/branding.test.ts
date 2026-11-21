@@ -9,9 +9,9 @@ describe("runtime branding", () => {
 
   it("falls back to built-in GoClaw branding", () => {
     expect(getRuntimeBranding()).toEqual({
-      appName: "GoClaw",
-      appShortName: "GoClaw",
-      logoUrl: "/goclaw-icon.svg",
+      appName: "ManToMan Agent",
+      appShortName: "ManToMan Agent",
+      logoUrl: "/logo.svg",
     });
   });
 

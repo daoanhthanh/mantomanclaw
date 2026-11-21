@@ -79,6 +79,7 @@ export function ChatPage() {
   }, [isBusy, refreshSessions]);
 
   const isOwn = !sessionKey || isOwnSession(sessionKey, userId);
+  const isEmptyChat = messages.length === 0 && !isBusy && !messagesLoading;
 
   const handleMessageAdded = useCallback(
     (msg: { role: "user" | "assistant" | "tool"; content: string; timestamp?: number }, key?: string) => {
@@ -253,7 +254,7 @@ export function ChatPage() {
         )}
 
         <DropZone onDrop={handleDropFiles}>
-          <ChatThread
+          {!isEmptyChat && <ChatThread
             messages={messages}
             streamText={streamText}
             thinkingText={thinkingText}
@@ -266,8 +267,21 @@ export function ChatPage() {
             loading={messagesLoading}
             scrollTrigger={scrollTrigger}
             onToggleTaskPanel={() => setTaskPanelOpen((v) => !v)}
-          />
+          />}
 
+          <div className={cn("relative mx-auto w-full max-w-3xl shrink-0", isEmptyChat && "my-auto")}>
+          {isEmptyChat && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-full mb-8 flex flex-col items-center gap-4 px-3 sm:mb-28">
+              <img
+                src="/logo.svg"
+                alt=""
+                className="h-[min(17rem,25dvh)] w-auto"
+              />
+              <p className="w-full break-words text-center text-xl font-medium sm:text-2xl">
+                {t("empty.greeting", { user: userId })}
+              </p>
+            </div>
+          )}
           {!isOwn ? (
             <div className="mx-3 mb-3 flex items-center gap-2 rounded-xl border bg-muted/50 px-4 py-3 text-sm text-muted-foreground shadow-sm">
               <Eye className="h-4 w-4" />
@@ -285,6 +299,7 @@ export function ChatPage() {
               onFilesChange={setFiles}
             />
           )}
+          </div>
         </DropZone>
       </div>
 

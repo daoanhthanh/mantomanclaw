@@ -9,6 +9,7 @@
     "never": "없음"
   },
   "empty": {
+    "greeting": "다시 만나서 반가워요, {{user}}",
     "title": "대화 시작",
     "description": "에이전트와 채팅을 시작하려면 메시지를 보내세요."
   },

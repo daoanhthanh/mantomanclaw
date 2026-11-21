@@ -4,6 +4,7 @@
     "never": "无"
   },
   "empty": {
+    "greeting": "很高兴再次见到你，{{user}}",
     "description": "发送消息开始与Agent对话。",
     "title": "开始对话"
   },

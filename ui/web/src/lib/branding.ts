@@ -7,7 +7,7 @@ export interface RuntimeBranding {
 const FALLBACK_BRANDING: RuntimeBranding = {
   appName: "ManToMan Agent",
   appShortName: "ManToMan Agent",
-  logoUrl: "/icon.svg",
+  logoUrl: "/logo.svg",
 };
 
 interface RuntimeBrandingPayload {
