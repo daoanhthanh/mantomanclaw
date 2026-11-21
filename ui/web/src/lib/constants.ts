@@ -8,16 +8,16 @@ export {
 } from "./timezone-utils";
 
 export const LOCAL_STORAGE_KEYS = {
-  TOKEN: "goclaw:token",
-  USER_ID: "goclaw:userId",
-  SENDER_ID: "goclaw:senderID",
-  TENANT_ID: "goclaw:tenant_id",
-  TENANT_HINT: "goclaw:tenant_hint",
-  SETUP_SKIPPED: "goclaw:setup_skipped",
-  THEME: "goclaw:theme",
-  SIDEBAR_COLLAPSED: "goclaw:sidebarCollapsed",
-  LANGUAGE: "goclaw:language",
-  TIMEZONE: "goclaw:timezone",
+  TOKEN: "magent:token",
+  USER_ID: "magent:userId",
+  SENDER_ID: "magent:senderID",
+  TENANT_ID: "magent:tenant_id",
+  TENANT_HINT: "magent:tenant_hint",
+  SETUP_SKIPPED: "magent:setup_skipped",
+  THEME: "magent:theme",
+  SIDEBAR_COLLAPSED: "magent:sidebarCollapsed",
+  LANGUAGE: "magent:language",
+  TIMEZONE: "magent:timezone",
 } as const;
 
 export const SUPPORTED_LANGUAGES = ["en", "vi", "zh", "ko", "ru"] as const;

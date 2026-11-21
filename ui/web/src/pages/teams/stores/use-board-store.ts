@@ -10,7 +10,7 @@ interface BoardState {
   setGroupBy: (by: GroupBy) => void;
 }
 
-const KEY = "goclaw:teamBoard";
+const KEY = "magent:teamBoard";
 
 function load(): Record<string, unknown> {
   try {

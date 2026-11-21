@@ -5,8 +5,8 @@ export interface RuntimeBranding {
 }
 
 const FALLBACK_BRANDING: RuntimeBranding = {
-  appName: "GoClaw",
-  appShortName: "GoClaw",
+  appName: "ManToMan",
+  appShortName: "ManToMan",
   logoUrl: "/goclaw-icon.svg",
 };
 
