@@ -164,7 +164,7 @@ func runChannelsAdd() {
 		os.Exit(1)
 	}
 	if len(agents) == 0 {
-		fmt.Println("No agents found. Create an agent first with 'goclaw agent add'.")
+		fmt.Println("No agents found. Create an agent first with 'mantomanagent agent add'.")
 		return
 	}
 

@@ -150,11 +150,11 @@ func loadSkillsLoader() *skills.Loader {
 	cfgPath := resolveConfigPath()
 	cfg, _ := config.Load(cfgPath)
 	workspace := config.ExpandHome(cfg.Agents.Defaults.Workspace)
-	globalSkillsDir := os.Getenv("GOCLAW_SKILLS_DIR")
+	globalSkillsDir := os.Getenv("MANTOMANAGENT_SKILLS_DIR")
 	if globalSkillsDir == "" {
 		globalSkillsDir = filepath.Join(cfg.ResolvedDataDir(), "skills")
 	}
-	builtinSkillsDir := os.Getenv("GOCLAW_BUILTIN_SKILLS_DIR")
+	builtinSkillsDir := os.Getenv("MANTOMANAGENT_BUILTIN_SKILLS_DIR")
 	if builtinSkillsDir == "" {
 		builtinSkillsDir = "/app/bundled-skills"
 	}

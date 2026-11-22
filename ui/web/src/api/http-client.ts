@@ -116,12 +116,12 @@ export class HttpClient {
     const token = this.getToken();
     if (token) h["Authorization"] = `Bearer ${token}`;
     const userId = this.getUserId();
-    if (userId) h["X-GoClaw-User-Id"] = userId;
+    if (userId) h["X-ManToManAgent-User-Id"] = userId;
     const senderID = this.getSenderID();
-    if (senderID) h["X-GoClaw-Sender-Id"] = senderID;
+    if (senderID) h["X-ManToManAgent-Sender-Id"] = senderID;
     // Tenant scope: narrow cross-tenant admin to a specific tenant
     const tenantScope = localStorage.getItem("magent:tenant_id");
-    if (tenantScope) h["X-GoClaw-Tenant-Id"] = tenantScope;
+    if (tenantScope) h["X-ManToManAgent-Tenant-Id"] = tenantScope;
     return h;
   }
 

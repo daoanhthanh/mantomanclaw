@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to GoClaw are documented here. For full documentation, see [docs.goclaw.sh](https://docs.goclaw.sh).
+All notable changes to ManToManAgent are documented here. For full documentation, see [docs.mantomanagent.sh](https://docs.mantomanagent.sh).
 
 ## Unreleased
 
@@ -20,6 +20,8 @@ All notable changes to GoClaw are documented here. For full documentation, see [
   blocked rely-office before a valid file could be previewed.
 
 ### Changed
+
+- **Product rename** — use `mantomanagent` and `ManToManAgent` consistently across source, module imports, CLI commands, web/desktop UI, assets, deployment configuration, and documentation. This is a clean cutover for branded paths, headers, storage keys, and the `MANTOMANAGENT_` environment-variable prefix. Existing installations must rename their environment variables; external repository, registry, and domain resources require separate migration.
 
 - **Bitrix24 channel migrated to imbot v2 messaging API** — outbound text now uses
   `imbot.v2.Chat.Message.send` (replacing `imbot.message.add`); bot verification/lookup
@@ -196,7 +198,7 @@ All notable changes to GoClaw are documented here. For full documentation, see [
   checks for mutable HTTP surfaces, and Lite hook schema migration verification.
 
 - **SecureCLI runtime npm binaries** — binary discovery and credentialed exec now
-  resolve tools installed under the GoClaw runtime directories, including
+  resolve tools installed under the ManToManAgent runtime directories, including
   `{runtimeDir}/npm-global/bin`, and support single-binary npm package aliases
   such as `openrouter-cli` exposing `orc`.
 
@@ -219,7 +221,7 @@ All notable changes to GoClaw are documented here. For full documentation, see [
 ### New Features
 
 - **Pancake private-reply (comment → DM).** Enables a one-time DM to commenters
-  after the public reply. Stateless on GoClaw side — no DB dedup table, no
+  after the public reply. Stateless on ManToManAgent side — no DB dedup table, no
   in-memory state:
   - Config: `features.private_reply` (bool) + `private_reply_message` (text).
   - **Template variables** `{{commenter_name}}` and `{{post_title}}` with
@@ -228,7 +230,7 @@ All notable changes to GoClaw are documented here. For full documentation, see [
   - Empty `private_reply_message` → English fallback constant.
   - **Dedup strategy**: webhook-level comment_id dedup (already in
     `comment_handler.go`) + Facebook's per-comment idempotent `private_replies`
-    endpoint handle duplicates platform-side. No GoClaw state required.
+    endpoint handle duplicates platform-side. No ManToManAgent state required.
   - No DB migration.
 
 ### Improvements

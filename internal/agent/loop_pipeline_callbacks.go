@@ -885,5 +885,5 @@ func defaultPromptCacheKey(tenantID, agentID uuid.UUID, providerName, sessionKey
 		providerName,
 		sessionKey,
 	}, "\x00")))
-	return "goclaw/" + hex.EncodeToString(h[:16])
+	return "mantomanagent/" + hex.EncodeToString(h[:16])
 }

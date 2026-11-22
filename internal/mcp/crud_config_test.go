@@ -15,7 +15,7 @@ func TestConfigGet_ReturnsMaskedCopy(t *testing.T) {
 	srv := newTestMCPServer()
 	registerConfigCRUDTools(srv, cfg)
 
-	result := callTool(t, srv, "goclaw_config_get", map[string]any{})
+	result := callTool(t, srv, "mantomanagent_config_get", map[string]any{})
 	require.False(t, toolIsError(result))
 	// MaskedCopy must never leak the raw token verbatim.
 	assert.NotContains(t, toolResultText(result), "super-secret-token")

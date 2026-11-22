@@ -12,55 +12,55 @@ type contextKey string
 
 const (
 	// UserIDKey is the context key for the external user ID (TEXT, free-form).
-	UserIDKey contextKey = "goclaw_user_id"
+	UserIDKey contextKey = "mantomanagent_user_id"
 	// AgentIDKey is the context key for the agent UUID.
-	AgentIDKey contextKey = "goclaw_agent_id"
+	AgentIDKey contextKey = "mantomanagent_agent_id"
 	// AgentTypeKey is the context key for the agent type ("open" or "predefined").
-	AgentTypeKey contextKey = "goclaw_agent_type"
+	AgentTypeKey contextKey = "mantomanagent_agent_type"
 	// SenderIDKey is the original individual sender's ID (not group-scoped).
 	// In group chats, UserIDKey is group-scoped but SenderIDKey preserves
 	// the actual person who sent the message.
-	SenderIDKey contextKey = "goclaw_sender_id"
+	SenderIDKey contextKey = "mantomanagent_sender_id"
 	// SelfEvolveKey indicates whether a predefined agent can update its SOUL.md.
-	SelfEvolveKey contextKey = "goclaw_self_evolve"
+	SelfEvolveKey contextKey = "mantomanagent_self_evolve"
 	// LocaleKey is the context key for the user's preferred locale (e.g. "en", "vi", "zh").
-	LocaleKey contextKey = "goclaw_locale"
+	LocaleKey contextKey = "mantomanagent_locale"
 	// SharedMemoryKey indicates memory should be shared (no per-user scoping).
-	SharedMemoryKey contextKey = "goclaw_shared_memory"
+	SharedMemoryKey contextKey = "mantomanagent_shared_memory"
 	// SharedKGKey indicates KG should be shared across all users of the agent (no per-user scoping).
-	SharedKGKey contextKey = "goclaw_shared_kg"
+	SharedKGKey contextKey = "mantomanagent_shared_kg"
 	// SharedSessionsKey indicates sessions should be shared across all users (no per-group scoping).
-	SharedSessionsKey contextKey = "goclaw_shared_sessions"
+	SharedSessionsKey contextKey = "mantomanagent_shared_sessions"
 	// SharedContextKey indicates context files should be read/written at agent scope.
-	SharedContextKey contextKey = "goclaw_shared_context"
+	SharedContextKey contextKey = "mantomanagent_shared_context"
 	// ShellDenyGroupsKey holds per-agent shell deny group overrides.
-	ShellDenyGroupsKey contextKey = "goclaw_shell_deny_groups"
+	ShellDenyGroupsKey contextKey = "mantomanagent_shell_deny_groups"
 	// AgentKeyKey is the context key for the agent key/name (string identifier, e.g. "default").
-	AgentKeyKey contextKey = "goclaw_agent_key"
+	AgentKeyKey contextKey = "mantomanagent_agent_key"
 	// AgentContextWindowKey carries the calling agent's configured context window.
-	AgentContextWindowKey contextKey = "goclaw_agent_context_window"
+	AgentContextWindowKey contextKey = "mantomanagent_agent_context_window"
 	// AgentMaxTokensKey carries the calling agent's configured output reserve.
-	AgentMaxTokensKey contextKey = "goclaw_agent_max_tokens"
+	AgentMaxTokensKey contextKey = "mantomanagent_agent_max_tokens"
 	// TenantIDKey is the context key for the tenant UUID.
-	TenantIDKey contextKey = "goclaw_tenant_id"
+	TenantIDKey contextKey = "mantomanagent_tenant_id"
 	// CrossTenantKey indicates the caller has cross-tenant access (owner/system admin).
-	CrossTenantKey contextKey = "goclaw_cross_tenant"
+	CrossTenantKey contextKey = "mantomanagent_cross_tenant"
 	// TenantSlugKey stores the tenant's URL-safe slug for filesystem paths.
-	TenantSlugKey contextKey = "goclaw_tenant_slug"
+	TenantSlugKey contextKey = "mantomanagent_tenant_slug"
 	// RoleKey is the context key for the caller's permission role (e.g. "admin", "operator", "viewer").
-	RoleKey contextKey = "goclaw_role"
+	RoleKey contextKey = "mantomanagent_role"
 	// AvailableToolNamesKey carries this iteration's policy-resolved tool allowlist
 	// (canonical registry names) so a tool can introspect its own sibling tools.
-	AvailableToolNamesKey contextKey = "goclaw_available_tool_names"
+	AvailableToolNamesKey contextKey = "mantomanagent_available_tool_names"
 	// CredentialUserIDKey holds the resolved tenant user identity for credential lookups.
 	// Falls back to UserIDFromContext if not set.
-	CredentialUserIDKey contextKey = "goclaw_credential_user_id"
+	CredentialUserIDKey contextKey = "mantomanagent_credential_user_id"
 	// SenderNameKey is the display name from channel metadata (for bootstrap auto-contact).
-	SenderNameKey contextKey = "goclaw_sender_name"
+	SenderNameKey contextKey = "mantomanagent_sender_name"
 	// ChannelContextScopeKey carries the channel/group/user scope for runtime grants and credentials.
-	ChannelContextScopeKey contextKey = "goclaw_channel_context_scope"
+	ChannelContextScopeKey contextKey = "mantomanagent_channel_context_scope"
 	// AgentAudioKey carries the immutable agent audio snapshot for TTS tool dispatch.
-	AgentAudioKey contextKey = "goclaw_agent_audio"
+	AgentAudioKey contextKey = "mantomanagent_agent_audio"
 )
 
 // AgentAudioSnapshot is an immutable snapshot of agent audio config carried through

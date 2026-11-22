@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="_statics/goclaw-logo.svg" alt="GoClaw" height="200" />
+  <img src="_statics/mantomanagent-logo.svg" alt="ManToManAgent" height="200" />
 </p>
 
 <p align="center"><strong>Multi-Tenant AI Agent Platform</strong></p>
@@ -10,8 +10,8 @@ Single binary. Production-tested. Agents that orchestrate for you.
 </p>
 
 <p align="center">
-  <a href="https://docs.goclaw.sh">Documentation</a> •
-  <a href="https://docs.goclaw.sh/#quick-start">Quick Start</a> •
+  <a href="https://docs.mantomanagent.sh">Documentation</a> •
+  <a href="https://docs.mantomanagent.sh/#quick-start">Quick Start</a> •
   <a href="https://x.com/nlb_io">Twitter / X</a>
 </p>
 
@@ -73,7 +73,7 @@ Single binary. Production-tested. Agents that orchestrate for you.
 - **Single Binary** — ~25 MB static Go binary, no Node.js runtime, <1s startup, runs on a $5 VPS
 - **Observability** — Built-in LLM call tracing with spans and prompt cache metrics, optional OpenTelemetry OTLP export
 
-## Desktop Edition (GoClaw Lite)
+## Desktop Edition (ManToManAgent Lite)
 
 A native desktop app for local AI agents — no Docker, no PostgreSQL, no infrastructure.
 
@@ -149,10 +149,10 @@ git tag lite-v0.1.0 && git push origin lite-v0.1.0
 ### From Source
 
 ```bash
-git clone -b main https://github.com/nextlevelbuilder/goclaw.git && cd goclaw
+git clone -b main https://github.com/nextlevelbuilder/goclaw.git && cd mantomanagent
 make build
-./goclaw onboard        # Interactive setup wizard
-source .env.local && ./goclaw
+./mantomanagent onboard        # Interactive setup wizard
+source .env.local && ./mantomanagent
 ```
 
 > **Note:** The default branch is `dev` (active development). Use `-b main` to clone the stable release branch.
@@ -163,7 +163,7 @@ source .env.local && ./goclaw
 # Generate .env with auto-generated secrets
 chmod +x prepare-env.sh && ./prepare-env.sh
 
-# Add at least one GOCLAW_*_API_KEY to .env, then:
+# Add at least one MANTOMANAGENT_*_API_KEY to .env, then:
 make up
 
 # If Postgres fails to start ("port 5432 already allocated"), set another host
@@ -183,18 +183,18 @@ make up
 ```bash
 make up                # Start all services (build + migrate)
 make down              # Stop all services
-make logs              # Tail logs (goclaw service)
+make logs              # Tail logs (mantomanagent service)
 make reset             # Wipe volumes and rebuild from scratch
 ```
 
 **Operator CLI:**
 
-The main `goclaw` binary can also inspect local or remote gateways:
+The main `mantomanagent` binary can also inspect local or remote gateways:
 
 ```bash
-goclaw traces list --status error
-goclaw traces get <trace-id> -o json
-goclaw --server https://goclaw.example.com --token "$GOCLAW_GATEWAY_TOKEN" traces follow --session <session-key>
+mantomanagent traces list --status error
+mantomanagent traces get <trace-id> -o json
+mantomanagent --server https://mantomanagent.example.com --token "$MANTOMANAGENT_GATEWAY_TOKEN" traces follow --session <session-key>
 ```
 
 **Optional services** — enable with `WITH_*` flags:
@@ -217,7 +217,7 @@ make up WITH_BROWSER=1 WITH_OTEL=1
 make down WITH_BROWSER=1 WITH_OTEL=1
 ```
 
-When `GOCLAW_*_API_KEY` environment variables are set, the gateway auto-onboards without interactive prompts — detects provider, runs migrations, and seeds default data.
+When `MANTOMANAGENT_*_API_KEY` environment variables are set, the gateway auto-onboards without interactive prompts — detects provider, runs migrations, and seeds default data.
 
 > **Docker image variants:**
 > | Image | Description |
@@ -226,14 +226,14 @@ When `GOCLAW_*_API_KEY` environment variables are set, the gateway auto-onboards
 > | `latest-base` | Backend API-only, no web UI, no runtimes, no media probes (`read_video` and `read_audio` refuse without `ffprobe`; `read_document` falls back to the 1000-page ceiling without `pdfinfo`) |
 > | `latest-full` | All runtimes + skill dependencies pre-installed |
 > | `latest-otel` | Latest + OpenTelemetry tracing |
-> | `goclaw-web` | Standalone nginx + React SPA (for custom reverse proxy) |
+> | `mantomanagent-web` | Standalone nginx + React SPA (for custom reverse proxy) |
 >
 > For custom builds (Tailscale, Redis): `docker build --build-arg ENABLE_TSNET=true ...`
-> See the [Deployment Guide](https://docs.goclaw.sh/#deploy-docker-compose) for details.
+> See the [Deployment Guide](https://docs.mantomanagent.sh/#deploy-docker-compose) for details.
 
 ## Easypanel
 
-[Easypanel](https://easypanel.io) is a self-hosted Docker deployment platform, and GoClaw has a one-click deployment template there: https://easypanel.io/templates/goclaw. It deploys the full stack (Postgres with pgvector, the GoClaw backend, headless Chrome for browser automation, and the web UI) - you'll still need to set your `GOCLAW_*_API_KEY` after deploying.
+[Easypanel](https://easypanel.io) is a self-hosted Docker deployment platform, and ManToManAgent has a one-click deployment template there: https://easypanel.io/templates/mantomanagent. It deploys the full stack (Postgres with pgvector, the ManToManAgent backend, headless Chrome for browser automation, and the web UI) - you'll still need to set your `MANTOMANAGENT_*_API_KEY` after deploying.
 
 ## Updating
 
@@ -244,7 +244,7 @@ docker compose pull && docker compose up -d
 
 ### Binary (with embedded web UI)
 ```bash
-goclaw update --apply    # Downloads, verifies SHA256, swaps binary, restarts
+mantomanagent update --apply    # Downloads, verifies SHA256, swaps binary, restarts
 ```
 
 ### Web Dashboard
@@ -262,7 +262,7 @@ Delegation can run synchronously or asynchronously and exchanges files through
 an isolated delegation workspace; validated outputs are published back under
 the caller's `.delegations/<delegation-id>/` directory.
 
-> Details: [Agent Teams docs](https://docs.goclaw.sh/#teams-what-are-teams)
+> Details: [Agent Teams docs](https://docs.mantomanagent.sh/#teams-what-are-teams)
 
 ## Knowledge Vault
 
@@ -311,7 +311,7 @@ Typed domain events power the consolidation pipeline — session summaries, know
 | **Teams** | `team_tasks`, `spawn`, `delegate`, `message` | Task board + orchestration + messaging |
 | **Automation** | `cron`, `heartbeat`, `sessions_*` | Scheduling + session management |
 
-> Full tool reference at [docs.goclaw.sh](https://docs.goclaw.sh/#custom-tools)
+> Full tool reference at [docs.mantomanagent.sh](https://docs.mantomanagent.sh/#custom-tools)
 
 ## Webhook API
 
@@ -331,7 +331,7 @@ SIG=$(echo -n "${TS}.${BODY}" | openssl dgst -sha256 -mac HMAC \
 curl -X POST https://example.com/v1/webhooks/llm \
   -H "Content-Type: application/json" \
   -H "X-Webhook-Id: ${WEBHOOK_ID}" \
-  -H "X-GoClaw-Signature: t=${TS},v1=${SIG}" \
+  -H "X-ManToManAgent-Signature: t=${TS},v1=${SIG}" \
   -d "$BODY"
 ```
 
@@ -339,19 +339,19 @@ See **[docs/webhooks.md](docs/webhooks.md)** for the full reference: auth, async
 
 ## Documentation
 
-Full documentation at **[docs.goclaw.sh](https://docs.goclaw.sh)** — or browse the source in [`goclaw-docs/`](https://github.com/nextlevelbuilder/goclaw-docs)
+Full documentation at **[docs.mantomanagent.sh](https://docs.mantomanagent.sh)** — or browse the source in [`mantomanagent-docs/`](https://github.com/nextlevelbuilder/goclaw-docs)
 
 | Section | Topics |
 |---------|--------|
-| [Getting Started](https://docs.goclaw.sh/#what-is-goclaw) | Installation, Quick Start, Configuration, Web Dashboard Tour |
-| [Core Concepts](https://docs.goclaw.sh/#how-goclaw-works) | Agent Loop, Sessions, Tools, Memory, Multi-Tenancy |
-| [Agents](https://docs.goclaw.sh/#creating-agents) | Creating Agents, Context Files, Personality, Sharing & Access |
-| [Providers](https://docs.goclaw.sh/#providers-overview) | Anthropic, OpenAI, OpenRouter, Gemini, DeepSeek, +15 more |
-| [Channels](https://docs.goclaw.sh/#channels-overview) | Telegram, Discord, Slack, Feishu, Zalo, WhatsApp, WebSocket |
-| [Agent Teams](https://docs.goclaw.sh/#teams-what-are-teams) | Teams, Task Board, Messaging, Delegation & Handoff |
-| [Advanced](https://docs.goclaw.sh/#custom-tools) | Custom Tools, MCP, Skills, Cron, Sandbox, Hooks, RBAC |
-| [Deployment](https://docs.goclaw.sh/#deploy-docker-compose) | Docker Compose, Database, Security, Observability, Tailscale |
-| [Reference](https://docs.goclaw.sh/#cli-commands) | CLI Commands, REST API, WebSocket Protocol, Environment Variables |
+| [Getting Started](https://docs.mantomanagent.sh/#what-is-mantomanagent) | Installation, Quick Start, Configuration, Web Dashboard Tour |
+| [Core Concepts](https://docs.mantomanagent.sh/#how-mantomanagent-works) | Agent Loop, Sessions, Tools, Memory, Multi-Tenancy |
+| [Agents](https://docs.mantomanagent.sh/#creating-agents) | Creating Agents, Context Files, Personality, Sharing & Access |
+| [Providers](https://docs.mantomanagent.sh/#providers-overview) | Anthropic, OpenAI, OpenRouter, Gemini, DeepSeek, +15 more |
+| [Channels](https://docs.mantomanagent.sh/#channels-overview) | Telegram, Discord, Slack, Feishu, Zalo, WhatsApp, WebSocket |
+| [Agent Teams](https://docs.mantomanagent.sh/#teams-what-are-teams) | Teams, Task Board, Messaging, Delegation & Handoff |
+| [Advanced](https://docs.mantomanagent.sh/#custom-tools) | Custom Tools, MCP, Skills, Cron, Sandbox, Hooks, RBAC |
+| [Deployment](https://docs.mantomanagent.sh/#deploy-docker-compose) | Docker Compose, Database, Security, Observability, Tailscale |
+| [Reference](https://docs.mantomanagent.sh/#cli-commands) | CLI Commands, REST API, WebSocket Protocol, Environment Variables |
 
 ## Testing
 
@@ -366,7 +366,7 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed feature status including what's be
 
 ## Acknowledgments
 
-GoClaw was originally inspired by the [OpenClaw](https://github.com/openclaw/openclaw) project architecture.
+ManToManAgent was originally inspired by the [OpenClaw](https://github.com/openclaw/openclaw) project architecture.
 
 ## License
 

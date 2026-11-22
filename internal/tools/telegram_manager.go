@@ -51,7 +51,7 @@ func (t *TelegramManagerTool) Parameters() map[string]any {
 			},
 			"channel": map[string]any{
 				"type":        "string",
-				"description": "GoClaw Telegram channel instance name. Defaults to current channel.",
+				"description": "ManToManAgent Telegram channel instance name. Defaults to current channel.",
 			},
 			"chat_id": map[string]any{
 				"type":        "string",

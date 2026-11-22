@@ -182,7 +182,7 @@ func TestTyping_StartsInThreadAndStopsOnFinalSend(t *testing.T) {
 	ch, msgBus := newTestChannel(t, fs, nil)
 	ctx := context.Background()
 
-	ch.handlePostedEvent(ctx, postedEvent(t, mmPost{ID: "p1", UserID: "u1", ChannelID: "c1", Message: "@goclawbot hi"}, "O", nil))
+	ch.handlePostedEvent(ctx, postedEvent(t, mmPost{ID: "p1", UserID: "u1", ChannelID: "c1", Message: "@mantomanagentbot hi"}, "O", nil))
 	if _, ok := consumeInbound(t, msgBus, time.Second); !ok {
 		t.Fatal("expected inbound message")
 	}

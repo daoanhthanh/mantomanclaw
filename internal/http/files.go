@@ -366,7 +366,7 @@ func (h *FilesHandler) findInWorkspace(workspace, basename string) string {
 			if path == workspace {
 				return nil
 			}
-			// Allow direct children of workspace root (agent workspace dirs like "quill", "goclaw")
+			// Allow direct children of workspace root (agent workspace dirs like "quill", "mantomanagent")
 			if filepath.Dir(path) == workspace {
 				return nil
 			}

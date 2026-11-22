@@ -23,7 +23,7 @@ import (
 )
 
 // StorageHandler provides HTTP endpoints for browsing and managing
-// files inside the ~/.goclaw/ data directory.
+// files inside the ~/.mantomanagent/ data directory.
 // Skills directories are browsable (read-only) but deletion is blocked.
 // sizeCacheEntry holds a cached storage size calculation for one tenant.
 type sizeCacheEntry struct {
@@ -33,7 +33,7 @@ type sizeCacheEntry struct {
 }
 
 type StorageHandler struct {
-	baseDir string // global data dir (resolved absolute path to ~/.goclaw/)
+	baseDir string // global data dir (resolved absolute path to ~/.mantomanagent/)
 	tenants store.TenantStore
 
 	// sizeCache caches the total storage size per tenant for 60 minutes.
@@ -189,7 +189,7 @@ func (h *StorageHandler) validateStorageParent(r *http.Request, base, parent str
 	}
 }
 
-// handleList lists files and directories under ~/.goclaw/ with depth limiting.
+// handleList lists files and directories under ~/.mantomanagent/ with depth limiting.
 // Query params:
 //   - ?path=  scopes the listing to a subtree
 //   - ?depth= max depth to walk (default 3, max 20)

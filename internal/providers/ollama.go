@@ -268,7 +268,7 @@ func (p *OllamaProvider) buildRequest(ctx context.Context, req ChatRequest, stre
 	}
 
 	// Thinking visibility: default off (models like qwq/deepseek-r1 have
-	// thinking on by default and goclaw suppresses it to avoid bloated
+	// thinking on by default and mantomanagent suppresses it to avoid bloated
 	// chain-of-thought responses), unless the provider config explicitly
 	// enables it via settings.thinking_enabled=true.
 	thinkingEnabled := false

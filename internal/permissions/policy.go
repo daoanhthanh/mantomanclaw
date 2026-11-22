@@ -1,6 +1,6 @@
 // Package permissions provides role-based access control for gateway methods.
 //
-// GoClaw uses a 5-layer permission system:
+// ManToManAgent uses a 5-layer permission system:
 //
 //  1. Gateway Auth (token/password, scopes: admin/read/write/approvals/pairing)
 //  2. Global Tool Policy (tools.allow[], tools.deny[], tools.profile)

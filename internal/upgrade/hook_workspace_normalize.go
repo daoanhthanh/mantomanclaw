@@ -26,7 +26,7 @@ const workspaceNormalizeHookName = "072_normalize_agent_workspaces"
 //
 // Stale rows are rewritten to `{configured_base}/{agent_key}`, where the
 // base is read with the same precedence used by the gateway:
-// `GOCLAW_WORKSPACE` env > config file `Agents.Defaults.Workspace` >
+// `MANTOMANAGENT_WORKSPACE` env > config file `Agents.Defaults.Workspace` >
 // default `~/.mantomanagent/workspace` (with tilde expansion).
 //
 // Idempotent: rows already at the proposed value are skipped.
@@ -109,10 +109,10 @@ func isStaleWorkspace(ws string) bool {
 // Matches the gateway's precedence so the hook normalizes to whatever the
 // next startup will use.
 func resolveWorkspaceBase() string {
-	if v := strings.TrimSpace(os.Getenv("GOCLAW_WORKSPACE")); v != "" {
+	if v := strings.TrimSpace(os.Getenv("MANTOMANAGENT_WORKSPACE")); v != "" {
 		return strings.TrimRight(config.ExpandHome(v), "/")
 	}
-	cfgPath := os.Getenv("GOCLAW_CONFIG")
+	cfgPath := os.Getenv("MANTOMANAGENT_CONFIG")
 	if cfgPath == "" {
 		cfgPath = "config.json"
 	}

@@ -23,7 +23,7 @@ func onboardCmd() *cobra.Command {
 
 func runOnboard() {
 	fmt.Println("╔══════════════════════════════════════════════╗")
-	fmt.Println("║        GoClaw — Quick Setup                 ║")
+	fmt.Println("║        ManToManAgent — Quick Setup                 ║")
 	fmt.Println("╚══════════════════════════════════════════════╝")
 	fmt.Println()
 
@@ -38,7 +38,7 @@ func runOnboard() {
 	}
 
 	// ── Step 1: Postgres connection ──
-	postgresDSN := os.Getenv("GOCLAW_POSTGRES_DSN")
+	postgresDSN := os.Getenv("MANTOMANAGENT_POSTGRES_DSN")
 	if postgresDSN == "" {
 		postgresDSN = cfg.Database.PostgresDSN
 	}
@@ -62,13 +62,13 @@ func runOnboard() {
 	if err := testPostgresConnection(postgresDSN); err != nil {
 		fmt.Println("FAILED")
 		fmt.Printf("  Error: %v\n", err)
-		fmt.Println("  Please check your DSN and try again: ./goclaw onboard")
+		fmt.Println("  Please check your DSN and try again: ./mantomanagent onboard")
 		return
 	}
 	fmt.Println("OK")
 
 	// ── Step 3: Generate keys ──
-	gatewayToken := os.Getenv("GOCLAW_GATEWAY_TOKEN")
+	gatewayToken := os.Getenv("MANTOMANAGENT_GATEWAY_TOKEN")
 	if gatewayToken == "" {
 		gatewayToken = cfg.Gateway.Token
 	}
@@ -78,24 +78,24 @@ func runOnboard() {
 		generatedToken = true
 	}
 
-	encryptionKey := os.Getenv("GOCLAW_ENCRYPTION_KEY")
+	encryptionKey := os.Getenv("MANTOMANAGENT_ENCRYPTION_KEY")
 	generatedEncKey := false
 	if encryptionKey == "" {
 		encryptionKey = onboardGenerateToken(32)
 		generatedEncKey = true
 	}
-	os.Setenv("GOCLAW_ENCRYPTION_KEY", encryptionKey)
+	os.Setenv("MANTOMANAGENT_ENCRYPTION_KEY", encryptionKey)
 
 	// ── Step 4: Migrations ──
 	fmt.Print("  Running migrations... ")
 	m, err := newMigrator(postgresDSN)
 	if err != nil {
 		fmt.Printf("FAILED: %v\n", err)
-		fmt.Println("  You can run it manually later: ./goclaw migrate up")
+		fmt.Println("  You can run it manually later: ./mantomanagent migrate up")
 	} else {
 		if err := m.Up(); err != nil && err.Error() != "no change" {
 			fmt.Printf("FAILED: %v\n", err)
-			fmt.Println("  You can run it manually later: ./goclaw migrate up")
+			fmt.Println("  You can run it manually later: ./mantomanagent migrate up")
 		} else {
 			v, _, _ := m.Version()
 			fmt.Printf("OK (version: %d)\n", v)
@@ -157,16 +157,16 @@ func runOnboard() {
 	fmt.Println("── Files ──")
 	fmt.Println()
 	fmt.Printf("  Config:    %s  (gateway host/port, no secrets)\n", cfgPath)
-	fmt.Printf("  Secrets:   %s  (GOCLAW_POSTGRES_DSN, GOCLAW_GATEWAY_TOKEN, GOCLAW_ENCRYPTION_KEY)\n", envPath)
+	fmt.Printf("  Secrets:   %s  (MANTOMANAGENT_POSTGRES_DSN, MANTOMANAGENT_GATEWAY_TOKEN, MANTOMANAGENT_ENCRYPTION_KEY)\n", envPath)
 	fmt.Println()
 
 	fmt.Println("── Next Steps ──")
 	fmt.Println()
 	fmt.Println("  1. Start the gateway:")
-	fmt.Printf("     source %s && ./goclaw\n", envPath)
+	fmt.Printf("     source %s && ./mantomanagent\n", envPath)
 	fmt.Println()
 	fmt.Println("  2. Run the configuration wizard:")
-	fmt.Println("     goclaw setup")
+	fmt.Println("     mantomanagent setup")
 	fmt.Println()
 	fmt.Println("  3. Or open the dashboard:")
 	fmt.Printf("     http://localhost:%s\n", port)

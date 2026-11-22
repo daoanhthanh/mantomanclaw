@@ -142,8 +142,8 @@ func TestUserAgent_RESTAndWebsocket(t *testing.T) {
 
 	for _, path := range []string{"/api/v4/posts/r1", "/api/v4/websocket"} {
 		calls := fs.callsTo("GET", path)
-		if len(calls) != 1 || calls[0].UserAgent != "goclaw/v1.2.3" {
-			t.Errorf("%s: calls = %+v, want one with User-Agent goclaw/v1.2.3", path, calls)
+		if len(calls) != 1 || calls[0].UserAgent != "mantomanagent/v1.2.3" {
+			t.Errorf("%s: calls = %+v, want one with User-Agent mantomanagent/v1.2.3", path, calls)
 		}
 	}
 }

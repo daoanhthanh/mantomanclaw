@@ -152,7 +152,7 @@ func runtimeBrandingScript(branding config.BrandingConfig) string {
 	if err != nil {
 		return ""
 	}
-	return `<script id="goclaw-branding" type="application/json">` + string(data) + `</script>`
+	return `<script id="mantomanagent-branding" type="application/json">` + string(data) + `</script>`
 }
 
 func firstNonEmpty(values ...string) string {

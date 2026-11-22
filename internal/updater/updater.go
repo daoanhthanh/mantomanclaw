@@ -155,7 +155,7 @@ func DownloadAndApply(info *UpdateInfo, appPath string) error {
 		return fmt.Errorf("download: %s", resp.Status)
 	}
 
-	tmpDir, err := os.MkdirTemp("", "goclaw-update-*")
+	tmpDir, err := os.MkdirTemp("", "mantomanagent-update-*")
 	if err != nil {
 		return fmt.Errorf("create temp dir: %w", err)
 	}
@@ -225,7 +225,7 @@ func applyMacOS(r io.Reader, tmpDir, appPath string) error {
 	}
 
 	// Find extracted .app
-	newApp := filepath.Join(tmpDir, "goclaw-lite.app")
+	newApp := filepath.Join(tmpDir, "mantomanagent-lite.app")
 	if _, err := os.Stat(newApp); err != nil {
 		return fmt.Errorf("extracted app not found: %w", err)
 	}
@@ -284,7 +284,7 @@ func applyWindows(r io.Reader, tmpDir, exePath string) error {
 	}
 
 	// Extract to temp
-	newExe := filepath.Join(tmpDir, "goclaw-lite.exe")
+	newExe := filepath.Join(tmpDir, "mantomanagent-lite.exe")
 	src, err := exeFile.Open()
 	if err != nil {
 		return err
@@ -358,8 +358,8 @@ func ResolveAppPath() (string, error) {
 
 	switch runtime.GOOS {
 	case "darwin":
-		// exe: /path/to/GoClaw Lite.app/Contents/MacOS/goclaw-lite
-		// app: /path/to/GoClaw Lite.app
+		// exe: /path/to/ManToManAgent Lite.app/Contents/MacOS/mantomanagent-lite
+		// app: /path/to/ManToManAgent Lite.app
 		dir := filepath.Dir(filepath.Dir(filepath.Dir(exe)))
 		if strings.HasSuffix(dir, ".app") {
 			return dir, nil

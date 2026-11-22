@@ -216,8 +216,8 @@ func TestApk_UpdateNotFound_E2E(t *testing.T) {
 	defer cancel()
 
 	executor := skills.NewApkUpdateExecutor()
-	// "this-does-not-exist-xyz-goclaw-test" is deliberately non-existent.
-	err := executor.Update(ctx, "this-package-does-not-exist-xyz-goclaw", "0.0.0", nil)
+	// "this-does-not-exist-xyz-mantomanagent-test" is deliberately non-existent.
+	err := executor.Update(ctx, "this-package-does-not-exist-xyz-mantomanagent", "0.0.0", nil)
 	if err == nil {
 		t.Fatal("expected error for non-existent package, got nil")
 	}

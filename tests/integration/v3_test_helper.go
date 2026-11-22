@@ -21,7 +21,7 @@ import (
 	"github.com/nextlevelbuilder/goclaw/internal/store/pg"
 )
 
-const defaultTestDSN = "postgres://postgres:test@localhost:5433/goclaw_test?sslmode=disable"
+const defaultTestDSN = "postgres://postgres:test@localhost:5433/mantomanagent_test?sslmode=disable"
 
 var (
 	sharedDB     *sql.DB

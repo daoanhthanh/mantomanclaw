@@ -45,7 +45,7 @@ func runClientMode(cfg *config.Config, addr, agentName, message, sessionKey stri
 	}
 
 	// Interactive REPL
-	fmt.Fprintf(os.Stderr, "\nGoClaw Interactive Chat (agent: %s, model: %s)\n", agentName, agentCfg.Model)
+	fmt.Fprintf(os.Stderr, "\nManToManAgent Interactive Chat (agent: %s, model: %s)\n", agentName, agentCfg.Model)
 	fmt.Fprintf(os.Stderr, "Session: %s\n", sessionKey)
 	fmt.Fprintf(os.Stderr, "Type \"exit\" to quit, \"/new\" for new session\n\n")
 
@@ -85,7 +85,7 @@ func runClientMode(cfg *config.Config, addr, agentName, message, sessionKey stri
 // wsConnect sends the connect RPC and waits for auth response.
 func wsConnect(conn *websocket.Conn, token string) error {
 	params := map[string]string{}
-	userId := os.Getenv("GOCLAW_USER_ID")
+	userId := os.Getenv("MANTOMANAGENT_USER_ID")
 	if userId == "" { userId = "system" }
 	params["user_id"] = userId
 	if token != "" {

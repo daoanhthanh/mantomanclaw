@@ -60,8 +60,8 @@ func TestResolverFallsBackToEnglishOverrideThenDefaultTemplate(t *testing.T) {
 		t.Fatalf("Render English fallback = %q, want %q", got, want)
 	}
 
-	got = r.Render(i18n.LocaleVI, KeyPairingApproved, Vars{"app_name": "GoClaw"})
-	want = "✅ GoClaw access approved. Send a message to start chatting."
+	got = r.Render(i18n.LocaleVI, KeyPairingApproved, Vars{"app_name": "ManToManAgent"})
+	want = "✅ ManToManAgent access approved. Send a message to start chatting."
 	if got != want {
 		t.Fatalf("Render default template = %q, want %q", got, want)
 	}

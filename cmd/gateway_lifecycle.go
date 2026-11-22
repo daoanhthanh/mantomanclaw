@@ -243,7 +243,7 @@ func (d *gatewayDeps) runLifecycle(
 			},
 		)
 		// K6: decrypt raw secret for outbound HMAC signing using the same key as inbound verify.
-		ww.SetEncKey(os.Getenv("GOCLAW_ENCRYPTION_KEY"))
+		ww.SetEncKey(os.Getenv("MANTOMANAGENT_ENCRYPTION_KEY"))
 		var workerCtx context.Context
 		workerCtx, webhookWorkerCancel = context.WithCancel(ctx)
 		go ww.Run(workerCtx)
@@ -348,7 +348,7 @@ func (d *gatewayDeps) runLifecycle(
 		cancel()
 	}()
 
-	slog.Info("goclaw gateway starting",
+	slog.Info("mantomanagent gateway starting",
 		"version", Version,
 		"protocol", protocol.ProtocolVersion,
 		"agents", d.agentRouter.List(),
@@ -390,17 +390,17 @@ func (d *gatewayDeps) runLifecycle(
 
 	// Phase 1: suggest localhost binding when Tailscale is active
 	if d.cfg.Tailscale.Hostname != "" && d.cfg.Gateway.Host == "0.0.0.0" {
-		slog.Info("Tailscale enabled. Consider setting GOCLAW_HOST=127.0.0.1 for localhost-only + Tailscale access")
+		slog.Info("Tailscale enabled. Consider setting MANTOMANAGENT_HOST=127.0.0.1 for localhost-only + Tailscale access")
 	}
 
 	// Security warnings
-	if strings.Contains(d.cfg.Database.PostgresDSN, ":goclaw@") {
+	if strings.Contains(d.cfg.Database.PostgresDSN, ":mantomanagent@") {
 		slog.Warn("security.default_db_password: using default Postgres password — run ./prepare-env.sh to generate a strong one")
 	}
 	if len(d.cfg.Gateway.AllowedOrigins) > 0 {
 		slog.Info("cors: allowed_origins configured", "origins", d.cfg.Gateway.AllowedOrigins)
 	} else if !edition.Current().IsLimited() {
-		slog.Warn("security.cors_open: no allowed_origins configured — all WebSocket origins accepted. Set gateway.allowed_origins or GOCLAW_ALLOWED_ORIGINS for production")
+		slog.Warn("security.cors_open: no allowed_origins configured — all WebSocket origins accepted. Set gateway.allowed_origins or MANTOMANAGENT_ALLOWED_ORIGINS for production")
 	}
 	if allowed, rejected := security.OperatorAllowlistStatus(); len(allowed) > 0 || len(rejected) > 0 {
 		if len(allowed) > 0 {

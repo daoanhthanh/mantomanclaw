@@ -136,7 +136,7 @@ func TestLoad_EnvVarOverrides(t *testing.T) {
 	os.WriteFile(cfgPath, []byte(`{"gateway":{"port":8080}}`), 0644)
 
 	// Env override should win
-	t.Setenv("GOCLAW_PORT", "7777")
+	t.Setenv("MANTOMANAGENT_PORT", "7777")
 
 	cfg, err := Load(cfgPath)
 	if err != nil {
@@ -164,8 +164,8 @@ func TestLoad_WebhookTimeoutsFromFileAndEnv(t *testing.T) {
 	}
 
 	// Env overrides the file values.
-	t.Setenv("GOCLAW_WEBHOOK_ASYNC_TIMEOUT_SEC", "300")
-	t.Setenv("GOCLAW_WEBHOOK_SYNC_TIMEOUT_SEC", "240")
+	t.Setenv("MANTOMANAGENT_WEBHOOK_ASYNC_TIMEOUT_SEC", "300")
+	t.Setenv("MANTOMANAGENT_WEBHOOK_SYNC_TIMEOUT_SEC", "240")
 	cfg, err = Load(cfgPath)
 	if err != nil {
 		t.Fatalf("load with env error: %v", err)
@@ -203,7 +203,7 @@ func TestLoad_WebhookStreamFromFileAndEnv(t *testing.T) {
 	}
 
 	// Env overrides the file value.
-	t.Setenv("GOCLAW_WEBHOOK_STREAM", "true")
+	t.Setenv("MANTOMANAGENT_WEBHOOK_STREAM", "true")
 	cfg, err = Load(cfgPath)
 	if err != nil {
 		t.Fatalf("load with env error: %v", err)
@@ -226,7 +226,7 @@ func TestLoad_SkillsMaxUploadSizeFromFileAndEnv(t *testing.T) {
 		t.Fatalf("file skill upload max: got %d, want 64", cfg.Skills.EffectiveMaxUploadSizeMB())
 	}
 
-	t.Setenv("GOCLAW_SKILLS_MAX_UPLOAD_SIZE_MB", "128")
+	t.Setenv("MANTOMANAGENT_SKILLS_MAX_UPLOAD_SIZE_MB", "128")
 	cfg, err = Load(cfgPath)
 	if err != nil {
 		t.Fatalf("load with env error: %v", err)
@@ -267,10 +267,10 @@ func TestLoad_SkillSlashCommandsFromFileEnvAndSystemConfig(t *testing.T) {
 		t.Fatalf("file prefix = %q, want !", cfg.Skills.SlashCommands.EffectivePrefix())
 	}
 
-	t.Setenv("GOCLAW_SKILLS_SLASH_COMMANDS_ENABLED", "true")
-	t.Setenv("GOCLAW_SKILLS_SLASH_COMMANDS_SUGGEST_NOT_FOUND", "true")
-	t.Setenv("GOCLAW_SKILLS_SLASH_COMMANDS_PARTIAL_MATCHING", "false")
-	t.Setenv("GOCLAW_SKILLS_SLASH_COMMANDS_PREFIX", "#")
+	t.Setenv("MANTOMANAGENT_SKILLS_SLASH_COMMANDS_ENABLED", "true")
+	t.Setenv("MANTOMANAGENT_SKILLS_SLASH_COMMANDS_SUGGEST_NOT_FOUND", "true")
+	t.Setenv("MANTOMANAGENT_SKILLS_SLASH_COMMANDS_PARTIAL_MATCHING", "false")
+	t.Setenv("MANTOMANAGENT_SKILLS_SLASH_COMMANDS_PREFIX", "#")
 	cfg, err = Load(cfgPath)
 	if err != nil {
 		t.Fatalf("load with env error: %v", err)
@@ -332,7 +332,7 @@ func TestSkillsMaxUploadSizeClampAndSystemConfigOverlay(t *testing.T) {
 }
 
 func TestLoad_EnvVarOverrides_InvalidPort(t *testing.T) {
-	t.Setenv("GOCLAW_PORT", "not-a-number")
+	t.Setenv("MANTOMANAGENT_PORT", "not-a-number")
 
 	cfg, err := Load("/nonexistent/path")
 	if err != nil {
@@ -380,7 +380,7 @@ func TestValidateGatewayAuthAllowsExplicitInsecureOptIn(t *testing.T) {
 // --- Env var for API keys ---
 
 func TestLoad_EnvVarAPIKeys(t *testing.T) {
-	t.Setenv("GOCLAW_ANTHROPIC_API_KEY", "sk-test-key")
+	t.Setenv("MANTOMANAGENT_ANTHROPIC_API_KEY", "sk-test-key")
 
 	cfg, err := Load("/nonexistent/path")
 	if err != nil {
@@ -405,13 +405,13 @@ func TestLoad_APIRouteProviderFromFileAndEnv(t *testing.T) {
 		t.Fatalf("write config: %v", err)
 	}
 
-	t.Setenv("GOCLAW_API_ROUTE_API_KEY", "env-key")
+	t.Setenv("MANTOMANAGENT_API_ROUTE_API_KEY", "env-key")
 	cfg, err := Load(cfgPath)
 	if err != nil {
 		t.Fatalf("load error: %v", err)
 	}
 	if cfg.Providers.APIRoute.APIKey != "env-key" {
-		t.Fatalf("API key = %q, want GOCLAW_API_ROUTE_API_KEY override", cfg.Providers.APIRoute.APIKey)
+		t.Fatalf("API key = %q, want MANTOMANAGENT_API_ROUTE_API_KEY override", cfg.Providers.APIRoute.APIKey)
 	}
 	if cfg.Providers.APIRoute.APIBase != "https://example.com/v1" {
 		t.Fatalf("API base = %q, want file value", cfg.Providers.APIRoute.APIBase)
@@ -431,17 +431,17 @@ func TestLoad_RequestyProviderFromFileAndEnv(t *testing.T) {
 		t.Fatalf("write config: %v", err)
 	}
 
-	t.Setenv("GOCLAW_REQUESTY_API_KEY", "env-key")
-	t.Setenv("GOCLAW_REQUESTY_BASE_URL", "https://router.eu.requesty.ai/v1")
+	t.Setenv("MANTOMANAGENT_REQUESTY_API_KEY", "env-key")
+	t.Setenv("MANTOMANAGENT_REQUESTY_BASE_URL", "https://router.eu.requesty.ai/v1")
 	cfg, err := Load(cfgPath)
 	if err != nil {
 		t.Fatalf("load error: %v", err)
 	}
 	if cfg.Providers.Requesty.APIKey != "env-key" {
-		t.Fatalf("API key = %q, want GOCLAW_REQUESTY_API_KEY override", cfg.Providers.Requesty.APIKey)
+		t.Fatalf("API key = %q, want MANTOMANAGENT_REQUESTY_API_KEY override", cfg.Providers.Requesty.APIKey)
 	}
 	if cfg.Providers.Requesty.APIBase != "https://router.eu.requesty.ai/v1" {
-		t.Fatalf("API base = %q, want GOCLAW_REQUESTY_BASE_URL override", cfg.Providers.Requesty.APIBase)
+		t.Fatalf("API base = %q, want MANTOMANAGENT_REQUESTY_BASE_URL override", cfg.Providers.Requesty.APIBase)
 	}
 }
 
@@ -480,7 +480,7 @@ func TestLoad_AllowedOrigins_JSON5(t *testing.T) {
 // --- Allowed origins from env var ---
 
 func TestLoad_AllowedOrigins_EnvVar(t *testing.T) {
-	t.Setenv("GOCLAW_ALLOWED_ORIGINS", " https://a.com , https://b.com ")
+	t.Setenv("MANTOMANAGENT_ALLOWED_ORIGINS", " https://a.com , https://b.com ")
 
 	cfg, err := Load("/nonexistent/path")
 	if err != nil {
@@ -500,7 +500,7 @@ func TestLoad_AllowedOrigins_EnvVar_OverridesFile(t *testing.T) {
 	os.WriteFile(cfgPath, []byte(`{"gateway":{"allowed_origins":["https://file.com"]}}`), 0644)
 
 	// Env var should override file value
-	t.Setenv("GOCLAW_ALLOWED_ORIGINS", "https://env.com")
+	t.Setenv("MANTOMANAGENT_ALLOWED_ORIGINS", "https://env.com")
 
 	cfg, err := Load(cfgPath)
 	if err != nil {
@@ -550,7 +550,7 @@ func TestFlexibleStringSlice_EmptyArray(t *testing.T) {
 // --- Owner IDs parsing ---
 
 func TestLoad_OwnerIDsParsing(t *testing.T) {
-	t.Setenv("GOCLAW_OWNER_IDS", " alice , bob , charlie ")
+	t.Setenv("MANTOMANAGENT_OWNER_IDS", " alice , bob , charlie ")
 
 	cfg, err := Load("/nonexistent/path")
 	if err != nil {
@@ -565,7 +565,7 @@ func TestLoad_OwnerIDsParsing(t *testing.T) {
 }
 
 func TestLoad_OwnerIDsEmpty(t *testing.T) {
-	t.Setenv("GOCLAW_OWNER_IDS", "")
+	t.Setenv("MANTOMANAGENT_OWNER_IDS", "")
 
 	cfg, err := Load("/nonexistent/path")
 	if err != nil {
@@ -582,7 +582,7 @@ func TestLoad_OwnerIDsEmpty(t *testing.T) {
 // --- Cron job timeout env override ---
 
 func TestLoad_CronJobTimeout_EnvVar(t *testing.T) {
-	t.Setenv("GOCLAW_CRON_JOB_TIMEOUT", "1h")
+	t.Setenv("MANTOMANAGENT_CRON_JOB_TIMEOUT", "1h")
 
 	cfg, err := Load("/nonexistent/path")
 	if err != nil {
@@ -594,7 +594,7 @@ func TestLoad_CronJobTimeout_EnvVar(t *testing.T) {
 }
 
 func TestLoad_CronJobTimeout_Invalid_FallsBackToDefault(t *testing.T) {
-	t.Setenv("GOCLAW_CRON_JOB_TIMEOUT", "not-a-duration")
+	t.Setenv("MANTOMANAGENT_CRON_JOB_TIMEOUT", "not-a-duration")
 
 	cfg, err := Load("/nonexistent/path")
 	if err != nil {
@@ -620,7 +620,7 @@ func TestLoad_CronJobTimeout_EnvOverridesFile(t *testing.T) {
 	cfgPath := filepath.Join(dir, "config.json5")
 	os.WriteFile(cfgPath, []byte(`{"cron":{"job_timeout":"5m"}}`), 0644)
 
-	t.Setenv("GOCLAW_CRON_JOB_TIMEOUT", "30m")
+	t.Setenv("MANTOMANAGENT_CRON_JOB_TIMEOUT", "30m")
 
 	cfg, err := Load(cfgPath)
 	if err != nil {

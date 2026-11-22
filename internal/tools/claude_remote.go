@@ -86,7 +86,7 @@ func (t *ClaudeRemoteTool) Execute(ctx context.Context, args map[string]any) *Re
 	scopeInput := sessionKey + "-" + agentID
 	rawHash := sha256.Sum256([]byte(scopeInput))
 	scopeHash := fmt.Sprintf("%x", rawHash[:6]) // 6 bytes = 12 hex chars
-	claudeConfigDir := "/tmp/goclaw-claude-" + scopeHash
+	claudeConfigDir := "/tmp/mantomanagent-claude-" + scopeHash
 
 	// Pass through to WorkstationExecTool with injected env and forwarded workstation_id.
 	passthrough := map[string]any{

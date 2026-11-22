@@ -142,7 +142,7 @@ func (c *Channel) fetchOneFile(ctx context.Context, hc *http.Client, client *Cli
 
 	mime := resolveMime(f, resp.Header.Get("Content-Type"))
 
-	tmp, err := os.CreateTemp("", "goclaw_bitrix_*"+filepath.Ext(f.Name))
+	tmp, err := os.CreateTemp("", "mantomanagent_bitrix_*"+filepath.Ext(f.Name))
 	if err != nil {
 		return bus.MediaFile{}, fmt.Errorf("create temp: %w", err)
 	}

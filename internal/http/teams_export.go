@@ -101,7 +101,7 @@ func (h *AgentsHandler) handleTeamExport(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		tmpFile, err := os.CreateTemp("", "goclaw-team-export-*.tar.gz")
+		tmpFile, err := os.CreateTemp("", "mantomanagent-team-export-*.tar.gz")
 		if err != nil {
 			sendSSE(w, flusher, "error", ProgressEvent{Phase: "init", Status: "error", Detail: "failed to create temp file"})
 			return
@@ -142,7 +142,7 @@ func (h *AgentsHandler) writeTeamExportArchive(ctx context.Context, w io.Writer,
 
 	manifest := &TeamExportManifest{
 		Version:    1,
-		Format:     "goclaw-team-export",
+		Format:     "mantomanagent-team-export",
 		ExportedAt: time.Now().UTC().Format(time.RFC3339),
 		ExportedBy: store.UserIDFromContext(ctx),
 		TeamName:   teamMeta.Name,

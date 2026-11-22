@@ -178,8 +178,8 @@ func (t *ExecTool) DenyPaths(paths ...string) {
 }
 
 // AllowPathExemptions adds path prefixes that exempt a command from deny pattern matches.
-// Each shell argument is checked individually — commands like "cat .goclaw/skills-store/tool.py"
-// are exempt because the argument ".goclaw/skills-store/tool.py" starts with the prefix.
+// Each shell argument is checked individually — commands like "cat .mantomanagent/skills-store/tool.py"
+// are exempt because the argument ".mantomanagent/skills-store/tool.py" starts with the prefix.
 func (t *ExecTool) AllowPathExemptions(prefixes ...string) {
 	t.denyExemptions = append(t.denyExemptions, prefixes...)
 }

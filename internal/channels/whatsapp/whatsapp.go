@@ -28,7 +28,7 @@ const (
 
 func init() {
 	// Set device name shown in WhatsApp's "Linked Devices" screen (once at package init).
-	wastore.DeviceProps.Os = new("GoClaw")
+	wastore.DeviceProps.Os = new("ManToManAgent")
 }
 
 // Channel connects directly to WhatsApp via go.mau.fi/whatsmeow.

@@ -1,6 +1,6 @@
-# GoClaw Selected Cookie Sync Extension
+# ManToManAgent Selected Cookie Sync Extension
 
-Chrome MV3 extension for explicit selected-cookie sync into GoClaw browser sessions.
+Chrome MV3 extension for explicit selected-cookie sync into ManToManAgent browser sessions.
 
 Security model:
 - No automatic background sync.

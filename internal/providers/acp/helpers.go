@@ -10,24 +10,24 @@ import (
 // contextKey is the unexported type for context values set by this package.
 type contextKey string
 
-const goclawSessionCtxKey contextKey = "goclaw_session"
+const mantomanagentSessionCtxKey contextKey = "mantomanagent_session"
 
-// WithGoclawSession attaches the goclaw conversation session key to ctx so
-// that ACP-level logs can correlate the ACP session ID with the goclaw session.
+// WithGoclawSession attaches the mantomanagent conversation session key to ctx so
+// that ACP-level logs can correlate the ACP session ID with the mantomanagent session.
 func WithGoclawSession(ctx context.Context, key string) context.Context {
-	return context.WithValue(ctx, goclawSessionCtxKey, key)
+	return context.WithValue(ctx, mantomanagentSessionCtxKey, key)
 }
 
-// goclawSessionFromCtx extracts the goclaw session key injected by WithGoclawSession.
+// mantomanagentSessionFromCtx extracts the mantomanagent session key injected by WithGoclawSession.
 // Returns "" if not set.
-func goclawSessionFromCtx(ctx context.Context) string {
-	v, _ := ctx.Value(goclawSessionCtxKey).(string)
+func mantomanagentSessionFromCtx(ctx context.Context) string {
+	v, _ := ctx.Value(mantomanagentSessionCtxKey).(string)
 	return v
 }
 
 // sensitiveEnvPrefixes lists env var prefixes stripped from ACP subprocesses.
 var sensitiveEnvPrefixes = []string{
-	"GOCLAW", "CLAUDE", "ANTHROPIC", "OPENAI",
+	"MANTOMANAGENT", "CLAUDE", "ANTHROPIC", "OPENAI",
 	"DATABASE", "POSTGRES", "MYSQL", "REDIS", "MONGO",
 	"AWS_", "AZURE_", "GOOGLE_", "GCP_",
 	"GITHUB_", "GH_", "GITLAB_", "BITBUCKET_",

@@ -9,7 +9,7 @@ Goclaw's browser automation tool (`pkg/browser/`) connects to any CDP-compatible
 
 ## Switching backends
 
-Both overlays set `GOCLAW_BROWSER_REMOTE_URL` to their respective sidecar. Only one should be active at a time.
+Both overlays set `MANTOMANAGENT_BROWSER_REMOTE_URL` to their respective sidecar. Only one should be active at a time.
 
 ```bash
 # Chrome (default)
@@ -19,7 +19,7 @@ docker compose -f docker-compose.yml -f docker-compose.postgres.yml -f docker-co
 docker compose -f docker-compose.yml -f docker-compose.postgres.yml -f docker-compose.lightpanda.yml up -d
 ```
 
-Set `GOCLAW_BROWSER_BACKEND=chrome|lightpanda` to pick the backend explicitly. If unset, goclaw probes `/json/version` on the remote and auto-detects from the `Browser` field.
+Set `MANTOMANAGENT_BROWSER_BACKEND=chrome|lightpanda` to pick the backend explicitly. If unset, mantomanagent probes `/json/version` on the remote and auto-detects from the `Browser` field.
 
 ## Compatibility matrix
 

@@ -20,7 +20,7 @@ var _ channels.ReactionChannel = (*Channel)(nil)
 // (done/error) bypass the debounce so the final outcome always lands.
 const reactionDebounceInterval = 700 * time.Millisecond
 
-// statusReaction maps a GoClaw agent status to a Bitrix24 v2 reaction code.
+// statusReaction maps a ManToManAgent agent status to a Bitrix24 v2 reaction code.
 // Codes come from imbot.v2.Chat.Message.Reaction.add's documented set.
 var statusReaction = map[string]string{
 	"queued":    "eyes",                // 👀 waiting to process

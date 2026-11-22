@@ -41,9 +41,9 @@ func (f *FlexibleStringSlice) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Config is the root configuration for the GoClaw Gateway.
+// Config is the root configuration for the ManToManAgent Gateway.
 type Config struct {
-	DataDir   string          `json:"data_dir,omitempty"` // persistent data directory (default: ~/.goclaw/data)
+	DataDir   string          `json:"data_dir,omitempty"` // persistent data directory (default: ~/.mantomanagent/data)
 	Branding  BrandingConfig  `json:"branding,omitempty"`
 	Agents    AgentsConfig    `json:"agents"`
 	Channels  ChannelsConfig  `json:"channels"`
@@ -117,7 +117,7 @@ type PackagesConfig struct {
 }
 
 // UpdatesCheckTTLDuration parses UpdatesCheckTTL returning 1h on empty/invalid.
-// SystemMsgConfig customizes operator-facing system messages that GoClaw
+// SystemMsgConfig customizes operator-facing system messages that ManToManAgent
 // sends directly, outside normal LLM replies. Message templates use
 // {{variable}} placeholders and may be overridden per locale.
 type SystemMsgConfig struct {
@@ -180,9 +180,9 @@ type HooksConfig struct {
 // TailscaleConfig configures the optional Tailscale tsnet listener.
 // Requires building with -tags tsnet. Auth key from env only (never persisted).
 type TailscaleConfig struct {
-	Hostname  string `json:"hostname"`             // Tailscale machine name (e.g. "goclaw-gateway")
-	StateDir  string `json:"state_dir,omitempty"`  // persistent state directory (default: os.UserConfigDir/tsnet-goclaw)
-	AuthKey   string `json:"-"`                    // from env GOCLAW_TSNET_AUTH_KEY only
+	Hostname  string `json:"hostname"`             // Tailscale machine name (e.g. "mantomanagent-gateway")
+	StateDir  string `json:"state_dir,omitempty"`  // persistent state directory (default: os.UserConfigDir/tsnet-mantomanagent)
+	AuthKey   string `json:"-"`                    // from env MANTOMANAGENT_TSNET_AUTH_KEY only
 	Ephemeral bool   `json:"ephemeral,omitempty"`  // remove node on exit (default false)
 	EnableTLS bool   `json:"enable_tls,omitempty"` // use ListenTLS for auto HTTPS certs
 }
@@ -190,10 +190,10 @@ type TailscaleConfig struct {
 // DatabaseConfig configures the database connection and optional Redis cache.
 // DSN fields are NEVER read from config.json (secrets) — only from env vars.
 type DatabaseConfig struct {
-	PostgresDSN    string `json:"-"` // from env GOCLAW_POSTGRES_DSN only
-	RedisDSN       string `json:"-"` // from env GOCLAW_REDIS_DSN only (optional, requires -tags redis)
-	StorageBackend string `json:"-"` // from env GOCLAW_STORAGE_BACKEND only ("postgres" or "sqlite", default "postgres")
-	SQLitePath     string `json:"-"` // from env GOCLAW_SQLITE_PATH only (default: {dataDir}/goclaw.db)
+	PostgresDSN    string `json:"-"` // from env MANTOMANAGENT_POSTGRES_DSN only
+	RedisDSN       string `json:"-"` // from env MANTOMANAGENT_REDIS_DSN only (optional, requires -tags redis)
+	StorageBackend string `json:"-"` // from env MANTOMANAGENT_STORAGE_BACKEND only ("postgres" or "sqlite", default "postgres")
+	SQLitePath     string `json:"-"` // from env MANTOMANAGENT_SQLITE_PATH only (default: {dataDir}/mantomanagent.db)
 }
 
 // SkillsConfig configures the skills storage system.
@@ -411,7 +411,7 @@ type DreamingConfig struct {
 // Matching TS agents.defaults.sandbox.
 type SandboxConfig struct {
 	Mode            string            `json:"mode,omitempty"`             // "off" (default), "non-main", "all"
-	Image           string            `json:"image,omitempty"`            // Docker image (default: "goclaw-sandbox:bookworm-slim")
+	Image           string            `json:"image,omitempty"`            // Docker image (default: "mantomanagent-sandbox:bookworm-slim")
 	WorkspaceAccess string            `json:"workspace_access,omitempty"` // "none", "ro", "rw" (default)
 	Scope           string            `json:"scope,omitempty"`            // "session" (default), "agent", "shared"
 	MemoryMB        int               `json:"memory_mb,omitempty"`        // memory limit in MB (default 512)
@@ -539,7 +539,7 @@ type TelemetryConfig struct {
 	Endpoint     string                   `json:"endpoint,omitempty"`      // OTLP endpoint (e.g. "localhost:4317", "https://otel.example.com:4318")
 	Protocol     string                   `json:"protocol,omitempty"`      // "grpc" (default) or "http"
 	Insecure     bool                     `json:"insecure,omitempty"`      // skip TLS verification (default false, set true for local dev)
-	ServiceName  string                   `json:"service_name,omitempty"`  // OTEL service name (default "goclaw-gateway")
+	ServiceName  string                   `json:"service_name,omitempty"`  // OTEL service name (default "mantomanagent-gateway")
 	Headers      map[string]string        `json:"headers,omitempty"`       // extra headers (e.g. auth tokens for cloud backends)
 	ModelPricing map[string]*ModelPricing `json:"model_pricing,omitempty"` // cost per model, key = "provider/model" or just "model"
 }
@@ -605,7 +605,7 @@ func (cc CronConfig) ToRetryConfig() cron.RetryConfig {
 	return cfg
 }
 
-// SubagentsConfig configures the GoClaw subagent system.
+// SubagentsConfig configures the ManToManAgent subagent system.
 // All fields optional — zero values mean "use default".
 type SubagentsConfig struct {
 	MaxConcurrent       int    `json:"maxConcurrent,omitempty"`       // executing descendants per root agent; default 20

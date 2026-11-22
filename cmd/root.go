@@ -37,16 +37,16 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "goclaw",
-	Short: "GoClaw — AI agent gateway",
-	Long:  "GoClaw: multi-agent AI platform with WebSocket RPC, tool execution, and channel integration. A Go port of OpenClaw with enhanced security and multi-tenant support.",
+	Use:   "mantomanagent",
+	Short: "ManToManAgent — AI agent gateway",
+	Long:  "ManToManAgent: multi-agent AI platform with WebSocket RPC, tool execution, and channel integration. A Go port of OpenClaw with enhanced security and multi-tenant support.",
 	Run: func(cmd *cobra.Command, args []string) {
 		runGateway()
 	},
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: config.json or $GOCLAW_CONFIG)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: config.json or $MANTOMANAGENT_CONFIG)")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable debug logging")
 	rootCmd.PersistentFlags().StringVar(&gatewayServerOverride, "server", "", "gateway server URL override")
 	rootCmd.PersistentFlags().StringVar(&gatewayTokenOverride, "token", "", "gateway bearer token override")
@@ -79,7 +79,7 @@ func versionCmd() *cobra.Command {
 		Use:   "version",
 		Short: "Print version information",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("goclaw %s%s (protocol %d)\n", Version, commitSuffix(), protocol.ProtocolVersion)
+			fmt.Printf("mantomanagent %s%s (protocol %d)\n", Version, commitSuffix(), protocol.ProtocolVersion)
 		},
 	}
 }
@@ -88,7 +88,7 @@ func resolveConfigPath() string {
 	if cfgFile != "" {
 		return cfgFile
 	}
-	if v := os.Getenv("GOCLAW_CONFIG"); v != "" {
+	if v := os.Getenv("MANTOMANAGENT_CONFIG"); v != "" {
 		return v
 	}
 	return "config.json"

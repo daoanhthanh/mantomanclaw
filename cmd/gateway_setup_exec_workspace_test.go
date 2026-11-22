@@ -73,7 +73,7 @@ func TestSetupToolRegistryExecWorkspacePaths(t *testing.T) {
 	if err := os.Symlink(protectedPath, symlinkPath); err != nil {
 		t.Fatalf("Symlink() error = %v", err)
 	}
-	legacyWorkspace := filepath.Join(dataDir, ".goclaw", "goclaw-workspace", "ws", "system")
+	legacyWorkspace := filepath.Join(dataDir, ".mantomanagent", "mantomanagent-workspace", "ws", "system")
 	legacyUploadPath := filepath.Join(legacyWorkspace, "uploads", "Quarterly Report.png")
 	legacyCopyTarget := filepath.Join(t.TempDir(), "partner.png")
 	if err := os.MkdirAll(filepath.Dir(legacyUploadPath), 0755); err != nil {
@@ -101,7 +101,7 @@ func TestSetupToolRegistryExecWorkspacePaths(t *testing.T) {
 			command: "printf '%s' --input=\"" + teamFilePath + "\"",
 		},
 		{
-			name:     "legacy_dotgoclaw_uploads_layout_allowed",
+			name:     "legacy_dotmantomanagent_uploads_layout_allowed",
 			ctx:      tools.WithToolWorkspace(context.Background(), legacyWorkspace),
 			command:  "cp \"" + legacyUploadPath + "\" \"" + legacyCopyTarget + "\"",
 			wantPath: legacyCopyTarget,
@@ -119,9 +119,9 @@ func TestSetupToolRegistryExecWorkspacePaths(t *testing.T) {
 			wantDenied: true,
 		},
 		{
-			name:       "workspace_local_dotgoclaw_denied",
+			name:       "workspace_local_dotmantomanagent_denied",
 			ctx:        tools.WithToolWorkspace(context.Background(), workspace),
-			command:    "printf '%s' " + filepath.Join(workspace, ".goclaw", "secrets.json"),
+			command:    "printf '%s' " + filepath.Join(workspace, ".mantomanagent", "secrets.json"),
 			wantDenied: true,
 		},
 	}

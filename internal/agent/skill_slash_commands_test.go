@@ -120,7 +120,7 @@ func boolPtr(v bool) *bool {
 
 func newSlashTestLoader(t *testing.T) *skills.Loader {
 	t.Helper()
-	t.Setenv("GOCLAW_DISABLE_PERSONAL_SKILLS", "1")
+	t.Setenv("MANTOMANAGENT_DISABLE_PERSONAL_SKILLS", "1")
 	root := t.TempDir()
 	writeSkill(t, root, "frontend-design", "Frontend Design", "Create polished UI layouts.", "Use responsive components.")
 	writeSkill(t, root, "git-helper", "Git Helper", "Handle git workflows.", "Use clean commits.")
@@ -132,7 +132,7 @@ func newSlashTestLoader(t *testing.T) *skills.Loader {
 // deliberately left empty: skillsReachableBySlash only gates Source == "managed".
 func newManagedSlashTestLoader(t *testing.T) *skills.Loader {
 	t.Helper()
-	t.Setenv("GOCLAW_DISABLE_PERSONAL_SKILLS", "1")
+	t.Setenv("MANTOMANAGENT_DISABLE_PERSONAL_SKILLS", "1")
 	dataDir := t.TempDir()
 	storeDir := config.TenantSkillsStoreDir(dataDir, store.MasterTenantID, "")
 	// Managed layout is <store>/<slug>/<version>/SKILL.md.

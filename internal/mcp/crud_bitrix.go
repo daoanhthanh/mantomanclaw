@@ -20,18 +20,18 @@ type bitrixPortalView struct {
 	Installed bool   `json:"installed"`
 }
 
-// registerBitrixCRUDTools registers the goclaw_bitrix_portals_* MCP tools
+// registerBitrixCRUDTools registers the mantomanagent_bitrix_portals_* MCP tools
 // backed by store.BitrixPortalStore. Requires a tenant-scoped context
 // (store.WithTenantID) or master scope, per store.BitrixPortalStore's own
 // contract — this server does not additionally gate access.
 func registerBitrixCRUDTools(srv *mcpserver.MCPServer, portals store.BitrixPortalStore) {
-	srv.AddTool(mcpgo.NewTool("goclaw_bitrix_portals_list",
+	srv.AddTool(mcpgo.NewTool("mantomanagent_bitrix_portals_list",
 		mcpgo.WithDescription("List Bitrix24 portals for the caller's tenant (credentials masked)."),
 		mcpgo.WithString("tenant_id", mcpgo.Required(), mcpgo.Description("Tenant UUID.")),
 		mcpgo.WithReadOnlyHintAnnotation(true),
 	), handleBitrixPortalsList(portals))
 
-	srv.AddTool(mcpgo.NewTool("goclaw_bitrix_portals_create",
+	srv.AddTool(mcpgo.NewTool("mantomanagent_bitrix_portals_create",
 		mcpgo.WithDescription("Provision a new Bitrix24 portal."),
 		mcpgo.WithString("tenant_id", mcpgo.Required(), mcpgo.Description("Tenant UUID.")),
 		mcpgo.WithString("name", mcpgo.Required(), mcpgo.Description("Portal name (unique per tenant).")),
@@ -40,7 +40,7 @@ func registerBitrixCRUDTools(srv *mcpserver.MCPServer, portals store.BitrixPorta
 		mcpgo.WithString("client_secret", mcpgo.Required(), mcpgo.Description("Bitrix24 OAuth app client secret.")),
 	), handleBitrixPortalsCreate(portals))
 
-	srv.AddTool(mcpgo.NewTool("goclaw_bitrix_portals_delete",
+	srv.AddTool(mcpgo.NewTool("mantomanagent_bitrix_portals_delete",
 		mcpgo.WithDescription("Delete a Bitrix24 portal."),
 		mcpgo.WithString("tenant_id", mcpgo.Required(), mcpgo.Description("Tenant UUID.")),
 		mcpgo.WithString("name", mcpgo.Required(), mcpgo.Description("Portal name.")),

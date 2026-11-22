@@ -11,17 +11,17 @@
 # Dashboard via nginx: http://localhost:3000
 
 services:
-  goclaw-ui:
+  mantomanagent-ui:
     image: ghcr.io/nextlevelbuilder/goclaw-web:latest
     build:
-      context: ${GOCLAW_DIR:-.}/ui/web
+      context: ${MANTOMANAGENT_DIR:-.}/ui/web
       dockerfile: Dockerfile
     ports:
-      - "${GOCLAW_UI_PORT:-3000}:80"
+      - "${MANTOMANAGENT_UI_PORT:-3000}:80"
     networks:
       - default
-      - goclaw-net
+      - mantomanagent-net
     depends_on:
-      - goclaw
+      - mantomanagent
     restart: unless-stopped
     stop_signal: SIGTERM

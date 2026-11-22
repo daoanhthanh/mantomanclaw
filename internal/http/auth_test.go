@@ -184,8 +184,8 @@ func TestResolveAuth_GatewayTokenScopesNonOwnerToMemberTenant(t *testing.T) {
 
 	r := httptest.NewRequest("GET", "/v1/agents", nil)
 	r.Header.Set("Authorization", "Bearer my-gateway-token")
-	r.Header.Set("X-GoClaw-User-Id", "user-1")
-	r.Header.Set("X-GoClaw-Tenant-Id", "acme")
+	r.Header.Set("X-ManToManAgent-User-Id", "user-1")
+	r.Header.Set("X-ManToManAgent-Tenant-Id", "acme")
 
 	auth := resolveAuth(r)
 	if !auth.Authenticated {
@@ -208,8 +208,8 @@ func TestResolveAuth_GatewayTokenRejectsUnauthorizedTenantScope(t *testing.T) {
 
 	r := httptest.NewRequest("GET", "/v1/agents", nil)
 	r.Header.Set("Authorization", "Bearer my-gateway-token")
-	r.Header.Set("X-GoClaw-User-Id", "user-1")
-	r.Header.Set("X-GoClaw-Tenant-Id", "acme")
+	r.Header.Set("X-ManToManAgent-User-Id", "user-1")
+	r.Header.Set("X-ManToManAgent-Tenant-Id", "acme")
 
 	auth := resolveAuth(r)
 	if auth.Authenticated {
@@ -361,7 +361,7 @@ func TestResolveAuth_SystemAPIKeyHonorsTenantScopeHeader(t *testing.T) {
 
 	r := httptest.NewRequest("GET", "/v1/providers", nil)
 	r.Header.Set("Authorization", "Bearer "+token)
-	r.Header.Set("X-GoClaw-Tenant-Id", "acme")
+	r.Header.Set("X-ManToManAgent-Tenant-Id", "acme")
 
 	auth := resolveAuth(r)
 	if !auth.Authenticated {
@@ -387,9 +387,9 @@ func TestResolveAuth_BrowserPairingScopesToMemberTenant(t *testing.T) {
 	setupTestTenantStore(t, ts)
 
 	r := httptest.NewRequest("GET", "/v1/agents", nil)
-	r.Header.Set("X-GoClaw-Sender-Id", "browser-1")
-	r.Header.Set("X-GoClaw-User-Id", "user-1")
-	r.Header.Set("X-GoClaw-Tenant-Id", "acme")
+	r.Header.Set("X-ManToManAgent-Sender-Id", "browser-1")
+	r.Header.Set("X-ManToManAgent-User-Id", "user-1")
+	r.Header.Set("X-ManToManAgent-Tenant-Id", "acme")
 
 	auth := resolveAuth(r)
 	if !auth.Authenticated {
@@ -415,8 +415,8 @@ func TestResolveAuth_BrowserPairingFallsBackToOperatorWithoutMembership(t *testi
 	setupTestTenantStore(t, ts)
 
 	r := httptest.NewRequest("GET", "/v1/agents", nil)
-	r.Header.Set("X-GoClaw-Sender-Id", "browser-1")
-	r.Header.Set("X-GoClaw-User-Id", "user-1")
+	r.Header.Set("X-ManToManAgent-Sender-Id", "browser-1")
+	r.Header.Set("X-ManToManAgent-User-Id", "user-1")
 
 	auth := resolveAuth(r)
 	if !auth.Authenticated {
@@ -440,9 +440,9 @@ func TestResolveAuth_BrowserPairingRejectsUnauthorizedTenantScope(t *testing.T) 
 	setupTestTenantStore(t, ts)
 
 	r := httptest.NewRequest("GET", "/v1/agents", nil)
-	r.Header.Set("X-GoClaw-Sender-Id", "browser-1")
-	r.Header.Set("X-GoClaw-User-Id", "user-1")
-	r.Header.Set("X-GoClaw-Tenant-Id", "acme")
+	r.Header.Set("X-ManToManAgent-Sender-Id", "browser-1")
+	r.Header.Set("X-ManToManAgent-User-Id", "user-1")
+	r.Header.Set("X-ManToManAgent-Tenant-Id", "acme")
 
 	auth := resolveAuth(r)
 	if auth.Authenticated {
@@ -521,7 +521,7 @@ func TestRequireAuth_InjectLocaleAndUserID(t *testing.T) {
 	r := httptest.NewRequest("GET", "/v1/agents", nil)
 	r.Header.Set("Authorization", "Bearer secret")
 	r.Header.Set("Accept-Language", "vi")
-	r.Header.Set("X-GoClaw-User-Id", "user123")
+	r.Header.Set("X-ManToManAgent-User-Id", "user123")
 	w := httptest.NewRecorder()
 	handler(w, r)
 

@@ -1,4 +1,4 @@
-// Package pancake implements the Pancake (pages.fm) channel for GoClaw.
+// Package pancake implements the Pancake (pages.fm) channel for ManToManAgent.
 // Pancake acts as a unified proxy for Facebook, Zalo OA, Instagram, TikTok, WhatsApp, Line.
 // A single Pancake API key gives access to all connected platforms — no per-platform OAuth needed.
 package pancake

@@ -87,7 +87,7 @@ func resolvePromptMode(runtimeOverride PromptMode, sessionKey string, configMode
 
 // CacheBoundaryMarker separates stable (agent config) from dynamic (per-turn) prompt content.
 // Anthropic provider splits at this marker into 2 system blocks: stable gets cache_control, dynamic doesn't.
-const CacheBoundaryMarker = "<!-- GOCLAW_CACHE_BOUNDARY -->"
+const CacheBoundaryMarker = "<!-- MANTOMANAGENT_CACHE_BOUNDARY -->"
 
 // SystemPromptConfig holds all inputs for system prompt construction.
 // Matches the params of TS buildAgentSystemPrompt().

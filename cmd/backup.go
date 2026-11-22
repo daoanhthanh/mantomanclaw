@@ -98,7 +98,7 @@ func backupCmd() *cobra.Command {
 // uploadBackupToS3 loads S3 config from the database and uploads the archive.
 func uploadBackupToS3(ctx context.Context, cfg *config.Config, archivePath, version string) error {
 	if cfg.Database.PostgresDSN == "" {
-		return fmt.Errorf("postgres DSN not configured; set GOCLAW_POSTGRES_DSN")
+		return fmt.Errorf("postgres DSN not configured; set MANTOMANAGENT_POSTGRES_DSN")
 	}
 	db, err := sql.Open("pgx", cfg.Database.PostgresDSN)
 	if err != nil {
@@ -106,14 +106,14 @@ func uploadBackupToS3(ctx context.Context, cfg *config.Config, archivePath, vers
 	}
 	defer db.Close()
 
-	encKey := os.Getenv("GOCLAW_ENCRYPTION_KEY")
+	encKey := os.Getenv("MANTOMANAGENT_ENCRYPTION_KEY")
 	secrets := pg.NewPGConfigSecretsStore(db, encKey)
 	s3cfg, err := backup.LoadS3Config(ctx, secrets)
 	if err != nil {
 		return fmt.Errorf("load s3 config: %w", err)
 	}
 	if s3cfg == nil {
-		return fmt.Errorf("s3 not configured — run: goclaw s3-config set")
+		return fmt.Errorf("s3 not configured — run: mantomanagent s3-config set")
 	}
 
 	client, err := backup.NewS3Client(s3cfg)

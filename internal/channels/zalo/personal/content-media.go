@@ -107,7 +107,7 @@ func downloadFile(ctx context.Context, fileURL string) (string, error) {
 		ext = ".bin"
 	}
 
-	tmpFile, err := os.CreateTemp("", "goclaw_zca_*"+ext)
+	tmpFile, err := os.CreateTemp("", "mantomanagent_zca_*"+ext)
 	if err != nil {
 		return "", fmt.Errorf("create temp: %w", err)
 	}

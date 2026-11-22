@@ -15,20 +15,20 @@ type ProviderEntry = {
 type ProvidersData = Record<string, ProviderEntry>;
 
 const KNOWN_PROVIDERS = [
-  { key: "anthropic", label: "Anthropic", envKey: "GOCLAW_ANTHROPIC_API_KEY" },
-  { key: "openai", label: "OpenAI", envKey: "GOCLAW_OPENAI_API_KEY" },
-  { key: "api_route", label: "API Route", envKey: "GOCLAW_API_ROUTE_API_KEY" },
-  { key: "openrouter", label: "OpenRouter", envKey: "GOCLAW_OPENROUTER_API_KEY" },
-  { key: "requesty", label: "Requesty", envKey: "GOCLAW_REQUESTY_API_KEY" },
-  { key: "groq", label: "Groq", envKey: "GOCLAW_GROQ_API_KEY" },
-  { key: "gemini", label: "Gemini", envKey: "GOCLAW_GEMINI_API_KEY" },
-  { key: "deepseek", label: "DeepSeek", envKey: "GOCLAW_DEEPSEEK_API_KEY" },
-  { key: "mistral", label: "Mistral", envKey: "GOCLAW_MISTRAL_API_KEY" },
-  { key: "xai", label: "xAI", envKey: "GOCLAW_XAI_API_KEY" },
-  { key: "minimax", label: "MiniMax", envKey: "GOCLAW_MINIMAX_API_KEY" },
-  { key: "cohere", label: "Cohere", envKey: "GOCLAW_COHERE_API_KEY" },
-  { key: "perplexity", label: "Perplexity", envKey: "GOCLAW_PERPLEXITY_API_KEY" },
-  { key: "ollama_cloud", label: "Ollama Cloud", envKey: "GOCLAW_OLLAMA_CLOUD_API_KEY" },
+  { key: "anthropic", label: "Anthropic", envKey: "MANTOMANAGENT_ANTHROPIC_API_KEY" },
+  { key: "openai", label: "OpenAI", envKey: "MANTOMANAGENT_OPENAI_API_KEY" },
+  { key: "api_route", label: "API Route", envKey: "MANTOMANAGENT_API_ROUTE_API_KEY" },
+  { key: "openrouter", label: "OpenRouter", envKey: "MANTOMANAGENT_OPENROUTER_API_KEY" },
+  { key: "requesty", label: "Requesty", envKey: "MANTOMANAGENT_REQUESTY_API_KEY" },
+  { key: "groq", label: "Groq", envKey: "MANTOMANAGENT_GROQ_API_KEY" },
+  { key: "gemini", label: "Gemini", envKey: "MANTOMANAGENT_GEMINI_API_KEY" },
+  { key: "deepseek", label: "DeepSeek", envKey: "MANTOMANAGENT_DEEPSEEK_API_KEY" },
+  { key: "mistral", label: "Mistral", envKey: "MANTOMANAGENT_MISTRAL_API_KEY" },
+  { key: "xai", label: "xAI", envKey: "MANTOMANAGENT_XAI_API_KEY" },
+  { key: "minimax", label: "MiniMax", envKey: "MANTOMANAGENT_MINIMAX_API_KEY" },
+  { key: "cohere", label: "Cohere", envKey: "MANTOMANAGENT_COHERE_API_KEY" },
+  { key: "perplexity", label: "Perplexity", envKey: "MANTOMANAGENT_PERPLEXITY_API_KEY" },
+  { key: "ollama_cloud", label: "Ollama Cloud", envKey: "MANTOMANAGENT_OLLAMA_CLOUD_API_KEY" },
 ];
 
 interface Props {

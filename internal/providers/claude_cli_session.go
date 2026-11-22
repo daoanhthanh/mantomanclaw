@@ -17,8 +17,8 @@ import (
 )
 
 // cliNativeToolGoclawEquivalent maps Claude CLI native built-in tool names to
-// their GoClaw canonical registry equivalents. A native tool is only allowed
-// (omitted from --disallowedTools) when its GoClaw equivalent is present in
+// their ManToManAgent canonical registry equivalents. A native tool is only allowed
+// (omitted from --disallowedTools) when its ManToManAgent equivalent is present in
 // the agent's policy-filtered allowed tool set.
 var cliNativeToolGoclawEquivalent = map[string]string{
 	"Bash":      "exec",
@@ -29,7 +29,7 @@ var cliNativeToolGoclawEquivalent = map[string]string{
 	"WebSearch": "web_search",
 }
 
-// cliNativeToolsAlwaysBlocked lists Claude CLI native tools with no GoClaw
+// cliNativeToolsAlwaysBlocked lists Claude CLI native tools with no ManToManAgent
 // policy equivalent. They are always disallowed so agent tool policy cannot
 // be bypassed through them.
 //
@@ -45,9 +45,9 @@ var cliNativeToolsAlwaysBlocked = []string{
 var unknownDisallowedToolRe = regexp.MustCompile(`Permission deny rule "([^"]+)" matches no known tool`)
 
 // disallowedCLITools computes the --disallowedTools value for the Claude CLI
-// subprocess from the agent's policy-filtered allowed GoClaw tool names.
+// subprocess from the agent's policy-filtered allowed ManToManAgent tool names.
 // allowedToolNames == nil is treated as "no tools allowed" (fail closed):
-// every native tool with a GoClaw equivalent is blocked, same as an empty set.
+// every native tool with a ManToManAgent equivalent is blocked, same as an empty set.
 func disallowedCLITools(allowedToolNames []string) []string {
 	allowed := make(map[string]bool, len(allowedToolNames))
 	for _, name := range allowedToolNames {
@@ -117,7 +117,7 @@ func validateCLIModel(model string) error {
 // buildArgs constructs CLI arguments.
 // mcpConfigPath is the resolved per-session MCP config file (may differ per call).
 // effort is the reasoning effort level (low/medium/high); empty or "off" omits the flag.
-// allowedToolNames is the agent's policy-filtered canonical GoClaw tool set for this
+// allowedToolNames is the agent's policy-filtered canonical ManToManAgent tool set for this
 // turn; it drives which Claude CLI native built-in tools are permitted (see
 // disallowedCLITools). nil means "no tools allowed" (fail closed).
 func (p *ClaudeCLIProvider) buildArgs(model, workDir, mcpConfigPath string, cliSessionID uuid.UUID, outputFormat string, hasImages, disableTools bool, effort string, allowedToolNames []string) []string {
@@ -159,7 +159,7 @@ func (p *ClaudeCLIProvider) buildArgs(model, workDir, mcpConfigPath string, cliS
 	// --disallowedTools is always computed, regardless of whether an MCP config
 	// path was resolved: when disableTools is set (e.g. summoner), no native
 	// tools are permitted; otherwise the agent's policy-filtered allowed tool
-	// set determines which native CLI tools (with a GoClaw equivalent) may run.
+	// set determines which native CLI tools (with a ManToManAgent equivalent) may run.
 	// This must never be skipped — omitting it previously let the CLI
 	// subprocess run with its full native toolset unrestricted whenever no MCP
 	// config was resolved.

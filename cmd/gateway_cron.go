@@ -128,7 +128,7 @@ func makeCronJobHandler(sched *scheduler.Scheduler, msgBus *bus.MessageBus, cfg 
 		// Reset the session before each STATELESS cron run so the run starts fresh:
 		// no carried-over history (the whole point of stateless — saves tokens) and
 		// no tool errors from a previous run polluting the context (#294). Clear BOTH
-		// layers — the goclaw session store AND the Claude CLI's own on-disk session —
+		// layers — the mantomanagent session store AND the Claude CLI's own on-disk session —
 		// because a claude-cli agent resumes its .jsonl by a deterministic per-key
 		// UUID and would otherwise replay the full accumulated history every run
 		// regardless of this flag (i.e. "stateless" had no effect on what the model

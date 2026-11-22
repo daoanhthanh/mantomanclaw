@@ -36,7 +36,7 @@ func connectAndDiscover(ctx context.Context, name, transportType, command string
 	initReq := mcpgo.InitializeRequest{}
 	initReq.Params.ProtocolVersion = mcpgo.LATEST_PROTOCOL_VERSION
 	initReq.Params.ClientInfo = mcpgo.Implementation{
-		Name:    "goclaw",
+		Name:    "mantomanagent",
 		Version: "1.0.0",
 	}
 
@@ -487,7 +487,7 @@ func fullReconnect(ctx context.Context, ss *serverState) bool {
 
 	initReq := mcpgo.InitializeRequest{}
 	initReq.Params.ProtocolVersion = mcpgo.LATEST_PROTOCOL_VERSION
-	initReq.Params.ClientInfo = mcpgo.Implementation{Name: "goclaw", Version: "1.0.0"}
+	initReq.Params.ClientInfo = mcpgo.Implementation{Name: "mantomanagent", Version: "1.0.0"}
 
 	if _, err := newClient.Initialize(ctx, initReq); err != nil {
 		_ = newClient.Close()

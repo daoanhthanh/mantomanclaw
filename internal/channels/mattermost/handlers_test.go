@@ -57,7 +57,7 @@ func TestHandlePosted_GroupRecordsHistoryUntilMentioned(t *testing.T) {
 	}
 
 	ch.handlePostedEvent(context.Background(), postedEvent(t, mmPost{
-		ID: "p2", UserID: "u1", ChannelID: "c1", Message: "@goclawbot why?",
+		ID: "p2", UserID: "u1", ChannelID: "c1", Message: "@mantomanagentbot why?",
 	}, "O", nil))
 
 	msg, ok := consumeInbound(t, msgBus, time.Second)
@@ -72,7 +72,7 @@ func TestHandlePosted_GroupRecordsHistoryUntilMentioned(t *testing.T) {
 			t.Fatalf("content missing %q:\n%s", want, msg.Content)
 		}
 	}
-	if strings.Contains(msg.Content, "@goclawbot") {
+	if strings.Contains(msg.Content, "@mantomanagentbot") {
 		t.Fatalf("bot mention must be stripped:\n%s", msg.Content)
 	}
 	if msg.Metadata["local_key"] != "c1:thread:p2" || msg.Metadata["message_thread_id"] != "p2" {
@@ -130,9 +130,9 @@ func TestHandlePosted_ThreadParticipationAndRootContext(t *testing.T) {
 	fs := newFakeServer(t)
 	ch, msgBus := newTestChannel(t, fs, nil)
 	ctx := context.Background()
-	fs.addPost(&mmPost{ID: "r1", UserID: "u1", ChannelID: "c1", Message: "@goclawbot summarize the incident"})
+	fs.addPost(&mmPost{ID: "r1", UserID: "u1", ChannelID: "c1", Message: "@mantomanagentbot summarize the incident"})
 
-	ch.handlePostedEvent(ctx, postedEvent(t, mmPost{ID: "r1", UserID: "u1", ChannelID: "c1", Message: "@goclawbot summarize the incident"}, "O", nil))
+	ch.handlePostedEvent(ctx, postedEvent(t, mmPost{ID: "r1", UserID: "u1", ChannelID: "c1", Message: "@mantomanagentbot summarize the incident"}, "O", nil))
 	if _, ok := consumeInbound(t, msgBus, time.Second); !ok {
 		t.Fatal("expected mention to be delivered")
 	}
@@ -171,7 +171,7 @@ func TestHandlePosted_ThreadTTLDisabledRequiresMention(t *testing.T) {
 	ch, msgBus := newTestChannel(t, fs, func(c *config.MattermostConfig) { c.ThreadTTL = &zero })
 	ctx := context.Background()
 
-	ch.handlePostedEvent(ctx, postedEvent(t, mmPost{ID: "r1", UserID: "u1", ChannelID: "c1", Message: "@goclawbot hi"}, "O", nil))
+	ch.handlePostedEvent(ctx, postedEvent(t, mmPost{ID: "r1", UserID: "u1", ChannelID: "c1", Message: "@mantomanagentbot hi"}, "O", nil))
 	if _, ok := consumeInbound(t, msgBus, time.Second); !ok {
 		t.Fatal("expected mention to be delivered")
 	}
@@ -189,11 +189,11 @@ func TestHandlePosted_AllowlistAcceptsChannelID(t *testing.T) {
 	})
 	ctx := context.Background()
 
-	ch.handlePostedEvent(ctx, postedEvent(t, mmPost{ID: "p1", UserID: "u1", ChannelID: "c-other", Message: "@goclawbot hi"}, "O", nil))
+	ch.handlePostedEvent(ctx, postedEvent(t, mmPost{ID: "p1", UserID: "u1", ChannelID: "c-other", Message: "@mantomanagentbot hi"}, "O", nil))
 	if _, ok := consumeInbound(t, msgBus, shortWait); ok {
 		t.Fatal("channel outside the allowlist must be rejected")
 	}
-	ch.handlePostedEvent(ctx, postedEvent(t, mmPost{ID: "p2", UserID: "u1", ChannelID: "c-allowed", Message: "@goclawbot hi"}, "O", nil))
+	ch.handlePostedEvent(ctx, postedEvent(t, mmPost{ID: "p2", UserID: "u1", ChannelID: "c-allowed", Message: "@mantomanagentbot hi"}, "O", nil))
 	if _, ok := consumeInbound(t, msgBus, time.Second); !ok {
 		t.Fatal("allowlisted channel must be accepted")
 	}
@@ -205,7 +205,7 @@ func TestHandlePosted_GroupPairingUsesChannelTemplate(t *testing.T) {
 	ps := &fakePairingStore{}
 	ch.SetPairingService(ps)
 
-	ch.handlePostedEvent(context.Background(), postedEvent(t, mmPost{ID: "p1", UserID: "u1", ChannelID: "c1", Message: "@goclawbot hi"}, "O", nil))
+	ch.handlePostedEvent(context.Background(), postedEvent(t, mmPost{ID: "p1", UserID: "u1", ChannelID: "c1", Message: "@mantomanagentbot hi"}, "O", nil))
 	if _, ok := consumeInbound(t, msgBus, shortWait); ok {
 		t.Fatal("unpaired channel must not reach the agent")
 	}
@@ -316,7 +316,7 @@ func TestHandleEdited_AddedMentionTriggersOnce(t *testing.T) {
 	}
 
 	edited := original
-	edited.Message = "@goclawbot who can check the deploy?"
+	edited.Message = "@mantomanagentbot who can check the deploy?"
 	ch.handlePostEditedEvent(ctx, editedEvent(t, edited))
 	msg, ok := consumeInbound(t, msgBus, time.Second)
 	if !ok {
@@ -329,7 +329,7 @@ func TestHandleEdited_AddedMentionTriggersOnce(t *testing.T) {
 		t.Fatalf("chat title must come from the channel lookup, got %v", msg.Metadata)
 	}
 
-	edited.Message = "@goclawbot who can check the deploy today?"
+	edited.Message = "@mantomanagentbot who can check the deploy today?"
 	ch.handlePostEditedEvent(ctx, editedEvent(t, edited))
 	if _, ok := consumeInbound(t, msgBus, shortWait); ok {
 		t.Fatal("an answered post must not be re-triggered by further edits")
@@ -343,21 +343,21 @@ func TestHandleEdited_IgnoresAnsweredDMOwnAndOldPosts(t *testing.T) {
 	now := time.Now().UnixMilli()
 
 	// Answered on the first send.
-	answered := mmPost{ID: "p1", CreateAt: now, UserID: "u1", ChannelID: "c1", Message: "@goclawbot hi"}
+	answered := mmPost{ID: "p1", CreateAt: now, UserID: "u1", ChannelID: "c1", Message: "@mantomanagentbot hi"}
 	ch.handlePostedEvent(ctx, postedEvent(t, answered, "O", nil))
 	if _, ok := consumeInbound(t, msgBus, time.Second); !ok {
 		t.Fatal("expected mention to be delivered")
 	}
-	answered.Message = "@goclawbot hi there"
+	answered.Message = "@mantomanagentbot hi there"
 	ch.handlePostEditedEvent(ctx, editedEvent(t, answered))
 
 	// DM edits.
 	fs.addChannel(mmChannel{ID: "dm1", Type: "D"})
-	ch.handlePostEditedEvent(ctx, editedEvent(t, mmPost{ID: "p2", CreateAt: now, UserID: "u1", ChannelID: "dm1", Message: "@goclawbot fixed typo"}))
+	ch.handlePostEditedEvent(ctx, editedEvent(t, mmPost{ID: "p2", CreateAt: now, UserID: "u1", ChannelID: "dm1", Message: "@mantomanagentbot fixed typo"}))
 
 	// Posts older than the edit window.
 	old := time.Now().Add(-editWindow - time.Hour).UnixMilli()
-	ch.handlePostEditedEvent(ctx, editedEvent(t, mmPost{ID: "p3", CreateAt: old, UserID: "u1", ChannelID: "c1", Message: "@goclawbot ancient"}))
+	ch.handlePostEditedEvent(ctx, editedEvent(t, mmPost{ID: "p3", CreateAt: old, UserID: "u1", ChannelID: "c1", Message: "@mantomanagentbot ancient"}))
 
 	if _, ok := consumeInbound(t, msgBus, shortWait); ok {
 		t.Fatal("answered, DM and old posts must not be triggered by edits")
@@ -365,7 +365,7 @@ func TestHandleEdited_IgnoresAnsweredDMOwnAndOldPosts(t *testing.T) {
 
 	// The bot's own streaming edits must not even cost a channel lookup.
 	before := len(fs.callsTo("GET", "/api/v4/channels/c9"))
-	ch.handlePostEditedEvent(ctx, editedEvent(t, mmPost{ID: "p4", CreateAt: now, UserID: testBotID, ChannelID: "c9", Message: "@goclawbot partial"}))
+	ch.handlePostEditedEvent(ctx, editedEvent(t, mmPost{ID: "p4", CreateAt: now, UserID: testBotID, ChannelID: "c9", Message: "@mantomanagentbot partial"}))
 	if len(fs.callsTo("GET", "/api/v4/channels/c9")) != before {
 		t.Fatal("own edits must be dropped before any API call")
 	}
@@ -379,12 +379,12 @@ func TestMentionMatching(t *testing.T) {
 		text string
 		want bool
 	}{
-		{"@goclawbot hi", true},
-		{"hi @GoClawBot.", true},
-		{"(@goclawbot)", true},
-		{"@goclawbot2 hi", false},
-		{"@goclawbot_x hi", false},
-		{"mail a@goclawbot.com", false},
+		{"@mantomanagentbot hi", true},
+		{"hi @ManToManAgentBot.", true},
+		{"(@mantomanagentbot)", true},
+		{"@mantomanagentbot2 hi", false},
+		{"@mantomanagentbot_x hi", false},
+		{"mail a@mantomanagentbot.com", false},
 		{"no mention", false},
 	}
 	for _, tc := range cases {
@@ -393,7 +393,7 @@ func TestMentionMatching(t *testing.T) {
 		}
 	}
 
-	if got := ch.stripBotMention("hey @goclawbot, check this"); got != "hey , check this" {
+	if got := ch.stripBotMention("hey @mantomanagentbot, check this"); got != "hey , check this" {
 		t.Errorf("stripBotMention = %q", got)
 	}
 }
@@ -409,7 +409,7 @@ func TestHandlePosted_ThreadRootMediaOrderMatchesTags(t *testing.T) {
 	})
 
 	ch.handlePostedEvent(context.Background(), postedEvent(t, mmPost{
-		ID: "p2", UserID: "u1", ChannelID: "c1", RootID: "r1", Message: "@goclawbot what is this",
+		ID: "p2", UserID: "u1", ChannelID: "c1", RootID: "r1", Message: "@mantomanagentbot what is this",
 		Metadata: &mmPostMetadata{Files: []mmFileInfo{{ID: "f-reply", Name: "reply.png", Size: 10, MimeType: "image/png"}}},
 	}, "O", nil))
 

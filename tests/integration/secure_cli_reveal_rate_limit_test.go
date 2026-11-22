@@ -86,7 +86,7 @@ func TestRevealRateLimit_PerCallerBuckets(t *testing.T) {
 }
 
 // TestRevealRateLimit_ContextUserIDNotHeader verifies that the rate limit key
-// comes from the context-injected UserID (authenticated), not the X-GoClaw-User-Id header.
+// comes from the context-injected UserID (authenticated), not the X-ManToManAgent-User-Id header.
 func TestRevealRateLimit_ContextUserIDNotHeader(t *testing.T) {
 	t.Parallel()
 
@@ -116,7 +116,7 @@ func TestRevealRateLimit_ContextUserIDNotHeader(t *testing.T) {
 		req.SetPathValue("id", binaryID.String())
 		req.SetPathValue("grantId", g.ID.String())
 		if headerUser != "" {
-			req.Header.Set("X-GoClaw-User-Id", headerUser)
+			req.Header.Set("X-ManToManAgent-User-Id", headerUser)
 		}
 		ctx := store.WithTenantID(req.Context(), tenantID)
 		if contextUser != "" {

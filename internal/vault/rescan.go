@@ -116,7 +116,7 @@ func RescanWorkspace(ctx context.Context, params RescanParams, vs store.VaultSto
 
 		// Collect enrichment events — published AFTER the loop so the caller
 		// can call progress.Start(total) before workers receive events.
-		// Skip auto-generated media files (goclaw_gen_*) — they create excessive
+		// Skip auto-generated media files (mantomanagent_gen_*) — they create excessive
 		// noise links and shouldn't be counted in progress tracking.
 		if bus != nil && !shouldSkipEnrichment(filepath.Base(relPath)) {
 			result.PendingEvents = append(result.PendingEvents, eventbus.DomainEvent{
@@ -158,7 +158,7 @@ func RescanWorkspace(ctx context.Context, params RescanParams, vs store.VaultSto
 //	agents/{agent_key}/...           → agentID=lookup(key), scope="personal"  (legacy prefix)
 //	{agent_key}/...                  → agentID=lookup(key), scope="personal"  (workspace layout)
 //
-// Chat segments starting with "." (e.g. ".goclaw") are config dirs, not real chats — chatID stays nil.
+// Chat segments starting with "." (e.g. ".mantomanagent") are config dirs, not real chats — chatID stays nil.
 // The full relPath is preserved in strippedPath for DB storage so enrichment workers
 // can locate files via filepath.Join(workspace, path).
 // Returns scope="" to signal the file should be skipped (unknown agent or invalid team).

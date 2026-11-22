@@ -76,7 +76,7 @@ func (p *serplySearchProvider) Search(ctx context.Context, params searchParams) 
 	req.Header.Set("X-Api-Key", p.apiKey)
 	// Serply attributes usage by client, so identify the gateway rather than
 	// sending the browser webSearchUserAgent the scraping providers need.
-	req.Header.Set("User-Agent", "goclaw")
+	req.Header.Set("User-Agent", "mantomanagent")
 
 	resp, err := p.client.Do(req)
 	if err != nil {

@@ -58,7 +58,7 @@ func TestFactoryWithPortalStore_AppliesDefaults(t *testing.T) {
 	fn := FactoryWithPortalStore(fs, "")
 
 	ch, err := fn("b1", nil,
-		json.RawMessage(`{"portal":"acme","bot_code":"goclaw","bot_name":"GoClaw Bot"}`),
+		json.RawMessage(`{"portal":"acme","bot_code":"mantomanagent","bot_name":"ManToManAgent Bot"}`),
 		&bus.MessageBus{}, nil)
 	if err != nil {
 		t.Fatalf("factory: %v", err)

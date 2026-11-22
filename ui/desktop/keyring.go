@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	serviceName = "goclaw-desktop"
+	serviceName = "mantomanagent-desktop"
 	keyEncKey   = "encryption_key"
 	keyGwToken  = "gateway_token"
 )
@@ -70,7 +70,7 @@ func generateHex(numBytes int) string {
 
 func secretsDir() string {
 	home, _ := os.UserHomeDir()
-	dir := filepath.Join(home, ".goclaw", "secrets")
+	dir := filepath.Join(home, ".mantomanagent", "secrets")
 	os.MkdirAll(dir, 0700)
 	return dir
 }

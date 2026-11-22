@@ -38,15 +38,15 @@ func TestWebSearchMigrateHook_ConfigJSON5Path(t *testing.T) {
 	}
 
 	// Set environment variables for the hook
-	oldConfigPath := os.Getenv("GOCLAW_CONFIG")
-	oldEncKey := os.Getenv("GOCLAW_ENCRYPTION_KEY")
+	oldConfigPath := os.Getenv("MANTOMANAGENT_CONFIG")
+	oldEncKey := os.Getenv("MANTOMANAGENT_ENCRYPTION_KEY")
 	defer func() {
-		os.Setenv("GOCLAW_CONFIG", oldConfigPath)
-		os.Setenv("GOCLAW_ENCRYPTION_KEY", oldEncKey)
+		os.Setenv("MANTOMANAGENT_CONFIG", oldConfigPath)
+		os.Setenv("MANTOMANAGENT_ENCRYPTION_KEY", oldEncKey)
 	}()
 
-	os.Setenv("GOCLAW_CONFIG", configPath)
-	os.Setenv("GOCLAW_ENCRYPTION_KEY", testEncryptionKey)
+	os.Setenv("MANTOMANAGENT_CONFIG", configPath)
+	os.Setenv("MANTOMANAGENT_ENCRYPTION_KEY", testEncryptionKey)
 
 	resetWebSearchMigrateHook(t, db)
 
@@ -145,9 +145,9 @@ func TestWebSearchMigrateHook_SettingsBlobLegacy(t *testing.T) {
 	})
 
 	// Set encryption key for the hook
-	oldEncKey := os.Getenv("GOCLAW_ENCRYPTION_KEY")
-	defer os.Setenv("GOCLAW_ENCRYPTION_KEY", oldEncKey)
-	os.Setenv("GOCLAW_ENCRYPTION_KEY", testEncryptionKey)
+	oldEncKey := os.Getenv("MANTOMANAGENT_ENCRYPTION_KEY")
+	defer os.Setenv("MANTOMANAGENT_ENCRYPTION_KEY", oldEncKey)
+	os.Setenv("MANTOMANAGENT_ENCRYPTION_KEY", testEncryptionKey)
 
 	resetWebSearchMigrateHook(t, db)
 
@@ -260,9 +260,9 @@ func TestWebSearchMigrateHook_ExistingSecretNoOverwrite(t *testing.T) {
 	}
 
 	// Set encryption key for the hook
-	oldEncKey := os.Getenv("GOCLAW_ENCRYPTION_KEY")
-	defer os.Setenv("GOCLAW_ENCRYPTION_KEY", oldEncKey)
-	os.Setenv("GOCLAW_ENCRYPTION_KEY", testEncryptionKey)
+	oldEncKey := os.Getenv("MANTOMANAGENT_ENCRYPTION_KEY")
+	defer os.Setenv("MANTOMANAGENT_ENCRYPTION_KEY", oldEncKey)
+	os.Setenv("MANTOMANAGENT_ENCRYPTION_KEY", testEncryptionKey)
 
 	resetWebSearchMigrateHook(t, db)
 

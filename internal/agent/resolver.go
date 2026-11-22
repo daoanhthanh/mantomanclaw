@@ -126,7 +126,7 @@ type ResolverDeps struct {
 	// System config store for tenant-scoped settings (allowed_paths, etc.)
 	SystemConfigs store.SystemConfigStore
 
-	// Global workspace root (GOCLAW_WORKSPACE)
+	// Global workspace root (MANTOMANAGENT_WORKSPACE)
 	Workspace string
 
 	// TTS auto mode from config: "off", "always", "inbound", "tagged"

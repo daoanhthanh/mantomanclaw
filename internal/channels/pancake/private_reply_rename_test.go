@@ -10,7 +10,7 @@ import (
 
 // TestPrivateReply_StatelessFiresEveryCall verifies private_reply fires on
 // every Send() when Features.PrivateReply is enabled. Stateless design: no
-// GoClaw-side dedup. Webhook-level comment_id dedup + FB per-comment
+// ManToManAgent-side dedup. Webhook-level comment_id dedup + FB per-comment
 // idempotency handle duplicates; sender-level dedup intentionally removed.
 func TestPrivateReply_StatelessFiresEveryCall(t *testing.T) {
 	cfg := pancakeInstanceConfig{}

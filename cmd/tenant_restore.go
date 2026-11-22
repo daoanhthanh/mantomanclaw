@@ -26,7 +26,7 @@ func tenantRestoreCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "tenant-restore <archive-path>",
 		Short: "Restore a tenant from a backup archive",
-		Long: `Restores a tenant from a .tar.gz archive produced by 'goclaw tenant-backup'.
+		Long: `Restores a tenant from a .tar.gz archive produced by 'mantomanagent tenant-backup'.
 
 Modes:
   upsert   (default) — INSERT ... ON CONFLICT DO NOTHING. Non-destructive.
@@ -44,7 +44,7 @@ Modes:
 			// Tenant restore is PG-only
 			cfg, cfgErr := config.Load(resolveConfigPath())
 			if cfgErr == nil && cfg.Database.StorageBackend == "sqlite" {
-				return fmt.Errorf("tenant restore is not available in Lite edition (single tenant). Use 'goclaw restore' for full system restore")
+				return fmt.Errorf("tenant restore is not available in Lite edition (single tenant). Use 'mantomanagent restore' for full system restore")
 			}
 
 			if _, err := os.Stat(archivePath); err != nil {

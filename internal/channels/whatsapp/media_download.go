@@ -62,7 +62,7 @@ func (c *Channel) downloadMedia(evt *events.Message) []media.MediaInfo {
 		}
 
 		ext := mimeToExt(item.mimetype)
-		tmpFile, err := os.CreateTemp("", "goclaw_wa_*"+ext)
+		tmpFile, err := os.CreateTemp("", "mantomanagent_wa_*"+ext)
 		if err != nil {
 			slog.Warn("whatsapp: temp file creation failed", "error", err)
 			continue

@@ -43,7 +43,7 @@ func tokenMatch(provided, expected string) bool {
 // Returns "" if no user ID is provided (anonymous).
 // Rejects IDs exceeding MaxUserIDLength (VARCHAR(255) DB constraint).
 func extractUserID(r *http.Request) string {
-	id := r.Header.Get("X-GoClaw-User-Id")
+	id := r.Header.Get("X-ManToManAgent-User-Id")
 	if id == "" {
 		return ""
 	}
@@ -57,8 +57,8 @@ func extractUserID(r *http.Request) string {
 // extractAgentID determines the target agent from the request.
 // Checks model field, headers, and falls back to "default".
 func extractAgentID(r *http.Request, model string) string {
-	// From model field: "goclaw:<agentId>" or "agent:<agentId>"
-	if after, ok := strings.CutPrefix(model, "goclaw:"); ok {
+	// From model field: "mantomanagent:<agentId>" or "agent:<agentId>"
+	if after, ok := strings.CutPrefix(model, "mantomanagent:"); ok {
 		return after
 	}
 	if after, ok := strings.CutPrefix(model, "agent:"); ok {
@@ -66,10 +66,10 @@ func extractAgentID(r *http.Request, model string) string {
 	}
 
 	// From headers
-	if id := r.Header.Get("X-GoClaw-Agent-Id"); id != "" {
+	if id := r.Header.Get("X-ManToManAgent-Agent-Id"); id != "" {
 		return id
 	}
-	if id := r.Header.Get("X-GoClaw-Agent"); id != "" {
+	if id := r.Header.Get("X-ManToManAgent-Agent"); id != "" {
 		return id
 	}
 
@@ -111,7 +111,7 @@ func InitAPIKeyCache(s store.APIKeyStore, mb *bus.MessageBus) {
 }
 
 // InitPairingAuth sets the pairing store for HTTP auth.
-// Allows browser-paired users to access HTTP APIs via X-GoClaw-Sender-Id header.
+// Allows browser-paired users to access HTTP APIs via X-ManToManAgent-Sender-Id header.
 func InitPairingAuth(ps store.PairingStore) {
 	pkgPairingStore = ps
 }
@@ -186,7 +186,7 @@ func resolveAuthWithBearer(r *http.Request, bearer string) authResult {
 			role = permissions.RoleOwner
 		}
 		res := authResult{Role: role, Authenticated: true}
-		tenantVal := r.Header.Get("X-GoClaw-Tenant-Id")
+		tenantVal := r.Header.Get("X-ManToManAgent-Tenant-Id")
 		if isOwner {
 			res.TenantID = resolveScopedTenant(r.Context(), tenantVal)
 		} else {
@@ -208,7 +208,7 @@ func resolveAuthWithBearer(r *http.Request, bearer string) authResult {
 		if keyData.TenantID == uuid.Nil {
 			// System-level API keys keep their scope-derived role. They may
 			// optionally scope a request to a tenant, but they do not become owner.
-			res.TenantID = resolveScopedTenant(r.Context(), r.Header.Get("X-GoClaw-Tenant-Id"))
+			res.TenantID = resolveScopedTenant(r.Context(), r.Header.Get("X-ManToManAgent-Tenant-Id"))
 			if res.TenantID == uuid.Nil {
 				res.TenantID = store.MasterTenantID
 			}
@@ -220,13 +220,13 @@ func resolveAuthWithBearer(r *http.Request, bearer string) authResult {
 		return res
 	}
 	// Browser pairing → role derived from tenant_users.role (via
-	// X-GoClaw-Sender-Id header). Falls back to RoleOperator when the user
+	// X-ManToManAgent-Sender-Id header). Falls back to RoleOperator when the user
 	// has no membership row, preserving pre-3.11 behaviour.
-	if senderID := r.Header.Get("X-GoClaw-Sender-Id"); senderID != "" && pkgPairingStore != nil {
+	if senderID := r.Header.Get("X-ManToManAgent-Sender-Id"); senderID != "" && pkgPairingStore != nil {
 		paired, err := pkgPairingStore.IsPaired(r.Context(), senderID, "browser")
 		if err == nil && paired {
 			userID := extractUserID(r)
-			hint := r.Header.Get("X-GoClaw-Tenant-Id")
+			hint := r.Header.Get("X-ManToManAgent-Tenant-Id")
 			tenantID, allowed := resolveTenantHint(r.Context(), hint, userID)
 			if !allowed {
 				return authResult{}
@@ -341,7 +341,7 @@ func enrichContext(ctx context.Context, r *http.Request, auth authResult) contex
 	ctx = store.WithRole(ctx, string(auth.Role))
 	userID := extractUserID(r)
 	// Security: In dev mode (no gateway token configured), do not trust the
-	// X-GoClaw-User-Id header — force "system" to prevent identity spoofing.
+	// X-ManToManAgent-User-Id header — force "system" to prevent identity spoofing.
 	if pkgGatewayToken == "" && auth.KeyData == nil && userID != "" {
 		slog.Warn("security.user_id_header_ignored_no_auth",
 			"attempted_user_id", userID,

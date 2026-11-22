@@ -98,7 +98,7 @@ func FetchOpenAIQuota(ctx context.Context, provider *store.LLMProviderData, toke
 	}
 
 	if strings.TrimSpace(settings.AccountID) == "" {
-		return buildOpenAIQuotaFailure(result, "missing_account_id", "Quota metadata is missing for this account.", "Sign in again so GoClaw can restore the ChatGPT account workspace metadata.", false, false, false)
+		return buildOpenAIQuotaFailure(result, "missing_account_id", "Quota metadata is missing for this account.", "Sign in again so ManToManAgent can restore the ChatGPT account workspace metadata.", false, false, false)
 	}
 
 	token, err := tokenSource.Token()

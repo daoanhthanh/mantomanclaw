@@ -60,7 +60,7 @@ func (h *TenantBackupHandler) handleRestore(w http.ResponseWriter, r *http.Reque
 	}
 	defer file.Close()
 
-	tmp, err := os.CreateTemp("", "goclaw-tenant-restore-*.tar.gz")
+	tmp, err := os.CreateTemp("", "mantomanagent-tenant-restore-*.tar.gz")
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, protocol.ErrInternal,
 			i18n.T(locale, i18n.MsgInternalError))

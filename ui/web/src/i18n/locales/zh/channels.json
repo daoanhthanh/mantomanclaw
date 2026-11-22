@@ -355,7 +355,7 @@
     },
     "server_url": {
       "label": "服务器 URL",
-      "help": "Mattermost 服务器的基础 URL。内网服务器（10.x、192.168.x、localhost）需要在网关上设置 GOCLAW_ALLOW_PRIVATE_MATTERMOST_URLS=true。"
+      "help": "Mattermost 服务器的基础 URL。内网服务器（10.x、192.168.x、localhost）需要在网关上设置 MANTOMANAGENT_ALLOW_PRIVATE_MATTERMOST_URLS=true。"
     },
     "proxy": {
       "label": "HTTP 代理",
@@ -835,7 +835,7 @@
         "invalidDomain": "必须是有效的主机名（例如：mycorp.bitrix24.com、mycorp.bitrix24.vn 或你的自托管域名）。",
         "duplicateName": "门户名称已存在。",
         "forbidden": "您需要租户管理员权限才能创建门户。",
-        "gatewayURLUnknown": "请先通过公网 URL（非 localhost）打开 goclaw UI 然后重试。"
+        "gatewayURLUnknown": "请先通过公网 URL（非 localhost）打开 mantomanagent UI 然后重试。"
       },
       "help": {
         "title": "如何获取 Client ID 和 Secret？",
@@ -853,7 +853,7 @@
         "installed": "门户安装成功！",
         "timedOut": "尚未完成授权。可从下拉框继续。",
         "closeResumeLater": "关闭（稍后继续）",
-        "urlUnknown": "无法获取安装 URL。请通过公网 URL 打开 goclaw UI 后从下拉框重试。"
+        "urlUnknown": "无法获取安装 URL。请通过公网 URL 打开 mantomanagent UI 后从下拉框重试。"
       }
     }
   }

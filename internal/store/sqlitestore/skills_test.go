@@ -189,7 +189,7 @@ func TestEnsureSchema_RestoresMisclassifiedCustomSkills(t *testing.T) {
 	var recoveryMarker string
 	var filePath string
 	if err := db.QueryRow(`SELECT is_system, visibility, version, status,
-		COALESCE(json_extract(frontmatter, '$._goclaw_recovery'), ''), file_path
+		COALESCE(json_extract(frontmatter, '$._mantomanagent_recovery'), ''), file_path
 		FROM skills WHERE slug = ?`, "lark-pm").Scan(&isSystem, &visibility, &version, &status, &recoveryMarker, &filePath); err != nil {
 		t.Fatalf("query repaired skill: %v", err)
 	}

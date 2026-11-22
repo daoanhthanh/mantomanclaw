@@ -262,7 +262,7 @@ func (h *BackupS3Handler) handleBackupAndUpload(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	tmpFile, err := os.CreateTemp("", "goclaw-backup-*.tar.gz")
+	tmpFile, err := os.CreateTemp("", "mantomanagent-backup-*.tar.gz")
 	if err != nil {
 		sendSSE(w, flusher, "error", ProgressEvent{Phase: "init", Status: "error", Detail: "failed to create temp file"})
 		return

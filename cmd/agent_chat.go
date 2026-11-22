@@ -25,10 +25,10 @@ func agentChatCmd() *cobra.Command {
 		Long: `Chat with an agent via the running gateway (WebSocket client mode).
 
 Examples:
-  goclaw agent chat                          # Interactive REPL
-  goclaw agent chat --name coder             # Chat with "coder" agent
-  goclaw agent chat -m "What time is it?"    # One-shot message
-  goclaw agent chat -s my-session            # Continue a session`,
+  mantomanagent agent chat                          # Interactive REPL
+  mantomanagent agent chat --name coder             # Chat with "coder" agent
+  mantomanagent agent chat -m "What time is it?"    # One-shot message
+  mantomanagent agent chat -s my-session            # Continue a session`,
 		Run: func(cmd *cobra.Command, args []string) {
 			runAgentChat(agentName, message, sessionKey)
 		},
@@ -63,7 +63,7 @@ func runAgentChat(agentName, message, sessionKey string) {
 
 	if !isGatewayRunning(addr) {
 		fmt.Fprintln(os.Stderr, "Error: the gateway must be running for this command.")
-		fmt.Fprintln(os.Stderr, "Start it first:  goclaw")
+		fmt.Fprintln(os.Stderr, "Start it first:  mantomanagent")
 		os.Exit(1)
 	}
 

@@ -52,8 +52,8 @@ func TestBaseChannelSystemMessageUsesConfiguredDefaultLocale(t *testing.T) {
 
 func TestBaseChannelSystemMessageFallsBackWithoutResolver(t *testing.T) {
 	base := NewBaseChannel("telegram-main", nil, nil)
-	got := base.SystemMessage(i18n.LocaleEN, systemmessages.KeyPairingApproved, systemmessages.Vars{"app_name": "GoClaw"})
-	want := "✅ GoClaw access approved. Send a message to start chatting."
+	got := base.SystemMessage(i18n.LocaleEN, systemmessages.KeyPairingApproved, systemmessages.Vars{"app_name": "ManToManAgent"})
+	want := "✅ ManToManAgent access approved. Send a message to start chatting."
 	if got != want {
 		t.Fatalf("SystemMessage fallback = %q, want %q", got, want)
 	}

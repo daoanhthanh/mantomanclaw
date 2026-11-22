@@ -16,8 +16,8 @@ import (
 )
 
 // allowPrivateEnv lets an operator connect to a Mattermost server on a private
-// network, mirroring GOCLAW_ALLOW_PRIVATE_PROVIDER_URLS for LLM providers.
-const allowPrivateEnv = "GOCLAW_ALLOW_PRIVATE_MATTERMOST_URLS"
+// network, mirroring MANTOMANAGENT_ALLOW_PRIVATE_PROVIDER_URLS for LLM providers.
+const allowPrivateEnv = "MANTOMANAGENT_ALLOW_PRIVATE_MATTERMOST_URLS"
 
 const maxRedirects = 5
 
@@ -37,7 +37,7 @@ var allowPrivateFn = sync.OnceValue(func() bool {
 
 // checkDialIP applies the egress policy to the IP actually being dialed.
 // Everything security.IsBlocked allows passes (including ranges an operator
-// opened with GOCLAW_SSRF_ALLOWED_CIDRS). Private and loopback addresses pass
+// opened with MANTOMANAGENT_SSRF_ALLOWED_CIDRS). Private and loopback addresses pass
 // only with allowPrivateEnv; link-local (cloud metadata), multicast,
 // unspecified and reserved ranges never do.
 func checkDialIP(ip net.IP) error {

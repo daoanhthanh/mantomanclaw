@@ -289,7 +289,7 @@ func (t *BrowserTool) handleScreenshot(ctx context.Context, args map[string]any)
 
 	// Save to workspace/screenshots/ so the agent can access the file.
 	// Falls back to os.TempDir() if workspace is not available.
-	screenshotDir := filepath.Join(os.TempDir(), "goclaw_screenshots")
+	screenshotDir := filepath.Join(os.TempDir(), "mantomanagent_screenshots")
 	if ws := tools.ToolWorkspaceFromCtx(ctx); ws != "" {
 		screenshotDir = filepath.Join(ws, "screenshots")
 	}

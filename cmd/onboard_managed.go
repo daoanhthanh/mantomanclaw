@@ -44,7 +44,7 @@ var defaultPlaceholderProviders = []store.LLMProviderData{
 func seedOnboardPlaceholders(dsn string) error {
 	storeCfg := store.StoreConfig{
 		PostgresDSN:   dsn,
-		EncryptionKey: os.Getenv("GOCLAW_ENCRYPTION_KEY"),
+		EncryptionKey: os.Getenv("MANTOMANAGENT_ENCRYPTION_KEY"),
 	}
 	stores, err := pg.NewPGStores(storeCfg)
 	if err != nil {

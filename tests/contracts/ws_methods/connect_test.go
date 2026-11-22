@@ -28,5 +28,5 @@ func TestContract_WS_Connect(t *testing.T) {
 
 	// Value checks
 	assertFieldValue(t, resp, "protocol", float64(protocol.ProtocolVersion))
-	assertFieldValue(t, resp, "server.name", "goclaw")
+	assertFieldValue(t, resp, "server.name", "mantomanagent")
 }

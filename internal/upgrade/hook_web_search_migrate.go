@@ -34,9 +34,9 @@ const webSearchMigrateHookName = "055_web_search_legacy_keys_to_config_secrets"
 // It reads config.json5 as raw JSON5 (map[string]any) to avoid any dependency
 // on config.Config struct fields deleted in phase 01.
 func migrateWebSearchInlineKeys(ctx context.Context, db *sql.DB) error {
-	encKey := os.Getenv("GOCLAW_ENCRYPTION_KEY")
+	encKey := os.Getenv("MANTOMANAGENT_ENCRYPTION_KEY")
 	if encKey == "" {
-		slog.Warn("web_search migrate: no GOCLAW_ENCRYPTION_KEY, skipping key migration")
+		slog.Warn("web_search migrate: no MANTOMANAGENT_ENCRYPTION_KEY, skipping key migration")
 		return nil
 	}
 
@@ -53,7 +53,7 @@ func migrateWebSearchInlineKeys(ctx context.Context, db *sql.DB) error {
 // config.json5 (raw JSON5 parse) and inserts into config_secrets under MasterTenantID.
 // Skips if the row already exists (do not overwrite user-saved secrets).
 func migrateConfigJSON5Keys(ctx context.Context, db *sql.DB, encKey string) {
-	cfgPath := os.Getenv("GOCLAW_CONFIG")
+	cfgPath := os.Getenv("MANTOMANAGENT_CONFIG")
 	if cfgPath == "" {
 		return // no config path — nothing to migrate
 	}

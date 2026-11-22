@@ -9,22 +9,22 @@ import (
 	"github.com/nextlevelbuilder/goclaw/internal/tools"
 )
 
-// registerExecApprovalCRUDTools registers the goclaw_exec_approval_* MCP
+// registerExecApprovalCRUDTools registers the mantomanagent_exec_approval_* MCP
 // tools backed by *tools.ExecApprovalManager. Mirrors
 // internal/gateway/methods/exec_approval.go.
 func registerExecApprovalCRUDTools(srv *mcpserver.MCPServer, manager *tools.ExecApprovalManager) {
-	srv.AddTool(mcpgo.NewTool("goclaw_exec_approval_list",
+	srv.AddTool(mcpgo.NewTool("mantomanagent_exec_approval_list",
 		mcpgo.WithDescription("List pending shell exec approvals."),
 		mcpgo.WithReadOnlyHintAnnotation(true),
 	), handleExecApprovalList(manager))
 
-	srv.AddTool(mcpgo.NewTool("goclaw_exec_approval_approve",
+	srv.AddTool(mcpgo.NewTool("mantomanagent_exec_approval_approve",
 		mcpgo.WithDescription("Approve a pending shell exec approval."),
 		mcpgo.WithString("id", mcpgo.Required(), mcpgo.Description("Approval ID.")),
 		mcpgo.WithBoolean("always", mcpgo.Description("true = allow-always, false (default) = allow-once.")),
 	), handleExecApprovalApprove(manager))
 
-	srv.AddTool(mcpgo.NewTool("goclaw_exec_approval_deny",
+	srv.AddTool(mcpgo.NewTool("mantomanagent_exec_approval_deny",
 		mcpgo.WithDescription("Deny a pending shell exec approval."),
 		mcpgo.WithString("id", mcpgo.Required(), mcpgo.Description("Approval ID.")),
 	), handleExecApprovalDeny(manager))

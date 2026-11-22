@@ -23,8 +23,8 @@ var builtinToolGroups = map[string][]string{
 	"messaging":  {"message", "create_forum_topic", "list_group_members", "zalo_list_groups"},
 	"team":       {"team_tasks"},
 	"vault":      {"vault_search", "vault_read"},
-	// Composite group: all goclaw native tools (excludes MCP/custom plugins).
-	"goclaw": {
+	// Composite group: all mantomanagent native tools (excludes MCP/custom plugins).
+	"mantomanagent": {
 		"read_file", "write_file", "list_files", "edit", "exec", "wait",
 		"web_search", "web_fetch", "browser",
 		"memory_search", "memory_get", "memory_expand",

@@ -1,5 +1,5 @@
 // Package scheduler provides lane-based concurrency control and
-// per-session message queuing for the GoClaw gateway.
+// per-session message queuing for the ManToManAgent gateway.
 //
 // Lanes are named worker pools with configurable concurrency limits.
 // Each lane processes requests independently, and the scheduler routes
@@ -150,10 +150,10 @@ func NewLaneManager(configs []LaneConfig) *LaneManager {
 // DefaultLanes returns the standard lane configuration.
 // Concurrency defaults can be overridden via env vars:
 //
-//	GOCLAW_LANE_MAIN=30
-//	GOCLAW_LANE_SUBAGENT=50
-//	GOCLAW_LANE_TEAM=100
-//	GOCLAW_LANE_CRON=30
+//	MANTOMANAGENT_LANE_MAIN=30
+//	MANTOMANAGENT_LANE_SUBAGENT=50
+//	MANTOMANAGENT_LANE_TEAM=100
+//	MANTOMANAGENT_LANE_CRON=30
 //
 // LaneMain bounds concurrent agent runs across every channel, so on a bot
 // shared by a whole org it is the ceiling on how many people can be answered
@@ -161,10 +161,10 @@ func NewLaneManager(configs []LaneConfig) *LaneManager {
 // it trades provider load for wait time, not local work.
 func DefaultLanes() []LaneConfig {
 	return []LaneConfig{
-		{Name: LaneMain, Concurrency: laneEnv("GOCLAW_LANE_MAIN", 30)},
-		{Name: LaneSubagent, Concurrency: laneEnv("GOCLAW_LANE_SUBAGENT", 50)},
-		{Name: LaneTeam, Concurrency: laneEnvFallback("GOCLAW_LANE_TEAM", "GOCLAW_LANE_DELEGATE", 100)},
-		{Name: LaneCron, Concurrency: laneEnv("GOCLAW_LANE_CRON", 30)},
+		{Name: LaneMain, Concurrency: laneEnv("MANTOMANAGENT_LANE_MAIN", 30)},
+		{Name: LaneSubagent, Concurrency: laneEnv("MANTOMANAGENT_LANE_SUBAGENT", 50)},
+		{Name: LaneTeam, Concurrency: laneEnvFallback("MANTOMANAGENT_LANE_TEAM", "MANTOMANAGENT_LANE_DELEGATE", 100)},
+		{Name: LaneCron, Concurrency: laneEnv("MANTOMANAGENT_LANE_CRON", 30)},
 	}
 }
 

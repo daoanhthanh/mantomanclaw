@@ -20,12 +20,12 @@ import (
 	"github.com/nextlevelbuilder/goclaw/internal/store"
 )
 
-const gatewayOperatorBinaryName = "goclaw"
+const gatewayOperatorBinaryName = "mantomanagent"
 
 var (
 	errGatewayOperatorSecureCLIUnavailable = errors.New("gateway operator securecli unavailable")
 	errGatewayOperatorTokenMissing         = errors.New("gateway operator token missing")
-	errGatewayOperatorBinaryMissing        = errors.New("gateway operator goclaw binary missing")
+	errGatewayOperatorBinaryMissing        = errors.New("gateway operator mantomanagent binary missing")
 	errGatewayOperatorExistingReview       = errors.New("gateway operator existing credential requires review")
 	errGatewayOperatorRegisterFailed       = errors.New("gateway operator register failed")
 	errGatewayOperatorCredentialFailed     = errors.New("gateway operator credential failed")
@@ -207,11 +207,11 @@ func gatewayOperatorBinaryPolicyUpdates(binaryPath string) map[string]any {
 }
 
 func gatewayOperatorDescription() string {
-	return "Local GoClaw gateway operator CLI"
+	return "Local ManToManAgent gateway operator CLI"
 }
 
 func gatewayOperatorTips() string {
-	return "Use for local gateway operations such as `goclaw agent list`. Auth/setup/migration/backup/restore and verbose/debug commands are blocked."
+	return "Use for local gateway operations such as `mantomanagent agent list`. Auth/setup/migration/backup/restore and verbose/debug commands are blocked."
 }
 
 func gatewayOperatorDenyArgs() json.RawMessage {
@@ -266,11 +266,11 @@ func (h *AgentsHandler) ensureGatewayOperatorGrant(ctx context.Context, binaryID
 
 func (h *AgentsHandler) setGatewayOperatorAgentCredential(ctx context.Context, binaryID uuid.UUID, agentID uuid.UUID) error {
 	env, err := store.SerializeSecureCLIEnv(map[string]store.SecureCLIEnvEntry{
-		"GOCLAW_GATEWAY_TOKEN": {
+		"MANTOMANAGENT_GATEWAY_TOKEN": {
 			Kind:  store.SecureCLIEnvKindSensitive,
 			Value: pkgGatewayToken,
 		},
-		"GOCLAW_SERVER": {
+		"MANTOMANAGENT_SERVER": {
 			Kind:  store.SecureCLIEnvKindSensitive,
 			Value: gatewayOperatorServerURL(h.gatewayAddr),
 		},

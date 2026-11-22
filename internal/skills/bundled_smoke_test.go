@@ -48,7 +48,7 @@ func TestBundledSkills_ExpectedCoreSkillSlugs(t *testing.T) {
 	bundled := "../../skills"
 	expected := map[string]bool{
 		"docx":                 false,
-		"goclaw":               false,
+		"mantomanagent":               false,
 		"pdf":                  false,
 		"pptx":                 false,
 		"skill-creator":        false,
@@ -93,24 +93,24 @@ func TestBundledSkills_ExpectedCoreSkillSlugs(t *testing.T) {
 	loader := NewLoader("", "", bundled)
 	var foundGoclaw bool
 	for _, info := range loader.ListSkills(context.Background()) {
-		if info.Slug == "goclaw" {
+		if info.Slug == "mantomanagent" {
 			foundGoclaw = true
 			if info.Source != "builtin" {
-				t.Errorf("goclaw source = %q, want builtin", info.Source)
+				t.Errorf("mantomanagent source = %q, want builtin", info.Source)
 			}
 			if info.Description == "" {
-				t.Error("goclaw description is empty in loader metadata")
+				t.Error("mantomanagent description is empty in loader metadata")
 			}
 		}
 	}
 	if !foundGoclaw {
-		t.Fatal("goclaw was not discoverable by the bundled skills loader")
+		t.Fatal("mantomanagent was not discoverable by the bundled skills loader")
 	}
-	content, ok := loader.LoadSkill(context.Background(), "goclaw")
+	content, ok := loader.LoadSkill(context.Background(), "mantomanagent")
 	if !ok {
-		t.Fatal("goclaw was not loadable by the bundled skills loader")
+		t.Fatal("mantomanagent was not loadable by the bundled skills loader")
 	}
-	if !strings.Contains(content, "GoClaw Gateway CLI Administration") {
-		t.Error("goclaw loaded content does not include the expected guide heading")
+	if !strings.Contains(content, "ManToManAgent Gateway CLI Administration") {
+		t.Error("mantomanagent loaded content does not include the expected guide heading")
 	}
 }

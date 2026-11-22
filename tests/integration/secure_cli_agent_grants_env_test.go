@@ -100,7 +100,7 @@ func TestGrantEnv_DenylistRejection(t *testing.T) {
 		{"PATH", true},
 		{"LD_PRELOAD", true},
 		{"DYLD_INSERT_LIBRARIES", true},
-		{"GOCLAW_SECRET", true},
+		{"MANTOMANAGENT_SECRET", true},
 		{"MY_TOKEN", false},
 		{"AWS_ACCESS_KEY_ID", false},
 		{"NODE_OPTIONS", true},

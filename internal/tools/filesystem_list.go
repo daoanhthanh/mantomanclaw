@@ -15,7 +15,7 @@ type ListFilesTool struct {
 	workspace       string
 	restrict        bool
 	allowedPrefixes []string // extra allowed path prefixes (e.g. skills dirs)
-	deniedPrefixes  []string // path prefixes to deny access to (e.g. .goclaw)
+	deniedPrefixes  []string // path prefixes to deny access to (e.g. .mantomanagent)
 	sandboxMgr      sandbox.Manager
 	contextFileIntc *ContextFileInterceptor // unused, satisfies InterceptorAware
 	memIntc         *MemoryInterceptor      // nil = no memory routing

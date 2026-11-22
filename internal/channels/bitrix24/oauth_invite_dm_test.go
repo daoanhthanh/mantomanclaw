@@ -121,7 +121,7 @@ func newOAuthInviteTestChannel(t *testing.T, imbotSrv *httptest.Server) (*Channe
 	portal := newTestPortal(t, httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t.Error("no OAuth token call expected — access token is pre-seeded fresh")
 	})), portalFS, bc.TenantID(), "p", store.BitrixPortalState{
-		PublicURL:    "https://goclaw.example.com",
+		PublicURL:    "https://mantomanagent.example.com",
 		AccessToken:  "bot-access-tok",
 		RefreshToken: "bot-refresh-tok",
 		ExpiresAt:    time.Now().Add(time.Hour),

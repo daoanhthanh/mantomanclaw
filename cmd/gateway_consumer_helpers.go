@@ -193,7 +193,7 @@ func mediaToMarkdown(media []agent.MediaResult, cfg *config.Config) string {
 	var parts []string
 	for _, mr := range media {
 		cleanPath := filepath.Clean(mr.Path)
-		// Strip leading "/" so URL path is /v1/files/app/.goclaw/...
+		// Strip leading "/" so URL path is /v1/files/app/.mantomanagent/...
 		urlPath := strings.TrimPrefix(cleanPath, "/")
 		if urlPath == "" {
 			continue

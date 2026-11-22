@@ -335,7 +335,7 @@ func TestAgentCredentialsRouteRequiresTenantAdmin(t *testing.T) {
 		"blob":            map[string]string{"token": "ghp_routeABC123456"},
 	})
 	req := httptest.NewRequest(http.MethodPut, "/v1/cli-credentials/"+binaryID.String()+"/agent-credentials/"+agentID.String(), bytes.NewReader(body))
-	req.Header.Set("X-GoClaw-User-Id", "browser-user")
+	req.Header.Set("X-ManToManAgent-User-Id", "browser-user")
 	rec := httptest.NewRecorder()
 
 	mux.ServeHTTP(rec, req)

@@ -23,22 +23,22 @@ const apiTimeout = 30 * time.Second
 var userAgentStore atomic.Pointer[string]
 
 // SetVersion sets the gateway version reported in the User-Agent header
-// ("goclaw/<version>"). Called once at gateway startup; an empty version
-// resets it to plain "goclaw".
+// ("mantomanagent/<version>"). Called once at gateway startup; an empty version
+// resets it to plain "mantomanagent".
 func SetVersion(v string) {
-	ua := "goclaw"
+	ua := "mantomanagent"
 	if v != "" {
 		ua += "/" + v
 	}
 	userAgentStore.Store(&ua)
 }
 
-// userAgent returns the User-Agent header value, "goclaw" if unset.
+// userAgent returns the User-Agent header value, "mantomanagent" if unset.
 func userAgent() string {
 	if p := userAgentStore.Load(); p != nil {
 		return *p
 	}
-	return "goclaw"
+	return "mantomanagent"
 }
 
 // apiClient is a minimal Mattermost REST API v4 client. It covers only the

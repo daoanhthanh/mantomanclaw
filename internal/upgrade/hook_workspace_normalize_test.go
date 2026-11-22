@@ -14,9 +14,9 @@ func TestIsStaleWorkspace(t *testing.T) {
 		{"docker era app workspace", "/app/workspace/clax", true},
 		{"docker era root", "/app/workspace", true},
 		{"docker era trailing slash", "/app/workspace/", true},
-		{"tilde literal", "~/.goclaw/x-workspace", true},
+		{"tilde literal", "~/.mantomanagent/x-workspace", true},
 		{"tilde only", "~", true},
-		{"absolute host path", "/var/lib/goclaw/workspace/clax", false},
+		{"absolute host path", "/var/lib/mantomanagent/workspace/clax", false},
 		{"current dot", ".", false},
 		{"empty", "", false},
 		{"whitespace", "   ", false},
@@ -33,14 +33,14 @@ func TestIsStaleWorkspace(t *testing.T) {
 }
 
 func TestResolveWorkspaceBase_EnvWins(t *testing.T) {
-	t.Setenv("GOCLAW_WORKSPACE", "/var/lib/goclaw/workspace")
-	if got := resolveWorkspaceBase(); got != "/var/lib/goclaw/workspace" {
-		t.Fatalf("resolveWorkspaceBase() = %q, want /var/lib/goclaw/workspace", got)
+	t.Setenv("MANTOMANAGENT_WORKSPACE", "/var/lib/mantomanagent/workspace")
+	if got := resolveWorkspaceBase(); got != "/var/lib/mantomanagent/workspace" {
+		t.Fatalf("resolveWorkspaceBase() = %q, want /var/lib/mantomanagent/workspace", got)
 	}
 }
 
 func TestResolveWorkspaceBase_EnvTilde(t *testing.T) {
-	t.Setenv("GOCLAW_WORKSPACE", "~/custom/ws")
+	t.Setenv("MANTOMANAGENT_WORKSPACE", "~/custom/ws")
 	home, _ := os.UserHomeDir()
 	want := home + "/custom/ws"
 	if got := resolveWorkspaceBase(); got != want {
@@ -49,15 +49,15 @@ func TestResolveWorkspaceBase_EnvTilde(t *testing.T) {
 }
 
 func TestResolveWorkspaceBase_StripsTrailingSlash(t *testing.T) {
-	t.Setenv("GOCLAW_WORKSPACE", "/var/lib/goclaw/workspace/")
-	if got := resolveWorkspaceBase(); got != "/var/lib/goclaw/workspace" {
+	t.Setenv("MANTOMANAGENT_WORKSPACE", "/var/lib/mantomanagent/workspace/")
+	if got := resolveWorkspaceBase(); got != "/var/lib/mantomanagent/workspace" {
 		t.Fatalf("resolveWorkspaceBase() = %q, want trimmed", got)
 	}
 }
 
 func TestResolveWorkspaceBase_FallbackOnMissingConfig(t *testing.T) {
-	t.Setenv("GOCLAW_WORKSPACE", "")
-	t.Setenv("GOCLAW_CONFIG", "/nonexistent/path/config.json")
+	t.Setenv("MANTOMANAGENT_WORKSPACE", "")
+	t.Setenv("MANTOMANAGENT_CONFIG", "/nonexistent/path/config.json")
 	// Should not return empty even if config file missing — falls back through
 	// config.Load's IsNotExist branch (which returns defaults) or to default.
 	if got := resolveWorkspaceBase(); got == "" {

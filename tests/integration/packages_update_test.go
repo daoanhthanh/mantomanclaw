@@ -254,7 +254,7 @@ func makeTarballWithBinaryForTest(t testing.TB, binName string, content []byte) 
 	t.Helper()
 	// For this integration test, we just need the path and a SHA.
 	// The actual tarball creation is handled by github_update_executor_test helpers.
-	tmpfile, _ := os.CreateTemp("", "goclaw-int-test-*.tar.gz")
+	tmpfile, _ := os.CreateTemp("", "mantomanagent-int-test-*.tar.gz")
 	tmpfile.Write(content)
 	tmpfile.Close()
 	t.Cleanup(func() { os.Remove(tmpfile.Name()) })

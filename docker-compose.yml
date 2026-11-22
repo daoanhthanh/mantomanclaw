@@ -1,5 +1,5 @@
 # Base docker-compose — shared service definition.
-# Pre-built images: ghcr.io/nextlevelbuilder/goclaw (also on Docker Hub: digitop/goclaw)
+# Pre-built images: ghcr.io/nextlevelbuilder/goclaw (also on Docker Hub: digitop/mantomanagent)
 #
 # The default `latest` image includes an embedded web dashboard (no separate nginx needed).
 # Web UI is served at the same port as the API (default: 18790).
@@ -23,10 +23,10 @@
 # With Claude CLI:    add -f docker-compose.claude-cli.yml
 
 services:
-  goclaw:
+  mantomanagent:
     image: ghcr.io/nextlevelbuilder/goclaw:latest
     build:
-      context: ${GOCLAW_DIR:-.}
+      context: ${MANTOMANAGENT_DIR:-.}
       dockerfile: Dockerfile
       args:
         ENABLE_OTEL: "${ENABLE_OTEL:-false}"
@@ -34,29 +34,29 @@ services:
         ENABLE_PYTHON: "${ENABLE_PYTHON:-true}"
         ENABLE_FULL_SKILLS:  true
         ENABLE_NODE: true
-        VERSION: "${GOCLAW_VERSION:-dev}"
-        COMMIT_SHA: "${GOCLAW_COMMIT_SHA:-}"        
-    # Uncomment to test update UI: GOCLAW_VERSION=v1.0.0
+        VERSION: "${MANTOMANAGENT_VERSION:-dev}"
+        COMMIT_SHA: "${MANTOMANAGENT_COMMIT_SHA:-}"        
+    # Uncomment to test update UI: MANTOMANAGENT_VERSION=v1.0.0
     ports:
-      - "${GOCLAW_PORT:-18790}:18790"
+      - "${MANTOMANAGENT_PORT:-18790}:18790"
     env_file:
       - path: .env
         required: false
     environment:
-      - GOCLAW_HOST=0.0.0.0
-      - GOCLAW_PORT=18790
-      - GOCLAW_CONFIG=/app/data/config.json
-      - GOCLAW_GATEWAY_TOKEN=${GOCLAW_GATEWAY_TOKEN:?run ./prepare-env.sh or set GOCLAW_GATEWAY_TOKEN}
-      - GOCLAW_ENCRYPTION_KEY=${GOCLAW_ENCRYPTION_KEY:-}
-      - GOCLAW_SKILLS_DIR=/app/data/skills
+      - MANTOMANAGENT_HOST=0.0.0.0
+      - MANTOMANAGENT_PORT=18790
+      - MANTOMANAGENT_CONFIG=/app/data/config.json
+      - MANTOMANAGENT_GATEWAY_TOKEN=${MANTOMANAGENT_GATEWAY_TOKEN:?run ./prepare-env.sh or set MANTOMANAGENT_GATEWAY_TOKEN}
+      - MANTOMANAGENT_ENCRYPTION_KEY=${MANTOMANAGENT_ENCRYPTION_KEY:-}
+      - MANTOMANAGENT_SKILLS_DIR=/app/data/skills
       # Debug
-      - GOCLAW_TRACE_VERBOSE=${GOCLAW_TRACE_VERBOSE:-0}
+      - MANTOMANAGENT_TRACE_VERBOSE=${MANTOMANAGENT_TRACE_VERBOSE:-0}
       - BITRIX24_LOG_RAW_EVENT=${BITRIX24_LOG_RAW_EVENT:-0}
       - BITRIX24_FORCE_REREGISTER=${BITRIX24_FORCE_REREGISTER:-0}
       - BITRIX24_DEBUG_UNREDACTED_TOKEN=${BITRIX24_DEBUG_UNREDACTED_TOKEN:-0}
     volumes:
-      - goclaw-data:/app/data
-      - goclaw-workspace:/app/workspace
+      - mantomanagent-data:/app/data
+      - mantomanagent-workspace:/app/workspace
     extra_hosts:
       - "host.docker.internal:host-gateway"
     security_opt:
@@ -78,14 +78,14 @@ services:
           pids: 200
     networks:
       - default
-      - goclaw-net
+      - mantomanagent-net
     restart: unless-stopped
 
 volumes:
-  goclaw-data:
-  goclaw-workspace:
+  mantomanagent-data:
+  mantomanagent-workspace:
 
 networks:
-  goclaw-net:
-    name: goclaw-net
+  mantomanagent-net:
+    name: mantomanagent-net
     driver: bridge

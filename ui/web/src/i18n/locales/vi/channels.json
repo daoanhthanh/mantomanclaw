@@ -355,7 +355,7 @@
     },
     "server_url": {
       "label": "URL máy chủ",
-      "help": "URL gốc của máy chủ Mattermost. Máy chủ trong mạng nội bộ (10.x, 192.168.x, localhost) cần đặt GOCLAW_ALLOW_PRIVATE_MATTERMOST_URLS=true trên gateway."
+      "help": "URL gốc của máy chủ Mattermost. Máy chủ trong mạng nội bộ (10.x, 192.168.x, localhost) cần đặt MANTOMANAGENT_ALLOW_PRIVATE_MATTERMOST_URLS=true trên gateway."
     },
     "proxy": {
       "label": "Proxy HTTP",
@@ -835,7 +835,7 @@
         "invalidDomain": "Phải là hostname hợp lệ (vd: mycorp.bitrix24.com, mycorp.bitrix24.vn, hoặc domain self-hosted của bạn).",
         "duplicateName": "Tên portal đã tồn tại.",
         "forbidden": "Cần quyền tenant admin để tạo portal.",
-        "gatewayURLUnknown": "Mở UI goclaw qua public URL (không phải localhost) trước, rồi retry."
+        "gatewayURLUnknown": "Mở UI mantomanagent qua public URL (không phải localhost) trước, rồi retry."
       },
       "help": {
         "title": "Lấy Client ID và Secret ở đâu?",

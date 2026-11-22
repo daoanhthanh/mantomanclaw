@@ -34,7 +34,7 @@ type sendOptions struct {
 // 2 seconds; we only retry once per chunk to avoid queueing storms.
 const rateLimitRetryDelay = 2 * time.Second
 
-// Send implements channels.Channel by delivering a goclaw OutboundMessage to
+// Send implements channels.Channel by delivering a mantomanagent OutboundMessage to
 // the Bitrix24 portal as one or more imbot.message.add calls.
 //
 // Contract:

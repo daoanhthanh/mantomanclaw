@@ -53,8 +53,8 @@ func TestRegisterProvidersRequestyDefaultsAndAuth(t *testing.T) {
 	if gotAuth != "Bearer requesty-key" {
 		t.Fatalf("Authorization = %q, want Bearer requesty-key", gotAuth)
 	}
-	if gotTitle != "GoClaw" {
-		t.Fatalf("X-Title = %q, want GoClaw", gotTitle)
+	if gotTitle != "ManToManAgent" {
+		t.Fatalf("X-Title = %q, want ManToManAgent", gotTitle)
 	}
 }
 

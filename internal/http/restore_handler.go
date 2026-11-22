@@ -97,7 +97,7 @@ func (h *RestoreHandler) handleRestore(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	// Save upload to a temp file so we can seek / re-read.
-	tmp, err := os.CreateTemp("", "goclaw-restore-*.tar.gz")
+	tmp, err := os.CreateTemp("", "mantomanagent-restore-*.tar.gz")
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, protocol.ErrInternal,
 			i18n.T(locale, i18n.MsgInternalError))

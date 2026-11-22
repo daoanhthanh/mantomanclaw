@@ -22,7 +22,7 @@ function stringValue(value: unknown): string | undefined {
 
 export function getRuntimeBranding(): RuntimeBranding {
   if (typeof document === "undefined") return FALLBACK_BRANDING;
-  const node = document.getElementById("goclaw-branding");
+  const node = document.getElementById("mantomanagent-branding");
   if (!node?.textContent) return FALLBACK_BRANDING;
   try {
     const payload = JSON.parse(node.textContent) as RuntimeBrandingPayload;

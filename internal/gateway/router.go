@@ -334,7 +334,7 @@ func (r *MethodRouter) handleConnect(ctx context.Context, client *Client, req *p
 				"pairing_code": code,
 				"sender_id":    client.id,
 				"server": map[string]any{
-					"name":    "goclaw",
+					"name":    "mantomanagent",
 					"version": r.server.version,
 				},
 			}))
@@ -396,7 +396,7 @@ func (r *MethodRouter) sendConnectResponse(ctx context.Context, client *Client, 
 		"is_master_scope": store.IsMasterScope(scopedCtx),
 		"edition":         edition.Current().Name,
 		"server": map[string]any{
-			"name":    "goclaw",
+			"name":    "mantomanagent",
 			"version": r.server.version,
 		},
 	}

@@ -85,7 +85,7 @@ func (h *TenantBackupHandler) handleBackup(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	tmpFile, err := os.CreateTemp("", "goclaw-tenant-backup-*.tar.gz")
+	tmpFile, err := os.CreateTemp("", "mantomanagent-tenant-backup-*.tar.gz")
 	if err != nil {
 		sendSSE(w, flusher, "error", ProgressEvent{Phase: "init", Status: "error", Detail: "failed to create temp file"})
 		return

@@ -327,7 +327,7 @@
     },
     "server_url": {
       "label": "URL сервера",
-      "help": "Базовый URL вашего сервера Mattermost. Для сервера во внутренней сети (10.x, 192.168.x, localhost) на шлюзе нужен GOCLAW_ALLOW_PRIVATE_MATTERMOST_URLS=true."
+      "help": "Базовый URL вашего сервера Mattermost. Для сервера во внутренней сети (10.x, 192.168.x, localhost) на шлюзе нужен MANTOMANAGENT_ALLOW_PRIVATE_MATTERMOST_URLS=true."
     },
     "proxy": {
       "label": "HTTP-прокси",
@@ -769,7 +769,7 @@
         "invalidDomain": "Должен быть корректным именем хоста (напр. mycorp.bitrix24.com, mycorp.bitrix24.vn или ваш самостоятельно размещённый домен).",
         "duplicateName": "Портал с таким именем уже существует.",
         "forbidden": "Для создания порталов необходимы права администратора арендатора.",
-        "gatewayURLUnknown": "Сначала откройте UI goclaw через ваш публичный URL (не localhost), затем повторите."
+        "gatewayURLUnknown": "Сначала откройте UI mantomanagent через ваш публичный URL (не localhost), затем повторите."
       },
       "help": {
         "title": "Как получить Client ID и Secret?",
@@ -787,7 +787,7 @@
         "installed": "Портал успешно установлен!",
         "timedOut": "Авторизация ещё не завершена. Вы можете продолжить из выпадающего списка.",
         "closeResumeLater": "Закрыть (продолжить позже)",
-        "urlUnknown": "URL установки недоступен. Откройте UI goclaw через ваш публичный URL и повторите из выпадающего списка."
+        "urlUnknown": "URL установки недоступен. Откройте UI mantomanagent через ваш публичный URL и повторите из выпадающего списка."
       }
     }
   }

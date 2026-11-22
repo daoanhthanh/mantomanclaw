@@ -62,10 +62,10 @@ import (
 )
 
 func gatewayLogOutput() io.Writer {
-	logFile := strings.TrimSpace(os.Getenv("GOCLAW_LOG_FILE"))
+	logFile := strings.TrimSpace(os.Getenv("MANTOMANAGENT_LOG_FILE"))
 	if logFile == "" {
-		if st, err := os.Stat("/var/log/goclaw"); err == nil && st.IsDir() {
-			logFile = "/var/log/goclaw/goclaw.log"
+		if st, err := os.Stat("/var/log/mantomanagent"); err == nil && st.IsDir() {
+			logFile = "/var/log/mantomanagent/mantomanagent.log"
 		}
 	}
 	if logFile == "" {
@@ -73,7 +73,7 @@ func gatewayLogOutput() io.Writer {
 	}
 	f, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "warning: cannot open GOCLAW_LOG_FILE=%q: %v\n", logFile, err)
+		fmt.Fprintf(os.Stderr, "warning: cannot open MANTOMANAGENT_LOG_FILE=%q: %v\n", logFile, err)
 		return os.Stdout
 	}
 	fmt.Fprintf(os.Stderr, "logging to %s\n", logFile)
@@ -203,8 +203,8 @@ func runGateway() {
 	if verbose {
 		logLevel = slog.LevelDebug
 	}
-	// Env override (docker/K8s friendly, default: info): GOCLAW_LOG_LEVEL=debug|info|warn|error
-	if lvl := os.Getenv("GOCLAW_LOG_LEVEL"); lvl != "" {
+	// Env override (docker/K8s friendly, default: info): MANTOMANAGENT_LOG_LEVEL=debug|info|warn|error
+	if lvl := os.Getenv("MANTOMANAGENT_LOG_LEVEL"); lvl != "" {
 		switch strings.ToLower(lvl) {
 		case "debug":
 			logLevel = slog.LevelDebug
@@ -215,7 +215,7 @@ func runGateway() {
 		case "error":
 			logLevel = slog.LevelError
 		default:
-			fmt.Fprintf(os.Stderr, "warning: unknown GOCLAW_LOG_LEVEL=%q, using info\n", lvl)
+			fmt.Fprintf(os.Stderr, "warning: unknown MANTOMANAGENT_LOG_LEVEL=%q, using info\n", lvl)
 		}
 	}
 	logOutput := gatewayLogOutput()
@@ -236,9 +236,9 @@ func runGateway() {
 		os.Exit(1)
 	}
 
-	// Edition override: explicit GOCLAW_EDITION takes precedence over auto-detection.
+	// Edition override: explicit MANTOMANAGENT_EDITION takes precedence over auto-detection.
 	// Auto-detection happens later in setupStoresAndTracing (sqlite → lite).
-	if edName := os.Getenv("GOCLAW_EDITION"); edName != "" {
+	if edName := os.Getenv("MANTOMANAGENT_EDITION"); edName != "" {
 		switch edName {
 		case "lite":
 			edition.SetCurrent(edition.Lite)
@@ -247,7 +247,7 @@ func runGateway() {
 			edition.SetCurrent(edition.Standard)
 			slog.Info("edition: standard (explicit)")
 		default:
-			slog.Warn("unknown GOCLAW_EDITION, using standard", "value", edName)
+			slog.Warn("unknown MANTOMANAGENT_EDITION, using standard", "value", edName)
 		}
 	}
 
@@ -922,7 +922,7 @@ func runGateway() {
 		// Bitrix24: factory needs the portal store + encKey injected so each
 		// Channel can resolve its portal on Start(). The encKey here mirrors
 		// the one used by pg.NewPGStores → NewPGBitrixPortalStore.
-		bitrixEncKey := os.Getenv("GOCLAW_ENCRYPTION_KEY")
+		bitrixEncKey := os.Getenv("MANTOMANAGENT_ENCRYPTION_KEY")
 		// Use the MCP-aware factory variant so channels that opt into
 		// lazy per-user credential provisioning (via mcp_server_id — or
 		// the legacy mcp_server_name + mcp_base_url pair — in their
@@ -959,10 +959,10 @@ func runGateway() {
 			if err := bitrix24.BootstrapPortals(context.Background(), pgStores.BitrixPortals, bitrixEncKey); err != nil {
 				// Surface the missing-table case loudly so an operator notices
 				// without having to grep logs — bitrix24 channels silently
-				// no-op until `goclaw migrate up` runs migration 000058.
+				// no-op until `mantomanagent migrate up` runs migration 000058.
 				if strings.Contains(err.Error(), "bitrix_portals") &&
 					(strings.Contains(err.Error(), "does not exist") || strings.Contains(err.Error(), "no such table")) {
-					slog.Warn("bitrix24 bootstrap skipped — bitrix_portals table missing; run `goclaw migrate up` (migration 000068) to enable Bitrix24 channels",
+					slog.Warn("bitrix24 bootstrap skipped — bitrix_portals table missing; run `mantomanagent migrate up` (migration 000068) to enable Bitrix24 channels",
 						"err", err)
 				} else {
 					slog.Warn("bitrix24 bootstrap failed", "err", err)
@@ -983,7 +983,7 @@ func runGateway() {
 	// Without this, deleting a disabled Bitrix24 channel would orphan the bot
 	// on the portal.
 	if pgStores.BitrixPortals != nil {
-		bitrixEncKey := os.Getenv("GOCLAW_ENCRYPTION_KEY")
+		bitrixEncKey := os.Getenv("MANTOMANAGENT_ENCRYPTION_KEY")
 		orphanCleaner := func(ctx context.Context, tenantID uuid.UUID, cfg []byte) error {
 			return bitrix24.DestroyOrphanBot(ctx, pgStores.BitrixPortals, bitrixEncKey, tenantID, cfg)
 		}

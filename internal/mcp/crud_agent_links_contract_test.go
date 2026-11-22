@@ -14,8 +14,8 @@ func TestAgentLinkMaxConcurrentSchemaIsCompatibilityMetadata(t *testing.T) {
 	registerAgentLinkCRUDTools(srv, links)
 
 	for _, toolName := range []string{
-		"goclaw_agent_links_create",
-		"goclaw_agent_links_update",
+		"mantomanagent_agent_links_create",
+		"mantomanagent_agent_links_update",
 	} {
 		registered := srv.GetTool(toolName)
 		if registered == nil {

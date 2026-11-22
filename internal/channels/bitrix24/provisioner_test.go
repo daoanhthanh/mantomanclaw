@@ -570,7 +570,7 @@ func attachTestPortal(t *testing.T, bc *Channel, oauthSrv *httptest.Server) {
 	bc.encKey = testOAuthEncKey
 	portalFS := newFakeStore()
 	portal := newTestPortal(t, oauthSrv, portalFS, bc.TenantID(), "p",
-		store.BitrixPortalState{PublicURL: "https://goclaw.example.com"})
+		store.BitrixPortalState{PublicURL: "https://mantomanagent.example.com"})
 	bc.startMu.Lock()
 	bc.portal = portal
 	bc.startMu.Unlock()

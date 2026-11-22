@@ -83,7 +83,7 @@ type bitrixInstanceConfig struct {
 	ChatBehavior *config.ChatBehaviorConfig `json:"chat_behavior,omitempty"`
 
 	// Webhook endpoint override. Bitrix24 imbot.register requires absolute
-	// URLs for EVENT_MESSAGE_ADD etc. GoClaw has no global GOCLAW_PUBLIC_URL
+	// URLs for EVENT_MESSAGE_ADD etc. ManToManAgent has no global MANTOMANAGENT_PUBLIC_URL
 	// setting — we let operators configure it per-instance so multiple
 	// gateways fronting different ingresses can co-exist.
 	//

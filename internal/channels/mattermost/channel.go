@@ -1,4 +1,4 @@
-// Package mattermost connects GoClaw agents to a Mattermost server through a
+// Package mattermost connects ManToManAgent agents to a Mattermost server through a
 // bot account: inbound posts arrive over the API v4 websocket, replies go out
 // through the REST API.
 package mattermost

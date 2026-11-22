@@ -21,7 +21,7 @@ import (
 const (
 	testToken       = "test-token"
 	testBotID       = "bot1"
-	testBotUsername = "goclawbot"
+	testBotUsername = "mantomanagentbot"
 )
 
 // recordedCall is one REST request the fake server received.

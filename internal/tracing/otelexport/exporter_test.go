@@ -82,7 +82,7 @@ func TestConfig_DefaultServiceName(t *testing.T) {
 		Insecure: true,
 	}
 	if cfg.ServiceName == "" {
-		// New should default to "goclaw-gateway"
+		// New should default to "mantomanagent-gateway"
 		// We can't easily test this without a running OTLP server,
 		// but we verify the config struct accepts empty service name
 	}

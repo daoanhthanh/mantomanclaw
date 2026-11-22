@@ -66,15 +66,15 @@ token in `config.json`.
 
 | Env var | Default | Notes |
 |---------|---------|-------|
-| `GOCLAW_PACKAGES_GITHUB_TOKEN` | `""` | Optional PAT: rate 60/hr → 5000/hr + private repo access |
-| `GOCLAW_PACKAGES_MAX_ASSET_SIZE_MB` | `200` | Applies to both download cap and 2× uncompressed cap |
-| `GOCLAW_PACKAGES_GITHUB_ALLOWED_ORGS` | `""` | Comma-separated allowlist (empty = all orgs allowed) |
-| `GOCLAW_PACKAGES_GITHUB_BIN_DIR` | `{runtimeDir}/bin` | Where extracted binaries land |
-| `GOCLAW_PACKAGES_GITHUB_MANIFEST` | `{bin_dir}/../github-packages.json` | Manifest path |
+| `MANTOMANAGENT_PACKAGES_GITHUB_TOKEN` | `""` | Optional PAT: rate 60/hr → 5000/hr + private repo access |
+| `MANTOMANAGENT_PACKAGES_MAX_ASSET_SIZE_MB` | `200` | Applies to both download cap and 2× uncompressed cap |
+| `MANTOMANAGENT_PACKAGES_GITHUB_ALLOWED_ORGS` | `""` | Comma-separated allowlist (empty = all orgs allowed) |
+| `MANTOMANAGENT_PACKAGES_GITHUB_BIN_DIR` | `{runtimeDir}/bin` | Where extracted binaries land |
+| `MANTOMANAGENT_PACKAGES_GITHUB_MANIFEST` | `{bin_dir}/../github-packages.json` | Manifest path |
 
 `packages.scratch_dir` in `config.json` is optional. If it is empty or cannot
 be created, updates use `{runtimeDir}/tmp` so bare-metal services do not depend
-on root-owned release directories such as `/opt/goclaw/tmp`.
+on root-owned release directories such as `/opt/mantomanagent/tmp`.
 
 Token scopes:
 - public-only repos: no scopes required
@@ -101,7 +101,7 @@ Token scopes:
 
 ### "glibc not found" / segfault on execution
 
-GoClaw runs on Alpine Linux (musl libc). Many Go/Rust binaries target glibc.
+ManToManAgent runs on Alpine Linux (musl libc). Many Go/Rust binaries target glibc.
 
 **Fix:** pick a musl-compatible release asset. Look for names containing:
 - `*-musl.tar.gz` (explicit musl)
@@ -127,7 +127,7 @@ matching the host arch — the release picker UI filters automatically.
 ### "rate limit exceeded"
 
 Anonymous GitHub API is capped at 60 req/hr. Set
-`GOCLAW_PACKAGES_GITHUB_TOKEN` to bump to 5000/hr.
+`MANTOMANAGENT_PACKAGES_GITHUB_TOKEN` to bump to 5000/hr.
 
 ### "checksum mismatch"
 
@@ -137,7 +137,7 @@ the release. Do not force-install; report upstream.
 ## Limitations (Phase 1)
 
 - Linux-only (Lite/Desktop editions not yet supported)
-- Docker and bare-metal gateway editions (default runtime dir resolves to `/app/data/.runtime/bin` in Docker or `/var/lib/goclaw/data/.runtime/bin` on bare-metal Linux)
+- Docker and bare-metal gateway editions (default runtime dir resolves to `/app/data/.runtime/bin` in Docker or `/var/lib/mantomanagent/data/.runtime/bin` on bare-metal Linux)
 - Installs all top-level executables in an archive (no interactive picker if
   archive contains multiple binaries)
 - No version history / rollback — re-installing replaces in place

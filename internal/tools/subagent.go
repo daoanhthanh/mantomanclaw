@@ -1,7 +1,7 @@
 // Package tools provides the subagent system for spawning child agent instances.
 //
 // Subagents run in background goroutines with restricted tool access.
-// Key GoClaw constraints:
+// Key ManToManAgent constraints:
 //   - Depth limit: configurable maxSpawnDepth (default 1)
 //   - Max children per parent: configurable (default 5)
 //   - Max executing descendants per root agent: configurable (default 20)

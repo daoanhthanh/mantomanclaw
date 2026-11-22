@@ -46,7 +46,7 @@ type webhookMsgTester interface {
 
 // WebhooksAdminHandler implements CRUD for webhook registry entries.
 // All endpoints are tenant-admin-gated (requireTenantAdmin).
-// encKey is the AES-256-GCM encryption key (GOCLAW_ENCRYPTION_KEY); if empty, encrypted_secret
+// encKey is the AES-256-GCM encryption key (MANTOMANAGENT_ENCRYPTION_KEY); if empty, encrypted_secret
 // is stored as "" and HMAC auth requires rotation before it can be used.
 type WebhooksAdminHandler struct {
 	webhooks  store.WebhookStore
@@ -145,7 +145,7 @@ type webhookCreateResp struct {
 	Kind            string     `json:"kind"`
 	SecretPrefix    string     `json:"secret_prefix"`
 	Secret          string     `json:"secret"`           // raw secret — shown ONCE; use this as HMAC key
-	HMACSigningKey  string     `json:"hmac_signing_key"` // same as Secret — raw bytes for X-GoClaw-Signature
+	HMACSigningKey  string     `json:"hmac_signing_key"` // same as Secret — raw bytes for X-ManToManAgent-Signature
 	Scopes          []string   `json:"scopes"`
 	ChannelID       *uuid.UUID `json:"channel_id,omitempty"`
 	RateLimitPerMin int        `json:"rate_limit_per_min"`

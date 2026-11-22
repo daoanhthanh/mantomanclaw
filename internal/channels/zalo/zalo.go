@@ -366,7 +366,7 @@ func (c *Channel) downloadMedia(url string) (string, error) {
 		ext = ".webp"
 	}
 
-	f, err := os.CreateTemp("", "goclaw_zalo_*"+ext)
+	f, err := os.CreateTemp("", "mantomanagent_zalo_*"+ext)
 	if err != nil {
 		return "", fmt.Errorf("create temp: %w", err)
 	}

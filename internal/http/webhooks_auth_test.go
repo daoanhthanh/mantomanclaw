@@ -225,7 +225,7 @@ func hmacReq(webhookID uuid.UUID, keyBytes []byte, body string, tsOffset int64) 
 	sig := signHMAC(keyBytes, ts, []byte(body))
 	sigHeader := fmt.Sprintf("t=%d,v1=%s", ts, sig)
 	r := httptest.NewRequest(http.MethodPost, "/v1/webhooks/llm", bytes.NewBufferString(body))
-	r.Header.Set("X-GoClaw-Signature", sigHeader)
+	r.Header.Set("X-ManToManAgent-Signature", sigHeader)
 	r.Header.Set("X-Webhook-Id", webhookID.String())
 	r.Header.Set("Content-Type", "application/json")
 	return r
@@ -312,7 +312,7 @@ func TestWebhookAuth_HMACTamperedBody(t *testing.T) {
 	tamperedBody := `{"input":"tampered"}`
 	sigHeader := fmt.Sprintf("t=%d,v1=%s", ts, sig)
 	r := httptest.NewRequest(http.MethodPost, "/v1/webhooks/llm", bytes.NewBufferString(tamperedBody))
-	r.Header.Set("X-GoClaw-Signature", sigHeader)
+	r.Header.Set("X-ManToManAgent-Signature", sigHeader)
 	r.Header.Set("X-Webhook-Id", wh.ID.String())
 
 	handler := makeMiddlewareWithKey(ws, calls, testEncKeyAuth, "llm", WebhookMaxBodyLLM)
@@ -691,7 +691,7 @@ func TestWebhookAuth_HMACReplayRejected(t *testing.T) {
 
 	makeReq := func() *http.Request {
 		r := httptest.NewRequest(http.MethodPost, "/v1/webhooks/llm", bytes.NewBufferString(body))
-		r.Header.Set("X-GoClaw-Signature", sigHeader)
+		r.Header.Set("X-ManToManAgent-Signature", sigHeader)
 		r.Header.Set("X-Webhook-Id", wh.ID.String())
 		r.Header.Set("Content-Type", "application/json")
 		return r

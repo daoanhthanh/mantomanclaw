@@ -22,9 +22,9 @@ import (
 // with full schema.
 //
 // It builds a minimal generic MCP server directly with the underlying
-// mark3labs/mcp-go library (no dependency on any goclaw-specific server such
+// mark3labs/mcp-go library (no dependency on any mantomanagent-specific server such
 // as the CRUD server), serves it over streamable-http via httptest
-// (mirroring a goclaw gateway connecting to an MCP endpoint), connects to it
+// (mirroring a mantomanagent gateway connecting to an MCP endpoint), connects to it
 // with the exact client path used by the Manager (connectAndDiscover), and
 // proves the resulting tool cache (buildCachedToolInfo) — and the full
 // downstream pipeline through ListToolsForAgent with a bare-name tool_allow
@@ -47,9 +47,9 @@ func TestSelfConnectedServer_CacheRetainsDescriptionAndSchema(t *testing.T) {
 	ts := httptest.NewServer(httpSrv)
 	defer ts.Close()
 
-	// "goclaw" is the same ClientInfo.Name used by connectAndDiscover in
+	// "mantomanagent" is the same ClientInfo.Name used by connectAndDiscover in
 	// production (manager_connect.go).
-	ss, mcpTools, err := connectAndDiscover(context.Background(), "goclaw", "streamable-http", "", nil, nil, ts.URL, nil, 10)
+	ss, mcpTools, err := connectAndDiscover(context.Background(), "mantomanagent", "streamable-http", "", nil, nil, ts.URL, nil, 10)
 	if err != nil {
 		t.Fatalf("connectAndDiscover: %v", err)
 	}
@@ -94,7 +94,7 @@ func TestSelfConnectedServer_CacheRetainsDescriptionAndSchema(t *testing.T) {
 			{
 				Server: store.MCPServerData{
 					BaseModel: store.BaseModel{ID: serverID},
-					Name:      "goclaw",
+					Name:      "mantomanagent",
 					Enabled:   true,
 					Settings:  settings,
 				},
@@ -109,12 +109,12 @@ func TestSelfConnectedServer_CacheRetainsDescriptionAndSchema(t *testing.T) {
 	}
 	var found *MCPToolPreviewInfo
 	for i := range previews {
-		if previews[i].RegisteredName == "mcp_goclaw__test_tool" {
+		if previews[i].RegisteredName == "mcp_mantomanagent__test_tool" {
 			found = &previews[i]
 		}
 	}
 	if found == nil {
-		t.Fatalf("expected mcp_goclaw__test_tool in preview, got %+v", previews)
+		t.Fatalf("expected mcp_mantomanagent__test_tool in preview, got %+v", previews)
 	}
 	if found.Description == "" {
 		t.Fatal("preview: expected non-empty description (regression)")

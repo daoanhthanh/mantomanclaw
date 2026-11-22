@@ -356,7 +356,7 @@
     },
     "server_url": {
       "label": "Server URL",
-      "help": "Base URL of your Mattermost server. A server on a private network (10.x, 192.168.x, localhost) also needs GOCLAW_ALLOW_PRIVATE_MATTERMOST_URLS=true on the gateway."
+      "help": "Base URL of your Mattermost server. A server on a private network (10.x, 192.168.x, localhost) also needs MANTOMANAGENT_ALLOW_PRIVATE_MATTERMOST_URLS=true on the gateway."
     },
     "proxy": {
       "label": "HTTP Proxy",
@@ -836,7 +836,7 @@
         "invalidDomain": "Must be a valid hostname (e.g. mycorp.bitrix24.com, mycorp.bitrix24.vn, or your self-hosted domain).",
         "duplicateName": "A portal with this name already exists.",
         "forbidden": "You need tenant admin permission to create portals.",
-        "gatewayURLUnknown": "Open the goclaw UI via your public URL first (not localhost), then retry."
+        "gatewayURLUnknown": "Open the mantomanagent UI via your public URL first (not localhost), then retry."
       },
       "help": {
         "title": "How to get Client ID and Secret?",
@@ -854,7 +854,7 @@
         "installed": "Portal installed successfully!",
         "timedOut": "Authorization not completed yet. You can resume from the dropdown.",
         "closeResumeLater": "Close (resume later)",
-        "urlUnknown": "Install URL is unavailable. Open the goclaw UI via your public URL and retry from the dropdown."
+        "urlUnknown": "Install URL is unavailable. Open the mantomanagent UI via your public URL and retry from the dropdown."
       }
     }
   }

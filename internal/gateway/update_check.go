@@ -93,7 +93,7 @@ func (uc *UpdateChecker) check() {
 		return
 	}
 	req.Header.Set("Accept", "application/vnd.github+json")
-	req.Header.Set("User-Agent", "goclaw/"+uc.currentVersion)
+	req.Header.Set("User-Agent", "mantomanagent/"+uc.currentVersion)
 
 	// ETag conditional request to reduce API rate limit usage.
 	if uc.etag != "" {

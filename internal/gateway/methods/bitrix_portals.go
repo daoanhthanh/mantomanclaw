@@ -28,7 +28,7 @@ import (
 // tenant member, create/delete require RoleAdmin.
 //
 // gatewayPublicURL is a late-bound provider returning the gateway's externally
-// reachable base URL (e.g. "https://goclaw.tamgiac.com"). Used to build the
+// reachable base URL (e.g. "https://mantomanagent.tamgiac.com"). Used to build the
 // install URL we hand back to the UI. The HTTP middleware updates this on
 // every authenticated request so the value tracks ingress changes without
 // requiring static config — see SetGatewayPublicURLSnapshot.
@@ -393,7 +393,7 @@ func (m *BitrixPortalsMethods) buildInstallURL(tid uuid.UUID, name string) (stri
 	}
 	base := strings.TrimRight(strings.TrimSpace(m.gatewayPublicURL()), "/")
 	if base == "" {
-		return "", errors.New("gateway public URL unknown — open the UI via your public goclaw URL first, then retry")
+		return "", errors.New("gateway public URL unknown — open the UI via your public mantomanagent URL first, then retry")
 	}
 	return base + "/bitrix24/install?state=" + tid.String() + ":" + name, nil
 }

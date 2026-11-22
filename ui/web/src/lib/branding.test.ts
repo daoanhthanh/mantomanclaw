@@ -7,7 +7,7 @@ describe("runtime branding", () => {
     document.head.innerHTML = "";
   });
 
-  it("falls back to built-in GoClaw branding", () => {
+  it("falls back to built-in ManToManAgent branding", () => {
     expect(getRuntimeBranding()).toEqual({
       appName: "ManToMan Agent",
       appShortName: "ManToMan Agent",
@@ -17,7 +17,7 @@ describe("runtime branding", () => {
 
   it("reads branding injected by the server", () => {
     const script = document.createElement("script");
-    script.id = "goclaw-branding";
+    script.id = "mantomanagent-branding";
     script.type = "application/json";
     script.textContent = JSON.stringify({
       app_name: "Acme Agents",

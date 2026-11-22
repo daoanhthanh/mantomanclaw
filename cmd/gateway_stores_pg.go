@@ -22,7 +22,7 @@ func setupStoresAndTracing(
 	msgBus *bus.MessageBus,
 ) (*store.Stores, *tracing.Collector, *tracing.SnapshotWorker) {
 	if cfg.Database.PostgresDSN == "" {
-		slog.Error("GOCLAW_POSTGRES_DSN is required. Set it in your environment or .env.local file.")
+		slog.Error("MANTOMANAGENT_POSTGRES_DSN is required. Set it in your environment or .env.local file.")
 		os.Exit(1)
 	}
 
@@ -33,7 +33,7 @@ func setupStoresAndTracing(
 
 	storeCfg := store.StoreConfig{
 		PostgresDSN:      cfg.Database.PostgresDSN,
-		EncryptionKey:    os.Getenv("GOCLAW_ENCRYPTION_KEY"),
+		EncryptionKey:    os.Getenv("MANTOMANAGENT_ENCRYPTION_KEY"),
 		SkillsStorageDir: filepath.Join(dataDir, "skills-store"),
 	}
 	pgStores, pgErr := pg.NewPGStores(storeCfg)

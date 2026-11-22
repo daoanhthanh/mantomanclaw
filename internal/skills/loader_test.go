@@ -13,7 +13,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	os.Setenv("GOCLAW_DISABLE_PERSONAL_SKILLS", "1")
+	os.Setenv("MANTOMANAGENT_DISABLE_PERSONAL_SKILLS", "1")
 	os.Exit(m.Run())
 }
 

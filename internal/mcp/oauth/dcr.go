@@ -36,7 +36,7 @@ func RegisterClient(ctx context.Context, client *http.Client, registrationEndpoi
 		RedirectURIs:            []string{callbackURL},
 		GrantTypes:              []string{"authorization_code", "refresh_token"},
 		ResponseTypes:           []string{"code"},
-		ClientName:              "GoClaw Gateway",
+		ClientName:              "ManToManAgent Gateway",
 		TokenEndpointAuthMethod: "none", // public client — PKCE handles security
 	}
 	data, err := json.Marshal(body)

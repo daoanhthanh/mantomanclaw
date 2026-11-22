@@ -257,7 +257,7 @@ func (ch *Channel) sendInboxReply(ctx context.Context, msg bus.OutboundMessage) 
 }
 
 // sendCommentReply posts a public reply to a comment and optionally sends a
-// one-time private DM to the commenter (best-effort). Stateless — no GoClaw
+// one-time private DM to the commenter (best-effort). Stateless — no ManToManAgent
 // dedup state; webhook-level comment_id dedup + FB platform per-comment
 // idempotency prevent duplicates.
 func (ch *Channel) sendCommentReply(ctx context.Context, msg bus.OutboundMessage) error {

@@ -93,7 +93,7 @@ func ClassifyChannelError(err error) ChannelErrorInfo {
 	if err == nil {
 		return ChannelErrorInfo{
 			Summary:   "Channel failed",
-			Detail:    "GoClaw could not determine the latest channel error.",
+			Detail:    "ManToManAgent could not determine the latest channel error.",
 			Kind:      ChannelFailureKindUnknown,
 			Retryable: true,
 		}
@@ -112,7 +112,7 @@ func ClassifyChannelError(err error) ChannelErrorInfo {
 	if errors.As(err, &dnsErr) {
 		return ChannelErrorInfo{
 			Summary:   "Network error",
-			Detail:    "GoClaw could not resolve the upstream host.",
+			Detail:    "ManToManAgent could not resolve the upstream host.",
 			Kind:      ChannelFailureKindNetwork,
 			Retryable: !dnsErr.IsNotFound,
 		}
@@ -129,7 +129,7 @@ func ClassifyChannelError(err error) ChannelErrorInfo {
 		}
 		return ChannelErrorInfo{
 			Summary:   "Network error",
-			Detail:    "GoClaw could not open a network connection to the upstream service.",
+			Detail:    "ManToManAgent could not open a network connection to the upstream service.",
 			Kind:      ChannelFailureKindNetwork,
 			Retryable: true,
 		}
@@ -199,7 +199,7 @@ func ClassifyChannelError(err error) ChannelErrorInfo {
 	case strings.Contains(msg, "no such host"):
 		return ChannelErrorInfo{
 			Summary:   "Network error",
-			Detail:    "GoClaw could not resolve the upstream host.",
+			Detail:    "ManToManAgent could not resolve the upstream host.",
 			Kind:      ChannelFailureKindNetwork,
 			Retryable: true,
 		}
@@ -215,7 +215,7 @@ func ClassifyChannelError(err error) ChannelErrorInfo {
 		strings.Contains(msg, "tcp "):
 		return ChannelErrorInfo{
 			Summary:   "Network error",
-			Detail:    "GoClaw could not open a network connection to the upstream service.",
+			Detail:    "ManToManAgent could not open a network connection to the upstream service.",
 			Kind:      ChannelFailureKindNetwork,
 			Retryable: true,
 		}
@@ -366,7 +366,7 @@ func buildChannelRemediation(snapshot ChannelHealth) *ChannelRemediation {
 		return &ChannelRemediation{
 			Code:     ChannelRemediationCodeCheckNetwork,
 			Headline: "Check upstream reachability",
-			Hint:     "Verify the upstream service is reachable from GoClaw, then inspect proxy or API server settings if you use them.",
+			Hint:     "Verify the upstream service is reachable from ManToManAgent, then inspect proxy or API server settings if you use them.",
 			Target:   ChannelRemediationTargetDetails,
 		}
 	default:

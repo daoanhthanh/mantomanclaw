@@ -30,7 +30,7 @@ type MCPOAuthHandler struct {
 	flowMgr    *mcpoauth.FlowManager
 	refresher  *mcpoauth.Refresher
 	eventBus   bus.EventPublisher
-	publicURL  string // e.g. "https://goclaw.example.com"
+	publicURL  string // e.g. "https://mantomanagent.example.com"
 	port       int
 	evictor    MCPPoolEvictor
 	// tenantStore gates tenant-scoped writes (token mint/revoke/admin status) with a
@@ -154,7 +154,7 @@ type startOAuthResp struct {
 // dropboxOfflineAuthParam returns the authorization-request parameter Dropbox
 // requires to issue a refresh token. Dropbox's default is an online-only token
 // (expires ~4h, cannot be refreshed), so every Dropbox authorize URL must carry
-// token_access_type=offline for goclaw's auto-refresh to work. Returns nil for
+// token_access_type=offline for mantomanagent's auto-refresh to work. Returns nil for
 // every other authorization server — unknown params could break stricter ASes.
 func dropboxOfflineAuthParam(authEndpoint string) url.Values {
 	u, err := url.Parse(authEndpoint)

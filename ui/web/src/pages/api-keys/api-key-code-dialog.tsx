@@ -98,8 +98,8 @@ export function ApiKeyCodeDialog({ open, onOpenChange }: Props) {
   const [tab, setTab] = useState<Tab>("curl");
   const [copied, setCopied] = useState(false);
 
-  const baseUrl = "https://YOUR-GOCLAW-BACKEND";
-  const placeholder = "YOUR-GOCLAW-API-KEY";
+  const baseUrl = "https://YOUR-MANTOMANAGENT-BACKEND";
+  const placeholder = "YOUR-MANTOMANAGENT-API-KEY";
 
   const snippets: Record<Tab, string> = useMemo(() => ({
     curl: buildCurl(baseUrl, placeholder, t),

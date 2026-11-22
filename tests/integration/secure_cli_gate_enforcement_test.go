@@ -17,7 +17,7 @@ import (
 
 // gateTestBinaryName is deliberately NOT a real binary on PATH so the
 // "allowed" path can never accidentally exec something real.
-const gateTestBinaryName = "goclaw_test_cli"
+const gateTestBinaryName = "mantomanagent_test_cli"
 
 // gateFixture holds the common seeds for gate enforcement tests.
 type gateFixture struct {
@@ -192,7 +192,7 @@ func TestSecureCLIGate_IsGlobalBinaryNotDenied(t *testing.T) {
 
 	db := testDB(t)
 	tenantID, agentID := seedTenantAgent(t, db)
-	seedGateBinary(t, db, tenantID, "goclaw_global_test", true)
+	seedGateBinary(t, db, tenantID, "mantomanagent_global_test", true)
 
 	secStore := pg.NewPGSecureCLIStore(db, testEncryptionKey)
 	tool := tools.NewExecTool(t.TempDir(), false)
@@ -200,7 +200,7 @@ func TestSecureCLIGate_IsGlobalBinaryNotDenied(t *testing.T) {
 
 	ctx := gateCtx(tenantID, agentID)
 	result := tool.Execute(ctx, map[string]any{
-		"command": "goclaw_global_test --help",
+		"command": "mantomanagent_global_test --help",
 	})
 
 	if strings.Contains(result.ForLLM, "requires a secure CLI grant") {

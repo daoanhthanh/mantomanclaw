@@ -159,7 +159,7 @@ func TestGitAdapter_PrepareSSH(t *testing.T) {
 	// Extract keypath: token after "-i ".
 	rest := strings.TrimPrefix(gsc, "ssh -i ")
 	keyPath := strings.SplitN(rest, " ", 2)[0]
-	if !strings.Contains(keyPath, "goclaw-gitkey-") {
+	if !strings.Contains(keyPath, "mantomanagent-gitkey-") {
 		t.Fatalf("keypath not in expected tmp prefix: %s", keyPath)
 	}
 	if !strings.HasPrefix(keyPath, os.TempDir()) {

@@ -224,8 +224,8 @@ func TestPromptCacheOptionsHelpers(t *testing.T) {
 	if key1 == key3 {
 		t.Fatal("defaultPromptCacheKey should vary by session")
 	}
-	if !strings.HasPrefix(key1, "goclaw/") {
-		t.Fatalf("defaultPromptCacheKey = %q, want goclaw/ prefix", key1)
+	if !strings.HasPrefix(key1, "mantomanagent/") {
+		t.Fatalf("defaultPromptCacheKey = %q, want mantomanagent/ prefix", key1)
 	}
 
 	opts := map[string]any{}

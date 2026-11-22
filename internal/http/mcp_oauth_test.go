@@ -296,10 +296,10 @@ func TestDropboxOfflineAuthParam(t *testing.T) {
 }
 
 func TestCallbackURLPublicURL(t *testing.T) {
-	h := &MCPOAuthHandler{publicURL: "https://goclaw.example.com"}
+	h := &MCPOAuthHandler{publicURL: "https://mantomanagent.example.com"}
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
 	got := h.callbackURL(r)
-	want := "https://goclaw.example.com/v1/mcp/oauth/callback"
+	want := "https://mantomanagent.example.com/v1/mcp/oauth/callback"
 	if got != want {
 		t.Errorf("callbackURL = %q, want %q", got, want)
 	}
@@ -308,11 +308,11 @@ func TestCallbackURLPublicURL(t *testing.T) {
 func TestCallbackURLForwardedHost(t *testing.T) {
 	h := &MCPOAuthHandler{}
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
-	r.Header.Set("X-Forwarded-Host", "goclaw.example.com")
+	r.Header.Set("X-Forwarded-Host", "mantomanagent.example.com")
 	r.Header.Set("X-Forwarded-Proto", "https")
 	got := h.callbackURL(r)
-	if !strings.HasPrefix(got, "https://goclaw.example.com") {
-		t.Errorf("callbackURL = %q, want https://goclaw.example.com prefix", got)
+	if !strings.HasPrefix(got, "https://mantomanagent.example.com") {
+		t.Errorf("callbackURL = %q, want https://mantomanagent.example.com prefix", got)
 	}
 }
 

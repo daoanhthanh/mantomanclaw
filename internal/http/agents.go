@@ -49,7 +49,7 @@ type AgentsHandler struct {
 	secureCLIGrants           store.SecureCLIAgentGrantStore
 	secureCLIAgentCreds       store.SecureCLIAgentCredentialStore
 	defaultWorkspace          string // default workspace path template (e.g. "~/.mantomanagent/workspace")
-	dataDir                   string // resolved data directory (e.g. "~/.goclaw/data") — for team workspace export
+	dataDir                   string // resolved data directory (e.g. "~/.mantomanagent/data") — for team workspace export
 	gatewayAddr               string
 	msgBus                    *bus.MessageBus   // for cache invalidation events (nil = no events)
 	summoner                  *AgentSummoner    // LLM-based agent setup (nil = disabled)
@@ -58,7 +58,7 @@ type AgentsHandler struct {
 }
 
 // NewAgentsHandler creates a handler for agent management endpoints.
-// isOwner is a function that checks if a user ID is in GOCLAW_OWNER_IDS (nil = disabled).
+// isOwner is a function that checks if a user ID is in MANTOMANAGENT_OWNER_IDS (nil = disabled).
 func NewAgentsHandler(agents store.AgentStore, providers store.ProviderStore, providerReg *providers.Registry, db *sql.DB, tracing store.TracingStore, defaultWorkspace string, msgBus *bus.MessageBus, summoner *AgentSummoner, isOwner func(string) bool) *AgentsHandler {
 	return &AgentsHandler{
 		agents:           agents,

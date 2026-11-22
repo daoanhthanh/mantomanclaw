@@ -9,12 +9,12 @@ import (
 	"github.com/nextlevelbuilder/goclaw/internal/store"
 )
 
-// registerActivityCRUDTools registers goclaw_activity_list, backed by
-// store.ActivityStore — closes a CLI-vs-MCP coverage gap (`goclaw activity
+// registerActivityCRUDTools registers mantomanagent_activity_list, backed by
+// store.ActivityStore — closes a CLI-vs-MCP coverage gap (`mantomanagent activity
 // list`, the audit log of admin/agent actions emitted via emitAudit
 // throughout internal/http).
 func registerActivityCRUDTools(srv *mcpserver.MCPServer, activity store.ActivityStore) {
-	srv.AddTool(mcpgo.NewTool("goclaw_activity_list",
+	srv.AddTool(mcpgo.NewTool("mantomanagent_activity_list",
 		mcpgo.WithDescription("List audit log entries (admin/agent actions), optionally filtered."),
 		mcpgo.WithString("actor_type", mcpgo.Description("Filter by actor type (e.g. \"user\", \"agent\", \"system\").")),
 		mcpgo.WithString("actor_id", mcpgo.Description("Filter by actor ID.")),

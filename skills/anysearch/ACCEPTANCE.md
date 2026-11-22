@@ -1,6 +1,6 @@
 # AnySearch Integration — Acceptance Checklist
 
-Filled against [AnySearch 内置接入资料与审查清单](./anysearch-integration-guide.md snapshot, 2026-09-14) for GoClaw Claim `goclaw#001`.
+Filled against [AnySearch 内置接入资料与审查清单](./anysearch-integration-guide.md snapshot, 2026-09-14) for ManToManAgent Claim `mantomanagent#001`.
 
 **Evidence date:** 2026-09-24 (anonymous live smoke + offline fixtures)  
 **Integration channel:** REST via bundled skill CLIs (`skills/anysearch/scripts/anysearch_cli.{py,js}`)  

@@ -29,7 +29,7 @@ var sharedHookHandlers map[hooks.HandlerType]hooks.Handler
 // to pg.NewPGHookBudget so token spend is atomically deducted per tenant.
 // When the DB handle is unavailable, budget falls back to nil (Lite desktop).
 func buildHookHandlers(stores *store.Stores, providerReg *providers.Registry, hooksCfg config.HooksConfig, usageCapSvc *usagecaps.Service) map[hooks.HandlerType]hooks.Handler {
-	encryptKey := os.Getenv("GOCLAW_ENCRYPTION_KEY")
+	encryptKey := os.Getenv("MANTOMANAGENT_ENCRYPTION_KEY")
 
 	var budgetStore *budget.Store
 	if stores != nil && stores.DB != nil {

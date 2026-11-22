@@ -10,13 +10,13 @@
 #   # Check status:
 #   docker compose -f docker-compose.yml -f docker-compose.postgres.yml -f docker-compose.upgrade.yml run --rm upgrade --status
 #
-# The upgrade service runs goclaw upgrade and exits. Use --rm to auto-remove the container.
+# The upgrade service runs mantomanagent upgrade and exits. Use --rm to auto-remove the container.
 
 services:
   upgrade:
     image: ghcr.io/nextlevelbuilder/goclaw:latest
     build:
-      context: ${GOCLAW_DIR:-.}
+      context: ${MANTOMANAGENT_DIR:-.}
       dockerfile: Dockerfile
       args:
         ENABLE_OTEL: "false"
@@ -24,15 +24,15 @@ services:
       - path: .env
         required: false
     environment:
-      - GOCLAW_POSTGRES_DSN=postgres://${POSTGRES_USER:-goclaw}:${POSTGRES_PASSWORD:-goclaw}@postgres:5432/${POSTGRES_DB:-goclaw}?sslmode=disable
-      - GOCLAW_CONFIG=/app/data/config.json
-      - GOCLAW_MIGRATIONS_DIR=/app/migrations
-      - GOCLAW_ENCRYPTION_KEY=${GOCLAW_ENCRYPTION_KEY:-}
+      - MANTOMANAGENT_POSTGRES_DSN=postgres://${POSTGRES_USER:-mantomanagent}:${POSTGRES_PASSWORD:-mantomanagent}@postgres:5432/${POSTGRES_DB:-mantomanagent}?sslmode=disable
+      - MANTOMANAGENT_CONFIG=/app/data/config.json
+      - MANTOMANAGENT_MIGRATIONS_DIR=/app/migrations
+      - MANTOMANAGENT_ENCRYPTION_KEY=${MANTOMANAGENT_ENCRYPTION_KEY:-}
     volumes:
-      - goclaw-data:/app/data
+      - mantomanagent-data:/app/data
     depends_on:
       postgres:
         condition: service_healthy
-    entrypoint: ["/app/goclaw"]
+    entrypoint: ["/app/mantomanagent"]
     command: ["upgrade"]
     restart: "no"

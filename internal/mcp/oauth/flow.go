@@ -68,7 +68,7 @@ type StartFlowParams struct {
 	GrantType string
 
 	// ExtraAuthParams carries provider-specific authorization-request parameters
-	// that goclaw's generic flow does not otherwise set (e.g. Dropbox's
+	// that mantomanagent's generic flow does not otherwise set (e.g. Dropbox's
 	// token_access_type=offline, which the AS requires to issue a refresh token;
 	// without it Dropbox returns an online-only token that cannot be refreshed).
 	// Standard OAuth keys already set by StartFlow are never overridden.

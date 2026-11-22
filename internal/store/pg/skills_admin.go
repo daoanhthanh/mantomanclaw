@@ -65,7 +65,7 @@ func (s *PGSkillStore) UpsertSystemSkill(ctx context.Context, p store.SkillCreat
 	var customID uuid.UUID
 	var recoveryMarker string
 	err = s.db.QueryRowContext(ctx,
-		`SELECT id, COALESCE(frontmatter->>'_goclaw_recovery', '') FROM skills
+		`SELECT id, COALESCE(frontmatter->>'_mantomanagent_recovery', '') FROM skills
 		 WHERE slug = $1 AND tenant_id = $2 AND is_system = false`,
 		p.Slug, store.MasterTenantID,
 	).Scan(&customID, &recoveryMarker)

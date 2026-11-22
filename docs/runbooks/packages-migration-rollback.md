@@ -33,14 +33,14 @@ Wait for health checks to pass before proceeding.
 
 ```bash
 # Verify old binary is live and no Phase-2 store queries are executing
-kubectl rollout status deployment/goclaw
+kubectl rollout status deployment/mantomanagent
 ```
 
 ### Step 2 — Migrate schema down
 
 ```bash
 # Against production database (use your DSN)
-./goclaw migrate down 1
+./mantomanagent migrate down 1
 # or with explicit DSN:
 migrate -database "$DATABASE_URL" -path migrations down 1
 ```
@@ -62,18 +62,18 @@ golang-migrate is PostgreSQL-only; SQLite versioning is upgrade-only.
 
 ### Option A — Clean reinstall (recommended for desktop users)
 
-1. Back up `~/.goclaw/data/goclaw.db`.
-2. Install older version of goclaw-lite.
-3. Delete `~/.goclaw/data/goclaw.db`.
+1. Back up `~/.mantomanagent/data/mantomanagent.db`.
+2. Install older version of mantomanagent-lite.
+3. Delete `~/.mantomanagent/data/mantomanagent.db`.
 4. Restart — fresh DB at v24 schema.
 
 ### Option B — Manual column drop (advanced)
 
 ```bash
-sqlite3 ~/.goclaw/data/goclaw.db \
+sqlite3 ~/.mantomanagent/data/mantomanagent.db \
   "ALTER TABLE secure_cli_agent_grants DROP COLUMN encrypted_env;"
 # Then manually update schema_version row:
-sqlite3 ~/.goclaw/data/goclaw.db \
+sqlite3 ~/.mantomanagent/data/mantomanagent.db \
   "UPDATE schema_version SET version = 26;"
 ```
 

@@ -190,7 +190,7 @@ func (s *Seeder) restoreCustomSkillMetadata(ctx context.Context, id uuid.UUID, p
 	}
 	quarantineDir := filepath.Join(
 		filepath.Dir(p.FilePath),
-		".goclaw-bundled-"+filepath.Base(p.FilePath)+"-"+(*p.FileHash)[:12],
+		".mantomanagent-bundled-"+filepath.Base(p.FilePath)+"-"+(*p.FileHash)[:12],
 	)
 	overwrittenDir := p.FilePath
 	alreadyQuarantined := false

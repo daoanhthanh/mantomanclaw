@@ -1,6 +1,6 @@
 # 05 - Channels and Messaging
 
-Channels connect external messaging platforms to the GoClaw agent runtime via a shared message bus. Each channel implementation translates platform-specific events into a unified `InboundMessage`, and converts agent responses into platform-appropriate outbound messages.
+Channels connect external messaging platforms to the ManToManAgent agent runtime via a shared message bus. Each channel implementation translates platform-specific events into a unified `InboundMessage`, and converts agent responses into platform-appropriate outbound messages.
 
 ---
 
@@ -518,7 +518,7 @@ Each update increments a sequence number for ordering. Updates are throttled at 
 
 ### Mention Resolution
 
-Feishu sends content with placeholder tokens (e.g., `@_user_1`) for mentioned users. GoClaw processes these:
+Feishu sends content with placeholder tokens (e.g., `@_user_1`) for mentioned users. ManToManAgent processes these:
 
 - **Bot mentions**: Stripped entirely (just the trigger, not meaningful content)
 - **User mentions**: Replaced with `@DisplayName` from the mention list
@@ -639,9 +639,9 @@ Key conversions: `**bold**` → `*bold*`, `~~strike~~` → `~strike~`, `[text](u
 ### Environment Variables
 
 ```
-GOCLAW_SLACK_BOT_TOKEN   → channels.slack.bot_token
-GOCLAW_SLACK_APP_TOKEN   → channels.slack.app_token
-GOCLAW_SLACK_USER_TOKEN  → channels.slack.user_token (optional)
+MANTOMANAGENT_SLACK_BOT_TOKEN   → channels.slack.bot_token
+MANTOMANAGENT_SLACK_APP_TOKEN   → channels.slack.app_token
+MANTOMANAGENT_SLACK_USER_TOKEN  → channels.slack.user_token (optional)
 ```
 
 Auto-enables when both bot_token and app_token are set.
@@ -870,7 +870,7 @@ The bot app must have the `imbot` scope granted. The `disk` scope is **not** req
 
 ## 17. Mattermost
 
-The Mattermost channel connects through a bot account: inbound posts arrive over the API v4 websocket, replies go out through the REST API. It uses a small built-in client (`internal/channels/mattermost/client.go`) on top of `gorilla/websocket` instead of the Mattermost server module. Configured as a DB channel instance (Web UI, `goclaw channels add`, HTTP/WS API) or, like Slack, through `channels.mattermost` in `config.json` / env vars (used only when no DB instance loader is active).
+The Mattermost channel connects through a bot account: inbound posts arrive over the API v4 websocket, replies go out through the REST API. It uses a small built-in client (`internal/channels/mattermost/client.go`) on top of `gorilla/websocket` instead of the Mattermost server module. Configured as a DB channel instance (Web UI, `mantomanagent channels add`, HTTP/WS API) or, like Slack, through `channels.mattermost` in `config.json` / env vars (used only when no DB instance loader is active).
 
 ### Setup
 
@@ -880,7 +880,7 @@ The Mattermost channel connects through a bot account: inbound posts arrive over
    - credentials: `bot_token`
    - config: `server_url` (e.g. `https://chat.example.com`; `http` is allowed for internal servers)
 
-   A server on a private network (10.x, 172.16–31.x, 192.168.x, localhost) also needs `GOCLAW_ALLOW_PRIVATE_MATTERMOST_URLS=true` on the gateway (see Egress policy below).
+   A server on a private network (10.x, 172.16–31.x, 192.168.x, localhost) also needs `MANTOMANAGENT_ALLOW_PRIVATE_MATTERMOST_URLS=true` on the gateway (see Egress policy below).
 
    The gateway must reach the server directly: `HTTP_PROXY` / `HTTPS_PROXY` are ignored for Mattermost, so a server reachable only through a proxy is not supported yet.
 
@@ -889,9 +889,9 @@ The Mattermost channel connects through a bot account: inbound posts arrive over
 ### Environment Variables
 
 ```
-GOCLAW_MATTERMOST_SERVER_URL          → channels.mattermost.server_url
-GOCLAW_MATTERMOST_BOT_TOKEN           → channels.mattermost.bot_token
-GOCLAW_ALLOW_PRIVATE_MATTERMOST_URLS  → allow private/loopback server addresses (true/1/yes)
+MANTOMANAGENT_MATTERMOST_SERVER_URL          → channels.mattermost.server_url
+MANTOMANAGENT_MATTERMOST_BOT_TOKEN           → channels.mattermost.bot_token
+MANTOMANAGENT_ALLOW_PRIVATE_MATTERMOST_URLS  → allow private/loopback server addresses (true/1/yes)
 ```
 
 Auto-enables when both are set. `bot_token` is masked in `config.get` and never written to `config.json`. In config mode `group_policy` defaults to `open` (as for Slack); DB instances default to `pairing`.
@@ -901,7 +901,7 @@ Auto-enables when both are set. `bot_token` is masked in `config.get` and never 
 `server_url` is operator-configured, but the gateway still treats it as an outbound target that must not open a path into the internal network (same policy as LLM provider URLs):
 
 - Every REST and websocket connection is checked at dial time against `security.IsBlocked` (`internal/channels/mattermost/egress.go`), on the IP actually dialed — so redirects (e.g. file downloads redirected to object storage) and DNS rebinding are covered too
-- Private and loopback addresses are refused unless `GOCLAW_ALLOW_PRIVATE_MATTERMOST_URLS=true`; ranges opened with `GOCLAW_SSRF_ALLOWED_CIDRS` are honoured
+- Private and loopback addresses are refused unless `MANTOMANAGENT_ALLOW_PRIVATE_MATTERMOST_URLS=true`; ranges opened with `MANTOMANAGENT_SSRF_ALLOWED_CIDRS` are honoured
 - Link-local (cloud metadata `169.254.169.254`), multicast, unspecified and reserved ranges are always refused
 - No HTTP proxy is used for Mattermost traffic (`HTTP_PROXY` / `HTTPS_PROXY` are ignored), so the check sees the real server address. Deployments that can reach Mattermost only through a proxy are not supported yet
 - A refused address fails `Start` with a non-retryable `config` health state and a hint about the env var; blocks are logged as `security.mattermost.ssrf_block`

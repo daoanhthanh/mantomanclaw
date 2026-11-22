@@ -125,11 +125,11 @@ RUN set -eux; \
     rm -f /tmp/requirements-base.txt /tmp/requirements-skills.txt
 
 # Non-root user
-RUN adduser -D -u 1000 -h /app goclaw
+RUN adduser -D -u 1000 -h /app mantomanagent
 WORKDIR /app
 
 # Copy binary, migrations, and bundled skills
-COPY --from=builder /out/goclaw /app/goclaw
+COPY --from=builder /out/mantomanagent /app/mantomanagent
 COPY --from=builder /out/pkg-helper /app/pkg-helper
 COPY --from=builder /src/migrations/ /app/migrations/
 COPY --from=builder /src/skills/ /app/bundled-skills/
@@ -155,32 +155,32 @@ RUN chmod +x /app/docker-entrypoint.sh && \
 
 # Create data directories.
 # .runtime has split ownership: root owns the dir (so pkg-helper can write apk-packages),
-# while pip/npm subdirs are goclaw-owned (runtime installs by the app process).
+# while pip/npm subdirs are mantomanagent-owned (runtime installs by the app process).
 # Symlink .claude → data volume so Claude CLI credentials persist across container recreates.
 RUN mkdir -p /app/workspace /app/data/.runtime/pip /app/data/.runtime/npm-global/lib \
         /app/data/.runtime/pip-cache /app/data/.runtime/bin /app/data/.claude /app/skills \
-        /app/tsnet-state /app/.goclaw \
+        /app/tsnet-state /app/.mantomanagent \
     && ln -s /app/data/.claude /app/.claude \
     && touch /app/data/.runtime/apk-packages \
-    && chown -R goclaw:goclaw /app/workspace /app/skills /app/tsnet-state /app/.goclaw \
-    && chown goclaw:goclaw /app/bundled-skills /app/data \
-    && chown root:goclaw /app/data/.runtime /app/data/.runtime/apk-packages \
+    && chown -R mantomanagent:mantomanagent /app/workspace /app/skills /app/tsnet-state /app/.mantomanagent \
+    && chown mantomanagent:mantomanagent /app/bundled-skills /app/data \
+    && chown root:mantomanagent /app/data/.runtime /app/data/.runtime/apk-packages \
     && chmod 0750 /app/data/.runtime \
     && chmod 0640 /app/data/.runtime/apk-packages \
-    && chown -R goclaw:goclaw /app/data/.runtime/pip /app/data/.runtime/npm-global /app/data/.runtime/pip-cache /app/data/.runtime/bin /app/data/.claude \
+    && chown -R mantomanagent:mantomanagent /app/data/.runtime/pip /app/data/.runtime/npm-global /app/data/.runtime/pip-cache /app/data/.runtime/bin /app/data/.claude \
     && chmod 0755 /app/data/.runtime/bin
 
 # Default environment
-ENV GOCLAW_CONFIG=/app/config.json \
-    GOCLAW_WORKSPACE=/app/workspace \
-    GOCLAW_DATA_DIR=/app/data \
-    GOCLAW_SKILLS_DIR=/app/skills \
-    GOCLAW_MIGRATIONS_DIR=/app/migrations \
-    GOCLAW_HOST=0.0.0.0 \
-    GOCLAW_PORT=18790
+ENV MANTOMANAGENT_CONFIG=/app/config.json \
+    MANTOMANAGENT_WORKSPACE=/app/workspace \
+    MANTOMANAGENT_DATA_DIR=/app/data \
+    MANTOMANAGENT_SKILLS_DIR=/app/skills \
+    MANTOMANAGENT_MIGRATIONS_DIR=/app/migrations \
+    MANTOMANAGENT_HOST=0.0.0.0 \
+    MANTOMANAGENT_PORT=18790
 
 # Entrypoint runs as root to install persisted packages and start pkg-helper,
-# then drops to goclaw user via su-exec before starting the app.
+# then drops to mantomanagent user via su-exec before starting the app.
 
 EXPOSE 18790
 

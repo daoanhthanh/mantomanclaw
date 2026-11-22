@@ -14,7 +14,7 @@ import (
 )
 
 // agentChatRunner implements mcpbridge.ChatRunner against the live
-// *agent.Router, backing the CRUD MCP server's goclaw_chat_* tools
+// *agent.Router, backing the CRUD MCP server's mantomanagent_chat_* tools
 // (see internal/mcp/crud_chat.go). It intentionally omits the WS-only
 // concerns handled by ChatMethods (internal/gateway/methods/chat.go): rate
 // limiting, send debouncing, and per-WS-client session ownership checks. The

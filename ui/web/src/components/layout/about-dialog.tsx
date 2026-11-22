@@ -127,7 +127,7 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
             {[
               { label: t("about.sourceCode"), href: "https://github.com/nextlevelbuilder/goclaw" },
               { label: t("about.license"), href: "https://creativecommons.org/licenses/by-nc/4.0/" },
-              { label: t("about.documentation"), href: "https://docs.goclaw.sh" },
+              { label: t("about.documentation"), href: "https://docs.mantomanagent.sh" },
               { label: t("about.reportBug"), href: "https://github.com/nextlevelbuilder/goclaw/issues" },
             ].map(({ label, href }) => (
               <a

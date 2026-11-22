@@ -34,10 +34,10 @@ export function skillExportDownloadName(
     const skill = skills[0]!;
     const label = sanitizeFilePart(skill.slug || skill.name || skill.id || "skill");
     const version = skill.version ? `-v${skill.version}` : "";
-    return `goclaw-skill-${label}${version}${extension}`;
+    return `mantomanagent-skill-${label}${version}${extension}`;
   }
 
-  return `goclaw-skills-export-${formatUtcTimestamp(now)}${extension}`;
+  return `mantomanagent-skills-export-${formatUtcTimestamp(now)}${extension}`;
 }
 
 function sanitizeFilePart(value: string): string {

@@ -36,7 +36,7 @@ func TestValidGatewayUpgradeTag(t *testing.T) {
 		{"3.12.0", false},
 		{"v3.12", false},
 		{"v3.12.0-beta", false},
-		{"https://example.com/goclaw.tar.gz", false},
+		{"https://example.com/mantomanagent.tar.gz", false},
 		{"v3.12.0;reboot", false},
 		{"../v3.12.0", false},
 		{"v3.12.0 linux", false},
@@ -266,9 +266,9 @@ func TestGatewayUpgradeRegisterRoutes(t *testing.T) {
 }
 
 func TestNewGatewayUpgradeHandlerFromEnvDefaults(t *testing.T) {
-	t.Setenv("GOCLAW_UPGRADE_SCRIPT", "")
-	t.Setenv("GOCLAW_UPGRADE_STATUS_PATH", "")
-	t.Setenv("GOCLAW_UPGRADE_TRIGGER_TOKEN", "secret-token")
+	t.Setenv("MANTOMANAGENT_UPGRADE_SCRIPT", "")
+	t.Setenv("MANTOMANAGENT_UPGRADE_STATUS_PATH", "")
+	t.Setenv("MANTOMANAGENT_UPGRADE_TRIGGER_TOKEN", "secret-token")
 
 	h := NewGatewayUpgradeHandlerFromEnv()
 

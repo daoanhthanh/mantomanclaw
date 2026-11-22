@@ -20,7 +20,7 @@ import (
 func initTailscale(ctx context.Context, cfg *config.Config, mux http.Handler) func() {
 	tc := cfg.Tailscale
 	if tc.Hostname == "" {
-		slog.Debug("Tailscale available but not configured (set GOCLAW_TSNET_HOSTNAME to enable)")
+		slog.Debug("Tailscale available but not configured (set MANTOMANAGENT_TSNET_HOSTNAME to enable)")
 		return nil
 	}
 

@@ -10,13 +10,13 @@ import (
 	"github.com/nextlevelbuilder/goclaw/pkg/protocol"
 )
 
-// registerHealthCRUDTool registers goclaw_health, closing the `goclaw
+// registerHealthCRUDTool registers mantomanagent_health, closing the `mantomanagent
 // health`/`status` CLI-vs-MCP coverage gap. A successful MCP tool call
 // already proves the gateway is reachable and this bearer token is valid —
 // what it can't prove on its own is that the DB behind it is up, so this
 // tool's only real value-add over "the call succeeded" is the DB ping.
 func registerHealthCRUDTool(srv *mcpserver.MCPServer, db *sql.DB, version string) {
-	srv.AddTool(mcpgo.NewTool("goclaw_health",
+	srv.AddTool(mcpgo.NewTool("mantomanagent_health",
 		mcpgo.WithDescription("Check gateway health: protocol version, server version, and database connectivity."),
 		mcpgo.WithReadOnlyHintAnnotation(true),
 	), handleHealth(db, version))

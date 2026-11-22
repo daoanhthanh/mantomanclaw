@@ -51,7 +51,7 @@ func Run(ctx context.Context, opts Options) (*BackupManifest, error) {
 
 	manifest := &BackupManifest{
 		Version:       1,
-		Format:        "goclaw-system-backup",
+		Format:        "mantomanagent-system-backup",
 		CreatedAt:     time.Now().UTC().Format(time.RFC3339),
 		CreatedBy:     opts.CreatedBy,
 		GoclawVersion: opts.GoclawVersion,

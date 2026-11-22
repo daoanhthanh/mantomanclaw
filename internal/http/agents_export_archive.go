@@ -24,7 +24,7 @@ func (h *AgentsHandler) writeExportArchive(ctx context.Context, w io.Writer, ag 
 
 	manifest := &ExportManifest{
 		Version:    1,
-		Format:     "goclaw-agent-export",
+		Format:     "mantomanagent-agent-export",
 		ExportedAt: time.Now().UTC().Format(time.RFC3339),
 		ExportedBy: store.UserIDFromContext(ctx),
 		AgentKey:   ag.AgentKey,

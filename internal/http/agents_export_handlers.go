@@ -139,7 +139,7 @@ func (h *AgentsHandler) handleExportSSE(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	tmpFile, err := os.CreateTemp("", "goclaw-export-*.tar.gz")
+	tmpFile, err := os.CreateTemp("", "mantomanagent-export-*.tar.gz")
 	if err != nil {
 		sendSSE(w, flusher, "error", ProgressEvent{Phase: "init", Status: "error", Detail: "failed to create temp file"})
 		return
