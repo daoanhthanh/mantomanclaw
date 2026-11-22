@@ -71,8 +71,12 @@ export function FileBrowser({
   const { t } = useTranslation("common");
   const containerRef = useRef<HTMLDivElement>(null);
   const [treeWidth, setTreeWidth] = useState(220);
-  const [mobileShowTree, setMobileShowTree] = useState(true);
+  const [mobileShowTree, setMobileShowTree] = useState(!activePath);
   const dragging = useRef(false);
+
+  useEffect(() => {
+    if (isMobile && activePath) setMobileShowTree(false);
+  }, [isMobile, activePath]);
 
   const handleSelect = useCallback((path: string) => {
     onSelect(path);

@@ -31,6 +31,11 @@ All notable changes to GoClaw are documented here. For full documentation, see [
 
 ### Added
 
+- **Storage remembers the open file in the URL** — `?file=...` restores the
+  preview after refresh and browser Back/Forward, expands selected folders,
+  and reopens the preview directly on mobile. Deleting or moving the selected
+  file clears the stale URL selection.
+
 - **Web file browser previews Office documents locally** — read-only Word
   (`doc`, `docx`, `docm`, `odt`), Excel (`xls`, `xlsx`, `xlsm`, `ods`), and
   PowerPoint (`ppt`, `pptx`, `pptm`, `odp`) previews in Storage and team

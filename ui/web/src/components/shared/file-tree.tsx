@@ -31,8 +31,17 @@ export function TreeItem({
   showSize?: boolean;
 }) {
   const { t } = useTranslation("common");
-  const [expanded, setExpanded] = useState(depth === 0);
+  const [expanded, setExpanded] = useState(depth === 0 || !!activePath?.startsWith(node.path + "/"));
   const isActive = activePath === node.path;
+
+  // Restore the selected file's lazy-loaded ancestors on direct navigation.
+  useEffect(() => {
+    if (!node.isDir || !activePath?.startsWith(node.path + "/")) return;
+    setExpanded(true);
+    if (node.hasChildren && node.children.length === 0) {
+      onLoadMore?.(node.path);
+    }
+  }, [activePath, node.path, node.isDir, node.hasChildren, node.children.length, onLoadMore]);
 
   // Auto-expand folder when hovered during drag for 800ms.
   useEffect(() => {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { Info, RefreshCw, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router";
 import { toast } from "@/stores/use-toast-store";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,8 @@ export function StoragePage() {
   const { totalSize, loading: sizeLoading, refreshSize } = useStorageSize();
 
   const [tree, setTree] = useState(buildTree(files));
-  const [activePath, setActivePath] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activePath = searchParams.get("file") || null;
   const [fileContent, setFileContent] = useState<{ content: string; path: string; size: number } | null>(null);
   const [contentLoading, setContentLoading] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ path: string; isDir: boolean } | null>(null);
@@ -65,25 +67,34 @@ export function StoragePage() {
     return m;
   }, [files]);
 
-  const handleSelect = useCallback(async (path: string) => {
-    setActivePath(path);
-    if (isTextFile(path)) {
+  const handleSelect = useCallback((path: string | null, replace = false) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (path) next.set("file", path);
+      else next.delete("file");
+      return next;
+    }, { replace });
+  }, [setSearchParams]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setFileContent(null);
+    setContentLoading(false);
+    if (!activePath) return;
+
+    if (isTextFile(activePath)) {
       setContentLoading(true);
-      try {
-        const res = await readFile(path);
-        setFileContent(res);
-      } catch {
-        setFileContent(null);
-      } finally {
-        setContentLoading(false);
-      }
+      void readFile(activePath).then(
+        (res) => { if (!cancelled) setFileContent(res); },
+        () => { if (!cancelled) setFileContent(null); },
+      ).finally(() => {
+        if (!cancelled) setContentLoading(false);
+      });
     } else {
-      // For non-text files (images, binaries): don't fetch content — just set metadata.
-      // ImageViewer will fetch the blob separately; UnsupportedViewer just shows size.
-      const size = fileSizeMap.get(path) ?? 0;
-      setFileContent({ content: "", path, size });
+      setFileContent({ content: "", path: activePath, size: fileSizeMap.get(activePath) ?? 0 });
     }
-  }, [readFile, fileSizeMap]);
+    return () => { cancelled = true; };
+  }, [activePath, readFile, fileSizeMap]);
 
   const handleDeleteRequest = useCallback((path: string, isDir: boolean) => {
     setDeleteTarget({ path, isDir });
@@ -95,7 +106,7 @@ export function StoragePage() {
     try {
       await deleteFile(deleteTarget.path);
       if (activePath === deleteTarget.path || (deleteTarget.isDir && activePath?.startsWith(deleteTarget.path + "/"))) {
-        setActivePath(null);
+        handleSelect(null, true);
         setFileContent(null);
       }
       await listFiles();
@@ -103,7 +114,7 @@ export function StoragePage() {
       setDeleting(false);
       setDeleteTarget(null);
     }
-  }, [deleteTarget, deleteFile, listFiles, activePath]);
+  }, [deleteTarget, deleteFile, listFiles, activePath, handleSelect]);
 
   const handleDownload = useCallback(async (path: string) => {
     try {
@@ -160,7 +171,7 @@ export function StoragePage() {
       await http.put(`/v1/storage/move?from=${encodeURIComponent(fromPath)}&to=${encodeURIComponent(newPath)}`);
       // Clear stale selection if the moved item was active.
       if (activePath === fromPath || activePath?.startsWith(fromPath + "/")) {
-        setActivePath(null);
+        handleSelect(null, true);
         setFileContent(null);
       }
       listFiles({ silent: true });
@@ -168,7 +179,7 @@ export function StoragePage() {
       const msg = err instanceof Error ? err.message : "Move failed";
       toast.error(msg);
     }
-  }, [http, listFiles, activePath]);
+  }, [http, listFiles, activePath, handleSelect]);
 
   const deleteName = deleteTarget?.path.split("/").pop() ?? "";
 
@@ -219,7 +230,7 @@ export function StoragePage() {
           activePath={activePath}
           onSelect={handleSelect}
           contentLoading={contentLoading}
-          fileContent={fileContent}
+          fileContent={fileContent?.path === activePath ? fileContent : null}
           onDelete={handleDeleteRequest}
           onLoadMore={handleLoadMore}
           onMove={handleMove}
