@@ -117,6 +117,8 @@
   "errorBoundary": "此部分渲染出错。",
   "csvRows": "csv ({{count}} 行)",
   "failedToLoadImage": "图片加载失败",
+  "officePreviewLoading": "正在加载 Office 预览…",
+  "officePreviewFailed": "无法预览此 Office 文件。文件可能已损坏、已加密或使用不受支持的格式。",
   "deleteFolder": "删除文件夹",
   "deleteFile": "删除文件",
   "loadMore": "加载更多...",

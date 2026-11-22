@@ -269,13 +269,13 @@ export function ChatPage() {
             onToggleTaskPanel={() => setTaskPanelOpen((v) => !v)}
           />}
 
-          <div className={cn("relative mx-auto w-full max-w-3xl shrink-0", isEmptyChat && "my-auto")}>
+          <div className={cn("mx-auto w-full max-w-3xl shrink-0", isEmptyChat && "my-auto min-h-0 shrink overflow-y-auto overscroll-contain py-6")}>
           {isEmptyChat && (
-            <div className="pointer-events-none absolute inset-x-0 bottom-full mb-8 flex flex-col items-center gap-4 px-3 sm:mb-28">
+            <div className="pointer-events-none mb-8 flex flex-col items-center gap-4 px-3">
               <img
                 src="/logo.svg"
                 alt=""
-                className="h-[min(17rem,25dvh)] w-auto"
+                className="h-[min(17rem,22dvh)] w-auto shrink-0"
               />
               <p className="w-full break-words text-center text-xl font-medium sm:text-2xl">
                 {t("empty.greeting", { user: userId })}

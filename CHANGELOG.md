@@ -4,6 +4,21 @@ All notable changes to GoClaw are documented here. For full documentation, see [
 
 ## Unreleased
 
+### Fixed
+
+- **Spreadsheet previews fill the available pane height** — give the Office
+  wrapper a full height for spreadsheets instead of leaving the grid at its
+  minimum height; document previews keep their natural scrolling layout.
+
+- **Office previews scroll on desktop and mobile** — contain scrolling on
+  the file browser's scrollable viewport, not the full-height Office wrapper
+  that previously trapped wheel events before they reached the viewport.
+
+- **Office previews work under the web application's CSP** — allow
+  WebAssembly compilation with `wasm-unsafe-eval` while continuing to block
+  JavaScript `eval`/`new Function`. Previously the app's `script-src 'self'`
+  blocked rely-office before a valid file could be previewed.
+
 ### Changed
 
 - **Bitrix24 channel migrated to imbot v2 messaging API** — outbound text now uses
@@ -15,6 +30,12 @@ All notable changes to GoClaw are documented here. For full documentation, see [
   require rewriting the inbound event parser. No user-facing behavior change.
 
 ### Added
+
+- **Web file browser previews Office documents locally** — read-only Word
+  (`doc`, `docx`, `docm`, `odt`), Excel (`xls`, `xlsx`, `xlsm`, `ods`), and
+  PowerPoint (`ppt`, `pptx`, `pptm`, `odp`) previews in Storage and team
+  workspaces, powered by lazily loaded rely-office WebAssembly. Includes
+  loading/error states, download fallback, and bundled third-party notices.
 
 - **Task detail dialog shows the full task UUID with one-click copy** — the
   short identifier (`T-015-cc8e`) carries only the last four hex characters of

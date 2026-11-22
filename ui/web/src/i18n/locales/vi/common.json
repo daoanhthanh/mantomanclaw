@@ -117,6 +117,8 @@
   "errorBoundary": "Đã xảy ra lỗi khi hiển thị phần này.",
   "csvRows": "csv ({{count}} dòng)",
   "failedToLoadImage": "Không thể tải hình ảnh",
+  "officePreviewLoading": "Đang tải bản xem trước Office…",
+  "officePreviewFailed": "Không thể xem trước tệp Office này. Tệp có thể bị hỏng, được mã hóa hoặc dùng định dạng chưa được hỗ trợ.",
   "deleteFolder": "Xóa thư mục",
   "deleteFile": "Xóa tệp",
   "loadMore": "Tải thêm...",

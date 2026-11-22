@@ -127,7 +127,7 @@ export function FileBrowser({
                 </>
               )}
             </div>
-            <div className="flex-1 overflow-auto p-3 min-h-0">
+            <div className="flex-1 overflow-auto overscroll-contain p-3 min-h-0">
               <FileContentPanel fileContent={fileContent} contentLoading={contentLoading} fetchBlob={fetchBlob} onDownload={onDownload} />
             </div>
           </div>
@@ -155,7 +155,7 @@ export function FileBrowser({
             <FileActions size={fileContent.size} onDownload={onDownload ? () => onDownload(fileContent.path) : undefined} />
           </div>
         )}
-        <div className="flex-1 overflow-auto p-3 min-h-0">
+        <div className="flex-1 overflow-auto overscroll-contain p-3 min-h-0">
           <FileContentPanel fileContent={fileContent} contentLoading={contentLoading} fetchBlob={fetchBlob} onDownload={onDownload} />
         </div>
       </div>

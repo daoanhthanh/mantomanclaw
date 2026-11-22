@@ -117,6 +117,8 @@
   "errorBoundary": "Something went wrong rendering this section.",
   "csvRows": "csv ({{count}} rows)",
   "failedToLoadImage": "Failed to load image",
+  "officePreviewLoading": "Loading Office preview…",
+  "officePreviewFailed": "Unable to preview this Office file. It may be damaged, encrypted, or use an unsupported format.",
   "deleteFolder": "Delete folder",
   "deleteFile": "Delete file",
   "loadMore": "Load more...",

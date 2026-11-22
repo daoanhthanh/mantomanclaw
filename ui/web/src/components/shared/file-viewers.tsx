@@ -7,6 +7,7 @@
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
+import { isOfficeFile, OfficeFileViewer } from "./office-file-viewer";
 import {
   extOf,
   langFor,
@@ -40,6 +41,10 @@ export function FileContentBody({
   // Image files
   if (isImageFile(path) && fetchBlob) {
     return <ImageViewer path={path} fetchBlob={fetchBlob} />;
+  }
+
+  if (isOfficeFile(path) && fetchBlob) {
+    return <OfficeFileViewer key={path} path={path} fetchBlob={fetchBlob} onDownload={onDownload} />;
   }
 
   // Text-based files
