@@ -33,7 +33,7 @@ export function useChatSend({
   const [error, setError] = useState<string | null>(null);
 
   const send = useCallback(
-    async (message: string, sessionKey: string, files?: AttachedFile[]) => {
+    async (message: string, sessionKey: string, files?: AttachedFile[], agentOverride?: string) => {
       const hasMessage = message.trim().length > 0;
       const hasFiles = files && files.length > 0;
       if (!ws.isConnected) {
@@ -82,7 +82,7 @@ export function useChatSend({
         const res = await ws.call<{ runId?: string; content?: string; injected?: boolean }>(
           Methods.CHAT_SEND,
           {
-            agentId,
+            agentId: agentOverride || agentId,
             sessionKey,
             message: trimmed,
             stream: true,

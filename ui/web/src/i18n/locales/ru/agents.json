@@ -1166,6 +1166,14 @@
     "skillGranted": "Навык предоставлен",
     "skillGrantFailed": "Не удалось предоставить навык",
     "skillRevoked": "Навык отозван",
-    "skillRevokeFailed": "Не удалось отозвать навык"
+    "skillRevokeFailed": "Не удалось отозвать навык",
+    "defaultAgentSaveFailed": "Не удалось сохранить агента по умолчанию",
+    "defaultAgentSaved": "Агент по умолчанию обновлён"
+  },
+  "defaultAgent": {
+    "label": "Агент по умолчанию",
+    "tooltip": "Этот агент используется в чате по умолчанию",
+    "placeholder": "Выберите агента по умолчанию...",
+    "searchPlaceholder": "Поиск агентов..."
   }
 }

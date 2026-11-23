@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router";
-import { Plus, Bot, LayoutGrid, List, ArrowLeftRight } from "lucide-react";
+import { Plus, Bot, LayoutGrid, List, ArrowLeftRight, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -11,6 +11,7 @@ import { useDeferredLoading } from "@/hooks/use-deferred-loading";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog";
+import { Combobox } from "@/components/ui/combobox";
 import {
   Select,
   SelectContent,
@@ -26,6 +27,7 @@ import { AgentCreateDialog } from "./agent-create-dialog";
 import { AgentDetailPage } from "./agent-detail/agent-detail-page";
 import { SummoningModal } from "./summoning-modal";
 import { usePagination } from "@/hooks/use-pagination";
+import { useDefaultAgent } from "@/hooks/use-default-agent";
 
 export function AgentsPage() {
   const { t } = useTranslation("agents");
@@ -59,6 +61,14 @@ export function AgentsPage() {
   const { pageItems, pagination, setPage, setPageSize, resetPage } = usePagination(filtered);
 
   useEffect(() => { resetPage(); }, [search, ownerFilter, typeFilter, resetPage]);
+
+  // Per-user default agent (server-side; falls back to the tenant default)
+  const { defaultAgentKey, setDefaultAgent } = useDefaultAgent();
+
+  const agentComboOptions = useMemo(
+    () => agents.map((a) => ({ value: a.agent_key, label: a.display_name || a.agent_key })),
+    [agents],
+  );
 
   const handleResummon = async (agent: { id: string; display_name?: string; agent_key: string }) => {
     try {
@@ -108,6 +118,31 @@ export function AgentsPage() {
           </div>
         }
       />
+
+      {/* Default agent selector */}
+      <div className="mt-4 rounded-xl border bg-card p-4">
+        <TooltipProvider>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm font-medium">{t("defaultAgent.label")}</span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent side="right" className="max-w-xs">
+                {t("defaultAgent.tooltip")}
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
+        <Combobox
+          value={defaultAgentKey}
+          onChange={() => {}}
+          onSelect={setDefaultAgent}
+          options={agentComboOptions}
+          placeholder={t("defaultAgent.placeholder")}
+          className="max-w-sm"
+        />
+      </div>
 
       {/* Toolbar: search + creator filter + view toggle */}
       <div className="mt-4 flex flex-wrap items-center gap-2">

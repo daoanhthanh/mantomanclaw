@@ -86,6 +86,9 @@ export function WsProvider({ children }: { children: React.ReactNode }) {
       },
     );
     wsRef.current.onAuthFailure = () => {
+      // Clear tenant scope immediately to prevent retry loops with stale tenant_id
+      localStorage.removeItem("magent:tenant_id");
+      localStorage.removeItem("magent:tenant_hint");
       // Don't logout if authenticated via browser pairing (no token)
       const state = useAuthStore.getState();
       if (state.senderID && !state.token) return;
@@ -102,6 +105,9 @@ export function WsProvider({ children }: { children: React.ReactNode }) {
       () => useAuthStore.getState().senderID,
     );
     client.onAuthFailure = () => {
+      // Clear tenant scope immediately to prevent retry loops with stale tenant_id
+      localStorage.removeItem("magent:tenant_id");
+      localStorage.removeItem("magent:tenant_hint");
       // Don't logout if authenticated via browser pairing (no token)
       const state = useAuthStore.getState();
       if (state.senderID && !state.token) return;

@@ -1076,6 +1076,14 @@
     "skillGranted": "스킬 부여됨",
     "skillGrantFailed": "스킬 부여 실패",
     "skillRevoked": "스킬 취소됨",
-    "skillRevokeFailed": "스킬 취소 실패"
+    "skillRevokeFailed": "스킬 취소 실패",
+    "defaultAgentSaveFailed": "기본 에이전트를 저장하지 못했습니다",
+    "defaultAgentSaved": "기본 에이전트가 업데이트되었습니다"
+  },
+  "defaultAgent": {
+    "label": "기본 채팅 에이전트",
+    "tooltip": "이 에이전트는 채팅에서 사용되는 기본 에이전트입니다",
+    "placeholder": "기본 에이전트 선택...",
+    "searchPlaceholder": "에이전트 검색..."
   }
 }

@@ -204,6 +204,12 @@ func (a *adminTenantStore) GetTenantUser(context.Context, uuid.UUID) (*store.Ten
 func (a *adminTenantStore) CreateTenantUserReturning(context.Context, uuid.UUID, string, string, string) (*store.TenantUserData, error) {
 	return nil, nil
 }
+func (a *adminTenantStore) GetUserPreferences(context.Context, uuid.UUID, string) (*store.UserPreferences, error) {
+	return &store.UserPreferences{}, nil
+}
+func (a *adminTenantStore) UpdateUserPreferences(context.Context, uuid.UUID, string, *store.UserPreferences) error {
+	return nil
+}
 
 // ---- helpers ----
 

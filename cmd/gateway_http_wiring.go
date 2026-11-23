@@ -68,6 +68,9 @@ func (d *gatewayDeps) wireHTTPHandlersOnServer(
 	if h.mcpUserCreds != nil {
 		d.server.SetMCPUserCredentialsHandler(h.mcpUserCreds)
 	}
+	if d.pgStores != nil && d.pgStores.Tenants != nil && d.pgStores.Agents != nil {
+		d.server.SetUserPreferencesHandler(httpapi.NewUserPreferencesHandler(d.pgStores.Tenants, d.pgStores.Agents))
+	}
 	if h.mcpOAuth != nil {
 		if mcpPool != nil {
 			h.mcpOAuth.SetEvictor(mcpPool)

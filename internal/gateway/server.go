@@ -687,6 +687,11 @@ func (s *Server) SetMCPUserCredentialsHandler(h *httpapi.MCPUserCredentialsHandl
 	s.handlers = append(s.handlers, h)
 }
 
+// SetUserPreferencesHandler sets the per-user preferences handler.
+func (s *Server) SetUserPreferencesHandler(h *httpapi.UserPreferencesHandler) {
+	s.handlers = append(s.handlers, h)
+}
+
 // SetChannelInstancesHandler sets the channel instance CRUD handler.
 func (s *Server) SetChannelInstancesHandler(h *httpapi.ChannelInstancesHandler) {
 	s.handlers = append(s.handlers, h)

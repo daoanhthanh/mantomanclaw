@@ -1153,6 +1153,14 @@
     "skillGranted": "Đã cấp skill",
     "skillGrantFailed": "Không thể cấp skill",
     "skillRevoked": "Đã thu hồi skill",
-    "skillRevokeFailed": "Không thể thu hồi skill"
+    "skillRevokeFailed": "Không thể thu hồi skill",
+    "defaultAgentSaveFailed": "Không thể lưu agent mặc định",
+    "defaultAgentSaved": "Đã cập nhật agent mặc định"
+  },
+  "defaultAgent": {
+    "label": "Agent mặc định trong chat",
+    "tooltip": "Đây là agent mặc định được sử dụng trong chat",
+    "placeholder": "Chọn agent mặc định...",
+    "searchPlaceholder": "Tìm kiếm agent..."
   }
 }

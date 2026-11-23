@@ -1153,6 +1153,14 @@
     "skillGranted": "技能已授权",
     "skillGrantFailed": "授权技能失败",
     "skillRevoked": "技能已撤销",
-    "skillRevokeFailed": "撤销技能失败"
+    "skillRevokeFailed": "撤销技能失败",
+    "defaultAgentSaveFailed": "保存默认助手失败",
+    "defaultAgentSaved": "默认助手已更新"
+  },
+  "defaultAgent": {
+    "label": "默认聊天助手",
+    "tooltip": "此助手是聊天中使用的默认助手",
+    "placeholder": "选择默认助手...",
+    "searchPlaceholder": "搜索助手..."
   }
 }

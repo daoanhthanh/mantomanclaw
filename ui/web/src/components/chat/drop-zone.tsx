@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Upload } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface DropZoneProps {
   onDrop: (files: File[]) => void;
@@ -8,6 +9,7 @@ interface DropZoneProps {
 
 /** Drag-and-drop overlay for file uploads. Uses a counter to handle child boundary events. */
 export function DropZone({ onDrop, children }: DropZoneProps) {
+  const { t } = useTranslation("common");
   const [isDragging, setIsDragging] = useState(false);
   const dragCounterRef = useRef(0);
 
@@ -38,7 +40,7 @@ export function DropZone({ onDrop, children }: DropZoneProps) {
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <Upload className="h-10 w-10" />
-            <span className="text-lg font-medium">Drop files here</span>
+            <span className="text-lg font-medium">{t("upload.dropHere")}</span>
           </div>
         </div>
       )}

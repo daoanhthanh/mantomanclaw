@@ -51,6 +51,11 @@ type TenantUserData struct {
 	UpdatedAt   time.Time       `json:"updated_at" db:"updated_at"`
 }
 
+// UserPreferences holds per-user settings stored in tenant_users.metadata.
+type UserPreferences struct {
+	DefaultAgentID *uuid.UUID `json:"default_agent_id,omitempty"`
+}
+
 // TenantStore manages tenants and tenant-user membership.
 type TenantStore interface {
 	// Tenant CRUD
@@ -81,4 +86,9 @@ type TenantStore interface {
 	// CreateTenantUserReturning creates a tenant_user and returns the row.
 	// On conflict (tenant_id, user_id), updates role/display_name and returns existing row.
 	CreateTenantUserReturning(ctx context.Context, tenantID uuid.UUID, userID, displayName, role string) (*TenantUserData, error)
+
+	// User preferences: stored in tenant_users.metadata.preferences JSONB.
+	// Auto-creates tenant_users row if missing.
+	GetUserPreferences(ctx context.Context, tenantID uuid.UUID, userID string) (*UserPreferences, error)
+	UpdateUserPreferences(ctx context.Context, tenantID uuid.UUID, userID string, prefs *UserPreferences) error
 }

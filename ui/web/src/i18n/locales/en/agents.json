@@ -1168,6 +1168,14 @@
     "skillGranted": "Skill granted",
     "skillGrantFailed": "Failed to grant skill",
     "skillRevoked": "Skill revoked",
-    "skillRevokeFailed": "Failed to revoke skill"
+    "skillRevokeFailed": "Failed to revoke skill",
+    "defaultAgentSaveFailed": "Failed to save default agent",
+    "defaultAgentSaved": "Default agent updated"
+  },
+  "defaultAgent": {
+    "label": "Default Chat Agent",
+    "tooltip": "This agent is the default agent that is used in the chat",
+    "placeholder": "Select default agent...",
+    "searchPlaceholder": "Search agents..."
   }
 }

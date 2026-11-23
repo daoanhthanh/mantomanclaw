@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router";
 import { Eye, PanelLeftOpen } from "lucide-react";
 import { useAuthStore } from "@/stores/use-auth-store";
+import { useDefaultAgent } from "@/hooks/use-default-agent";
 import { useIsMobile } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { ChatSidebar } from "./chat-sidebar";
@@ -10,7 +11,6 @@ import { ChatThread } from "./chat-thread";
 import { ChatInput, type AttachedFile } from "@/components/chat/chat-input";
 import { ChatTopBar } from "@/components/chat/chat-top-bar";
 import { DropZone } from "@/components/chat/drop-zone";
-import { AgentPickerPrompt } from "@/components/chat/agent-picker-prompt";
 import { useChatSessions } from "./hooks/use-chat-sessions";
 import { useChatMessages } from "./hooks/use-chat-messages";
 import { useChatSend } from "./hooks/use-chat-send";
@@ -31,11 +31,12 @@ export function ChatPage() {
   // sessionKey derived from URL — single source of truth, no separate state
   const sessionKey = urlSessionKey ?? "";
 
-  // Fallback agent ID used only when URL has no session key
-  const [agentIdFallback, setAgentIdFallback] = useState("");
+  // Per-user default agent (server-side preference → tenant default → only agent)
+  const { defaultAgentKey } = useDefaultAgent();
 
-  // Agent is confirmed when URL has a session (agentId parsed) or user explicitly picked one
-  const agentConfirmed = !!urlSessionKey || !!agentIdFallback;
+  // History (sidebar) agent: independent of the default agent. Set only by the sidebar
+  // selector, by opening a session, or by sending a message with the composer's agent.
+  const [agentIdFallback, setAgentIdFallback] = useState("");
 
   // Derive agentId from URL (source of truth), fallback to state when no session
   const agentId = useMemo(() => {
@@ -78,8 +79,20 @@ export function ChatPage() {
     prevIsBusyRef.current = isBusy;
   }, [isBusy, refreshSessions]);
 
+  // Composer agent: independent of the sidebar (history) agent. Applied only on send.
+  const [composerAgentId, setComposerAgentId] = useState("");
+  const effectiveComposerAgentId = composerAgentId || agentId || defaultAgentKey;
+
+  // History → composer (one-way): opening a session shows its agent in the composer.
+  useEffect(() => {
+    if (!urlSessionKey) return;
+    const { agentId: parsed } = parseSessionKey(urlSessionKey);
+    if (parsed) setComposerAgentId(parsed);
+  }, [urlSessionKey]);
+
   const isOwn = !sessionKey || isOwnSession(sessionKey, userId);
   const isEmptyChat = messages.length === 0 && !isBusy && !messagesLoading;
+  // The agent can only be chosen before the first message; once chatting it is fixed.
 
   const handleMessageAdded = useCallback(
     (msg: { role: "user" | "assistant" | "tool"; content: string; timestamp?: number }, key?: string) => {
@@ -95,8 +108,8 @@ export function ChatPage() {
   });
 
   const handleNewChat = useCallback(() => {
-    navigate(`/chat/${encodeURIComponent(buildNewSessionKey())}`);
-  }, [buildNewSessionKey, navigate]);
+    navigate("/chat");
+  }, [navigate]);
 
   const handleSessionSelect = useCallback(
     (key: string) => {
@@ -119,6 +132,7 @@ export function ChatPage() {
     }
   }, [deleteSession, sessionKey, sessions, handleSessionSelect, handleNewChat]);
 
+  // Sidebar agent change: affects history only, never the composer.
   const handleAgentChange = useCallback(
     (newAgentId: string) => {
       setAgentIdFallback(newAgentId);
@@ -126,20 +140,23 @@ export function ChatPage() {
         navigate("/chat");
       }
     },
-    [navigate],
+    [navigate, sessionKey],
   );
 
   const handleSend = useCallback(
     (message: string, sendFiles?: AttachedFile[]) => {
+      const targetAgent = effectiveComposerAgentId;
       let key = sessionKey;
-      if (!key) {
-        key = buildNewSessionKey();
-        navigate(`/chat/${encodeURIComponent(key)}`, { replace: true });
+      // Composer agent is applied to history only now: a different agent starts a new session.
+      if (!key || (targetAgent && targetAgent !== agentId)) {
+        key = buildNewSessionKey(targetAgent);
+        if (targetAgent) setAgentIdFallback(targetAgent);
+        navigate(`/chat/${encodeURIComponent(key)}`, { replace: !sessionKey });
       }
-      send(message, key, sendFiles);
+      send(message, key, sendFiles, targetAgent);
       setScrollTrigger((n) => n + 1);
     },
-    [sessionKey, send, buildNewSessionKey, navigate],
+    [sessionKey, agentId, effectiveComposerAgentId, send, buildNewSessionKey, navigate],
   );
 
   const handleDropFiles = useCallback((dropped: File[]) => {
@@ -287,16 +304,16 @@ export function ChatPage() {
               <Eye className="h-4 w-4" />
               {t("readOnly")}
             </div>
-          ) : !agentConfirmed ? (
-            <AgentPickerPrompt onSelect={handleAgentChange} />
           ) : (
             <ChatInput
               onSend={handleSend}
               onAbort={handleAbort}
               isBusy={isBusy}
-              disabled={!connected}
+              disabled={!connected || !effectiveComposerAgentId}
               files={files}
               onFilesChange={setFiles}
+              composerAgentId={effectiveComposerAgentId}
+              onComposerAgentChange={isEmptyChat ? setComposerAgentId : undefined}
             />
           )}
           </div>

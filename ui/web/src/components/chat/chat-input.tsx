@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useLayoutEffect, type KeyboardEvent } fr
 import { useTranslation } from "react-i18next";
 import { Send, Square, Paperclip, X, Mic } from "lucide-react";
 import { useVoiceRecorder } from "@/hooks/use-voice-recorder";
+import { AgentSelector } from "@/components/chat/agent-selector";
 
 export interface AttachedFile {
   file: File;
@@ -17,6 +18,9 @@ interface ChatInputProps {
   disabled?: boolean;
   files: AttachedFile[];
   onFilesChange: (files: AttachedFile[]) => void;
+  /** When provided, renders the agent selector inside the input box. Omit once the agent can no longer change. */
+  composerAgentId?: string;
+  onComposerAgentChange?: (id: string) => void;
 }
 
 export function ChatInput({
@@ -26,6 +30,8 @@ export function ChatInput({
   disabled,
   files,
   onFilesChange,
+  composerAgentId,
+  onComposerAgentChange,
 }: ChatInputProps) {
   const { t } = useTranslation("common");
   const [value, setValue] = useState("");
@@ -197,6 +203,16 @@ export function ChatInput({
             disabled={disabled}
             rows={1}
             className="flex-1 resize-none bg-transparent py-3 px-0 text-base md:text-sm placeholder:text-muted-foreground focus:outline-none disabled:opacity-50"
+          />
+        )}
+
+        {/* Agent selector — left of the send button; rendered only while the agent can still be chosen */}
+        {onComposerAgentChange && !voiceRecorder.isRecording && (
+          <AgentSelector
+            value={composerAgentId ?? ""}
+            onChange={onComposerAgentChange}
+            variant="ghost"
+            dropUp
           />
         )}
 

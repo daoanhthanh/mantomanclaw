@@ -10,6 +10,10 @@ import type { AgentData } from "@/types/agent";
 interface AgentSelectorProps {
   value: string;
   onChange: (agentId: string) => void;
+  /** Open the dropdown above the trigger (for selectors anchored at the screen bottom). */
+  dropUp?: boolean;
+  /** "default": bordered full-width trigger. "ghost": borderless, content-width trigger (inline use). */
+  variant?: "default" | "ghost";
 }
 
 /** Extract emoji from agent top-level field */
@@ -17,7 +21,7 @@ function agentEmoji(agent: AgentData): string | undefined {
   return agent.emoji || undefined;
 }
 
-export function AgentSelector({ value, onChange }: AgentSelectorProps) {
+export function AgentSelector({ value, onChange, dropUp, variant = "default" }: AgentSelectorProps) {
   const { t } = useTranslation("common");
   const http = useHttp();
   const connected = useAuthStore((s) => s.connected);
@@ -43,12 +47,14 @@ export function AgentSelector({ value, onChange }: AgentSelectorProps) {
     const rect = containerRef.current.getBoundingClientRect();
     setDropdownStyle({
       position: "fixed",
-      top: rect.bottom + 4,
+      ...(dropUp
+        ? { bottom: window.innerHeight - rect.top + 4 }
+        : { top: rect.bottom + 4 }),
       left: rect.left,
-      width: rect.width,
+      width: variant === "ghost" ? Math.max(rect.width, 224) : rect.width,
       zIndex: 9999,
     });
-  }, [open]);
+  }, [open, dropUp, variant]);
 
   usePortalDropdownClose({
     open,
@@ -60,11 +66,15 @@ export function AgentSelector({ value, onChange }: AgentSelectorProps) {
   const selectedEmoji = selected ? agentEmoji(selected) : undefined;
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className={variant === "ghost" ? "relative min-w-0" : "relative"}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm hover:bg-accent"
+        className={
+          variant === "ghost"
+            ? "flex max-w-[180px] items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-foreground hover:bg-accent"
+            : "flex w-full items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm hover:bg-accent"
+        }
       >
         {selectedEmoji ? (
           <span className="text-base shrink-0">{selectedEmoji}</span>

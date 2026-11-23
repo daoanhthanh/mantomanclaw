@@ -45,9 +45,9 @@ export function useChatSessions(agentId: string) {
     loadSessions();
   }, [loadSessions]);
 
-  const buildNewSessionKey = useCallback(() => {
+  const buildNewSessionKey = useCallback((agentOverride?: string) => {
     const convId = uniqueId();
-    return `agent:${agentId}:ws:direct:${convId}`;
+    return `agent:${agentOverride || agentId}:ws:direct:${convId}`;
   }, [agentId]);
 
   const deleteSession = useCallback(async (key: string) => {

@@ -210,3 +210,58 @@ func (s *PGTenantStore) ResolveUserTenant(ctx context.Context, userID string) (u
 	}
 	return tenantID, nil
 }
+
+// ============================================================
+// User Preferences
+// ============================================================
+
+// GetUserPreferences reads preferences from tenant_users.metadata.preferences.
+// Returns empty preferences when no row exists (backward compat).
+func (s *PGTenantStore) GetUserPreferences(ctx context.Context, tenantID uuid.UUID, userID string) (*store.UserPreferences, error) {
+	var metadataJSON []byte
+	err := s.db.QueryRowContext(ctx,
+		`SELECT metadata FROM tenant_users WHERE tenant_id = $1 AND user_id = $2`,
+		tenantID, userID,
+	).Scan(&metadataJSON)
+	if errors.Is(err, sql.ErrNoRows) {
+		return &store.UserPreferences{}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	if len(metadataJSON) == 0 {
+		return &store.UserPreferences{}, nil
+	}
+	var envelope map[string]json.RawMessage
+	if err := json.Unmarshal(metadataJSON, &envelope); err != nil {
+		return &store.UserPreferences{}, nil // Corrupt JSON → empty prefs
+	}
+	prefsJSON, exists := envelope["preferences"]
+	if !exists {
+		return &store.UserPreferences{}, nil
+	}
+	var prefs store.UserPreferences
+	if err := json.Unmarshal(prefsJSON, &prefs); err != nil {
+		return &store.UserPreferences{}, nil
+	}
+	return &prefs, nil
+}
+
+// UpdateUserPreferences merges preferences into tenant_users.metadata.preferences.
+// Auto-creates tenant_users row with TenantRoleMember if missing.
+func (s *PGTenantStore) UpdateUserPreferences(ctx context.Context, tenantID uuid.UUID, userID string, prefs *store.UserPreferences) error {
+	prefsJSON, err := json.Marshal(prefs)
+	if err != nil {
+		return err
+	}
+	now := time.Now()
+	_, err = s.db.ExecContext(ctx,
+		`INSERT INTO tenant_users (id, tenant_id, user_id, role, metadata, created_at, updated_at)
+		 VALUES ($1, $2, $3, $4, jsonb_build_object('preferences', $5::jsonb), $6, $7)
+		 ON CONFLICT (tenant_id, user_id) DO UPDATE SET
+		   metadata = COALESCE(tenant_users.metadata, '{}'::jsonb) || jsonb_build_object('preferences', $5::jsonb),
+		   updated_at = $7`,
+		store.GenNewID(), tenantID, userID, store.TenantRoleMember, prefsJSON, now, now,
+	)
+	return err
+}

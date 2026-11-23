@@ -51,6 +51,12 @@ func (f fakeTenantStore) GetTenantUser(context.Context, uuid.UUID) (*store.Tenan
 func (f fakeTenantStore) CreateTenantUserReturning(context.Context, uuid.UUID, string, string, string) (*store.TenantUserData, error) {
 	return nil, nil
 }
+func (f fakeTenantStore) GetUserPreferences(context.Context, uuid.UUID, string) (*store.UserPreferences, error) {
+	return &store.UserPreferences{}, nil
+}
+func (f fakeTenantStore) UpdateUserPreferences(context.Context, uuid.UUID, string, *store.UserPreferences) error {
+	return nil
+}
 
 func TestResolveTenantLooksUpSlugForTenantID(t *testing.T) {
 	tenantID := uuid.New()

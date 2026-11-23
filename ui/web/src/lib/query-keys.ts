@@ -11,6 +11,9 @@ export const queryKeys = {
     chatgptOAuthQuotas: (providerNames: string[]) => ["providers", "chatgpt-oauth-quotas", ...providerNames] as const,
     codexPoolActivity: (providerId: string, limit: number) => ["providers", providerId, "codex-pool-activity", limit] as const,
   },
+  me: {
+    preferences: ["me", "preferences"] as const,
+  },
   agents: {
     all: ["agents"] as const,
     detail: (id: string) => ["agents", id] as const,

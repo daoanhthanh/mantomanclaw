@@ -228,6 +228,62 @@ func (s *SQLiteTenantStore) ResolveUserTenant(ctx context.Context, userID string
 }
 
 // ============================================================
+// User Preferences
+// ============================================================
+
+// GetUserPreferences reads preferences from tenant_users.metadata.preferences.
+// Returns empty preferences when no row exists (backward compat).
+func (s *SQLiteTenantStore) GetUserPreferences(ctx context.Context, tenantID uuid.UUID, userID string) (*store.UserPreferences, error) {
+	var metadata sql.NullString
+	err := s.db.QueryRowContext(ctx,
+		`SELECT metadata FROM tenant_users WHERE tenant_id = ? AND user_id = ?`,
+		tenantID, userID,
+	).Scan(&metadata)
+	if errors.Is(err, sql.ErrNoRows) {
+		return &store.UserPreferences{}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	if !metadata.Valid || metadata.String == "" {
+		return &store.UserPreferences{}, nil
+	}
+	var envelope map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(metadata.String), &envelope); err != nil {
+		return &store.UserPreferences{}, nil // Corrupt JSON → empty prefs
+	}
+	prefsJSON, exists := envelope["preferences"]
+	if !exists {
+		return &store.UserPreferences{}, nil
+	}
+	var prefs store.UserPreferences
+	if err := json.Unmarshal(prefsJSON, &prefs); err != nil {
+		return &store.UserPreferences{}, nil
+	}
+	return &prefs, nil
+}
+
+// UpdateUserPreferences sets tenant_users.metadata.preferences.
+// Auto-creates tenant_users row with TenantRoleMember if missing.
+func (s *SQLiteTenantStore) UpdateUserPreferences(ctx context.Context, tenantID uuid.UUID, userID string, prefs *store.UserPreferences) error {
+	prefsJSON, err := json.Marshal(prefs)
+	if err != nil {
+		return err
+	}
+	now := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
+	_, err = s.db.ExecContext(ctx,
+		`INSERT INTO tenant_users (id, tenant_id, user_id, role, metadata, created_at, updated_at)
+		 VALUES (?, ?, ?, ?, json_object('preferences', json(?)), ?, ?)
+		 ON CONFLICT (tenant_id, user_id) DO UPDATE SET
+		   metadata = json_set(CASE WHEN json_valid(tenant_users.metadata) THEN tenant_users.metadata ELSE '{}' END, '$.preferences', json(?)),
+		   updated_at = ?`,
+		store.GenNewID(), tenantID, userID, store.TenantRoleMember, string(prefsJSON), now, now,
+		string(prefsJSON), now,
+	)
+	return err
+}
+
+// ============================================================
 // Conversion helpers
 // ============================================================
 

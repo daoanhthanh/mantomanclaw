@@ -12,38 +12,37 @@ Mantoman app-chat that posts assignments directly to a Teams channel via MCP too
 
 ## Architecture
 
+```mermaid
+flowchart LR
+    subgraph MS[Microsoft]
+        T[Teams channel]
+        G[Graph API<br/>SharePoint DOCX/XLSX]
+    end
+
+    subgraph BOT[teams-bot]
+        direction TB
+        A[Teams SDK + activity handler<br/>:3978 public<br/>validate tenant/actor/project]
+        Q[(SQLite<br/>jobs, routes, credentials, audit)]
+        W[Worker<br/>read, generate, send]
+        M[MCP server :3979 private<br/>project_resources<br/>read_requirement<br/>post_assignment<br/>assignment_status]
+        A -->|persist job, ack immediately| Q
+        Q --> W
+        M -->|reserve operation, enqueue| Q
+    end
+
+    subgraph MAN[Mantoman gateway]
+        H[POST /v1/webhooks/llm<br/>HMAC, agent-bound]
+        C[App chat agent]
+    end
+
+    T -->|"@bot assign recipient file"| A
+    W -->|read file| G
+    W -->|signed request| H
+    H -->|JSON draft| W
+    W -->|threaded reply with @mention| T
+    C -->|per-user bearer| M
 ```
-Teams channel
-  │  @bot assign recipient:alice file:<SharePoint URL>
-  ▼
-┌─────────────────────────────────────────────────────┐
-│  teams-bot  (port 3978 public, port 3979 private)   │
-│                                                     │
-│  Teams SDK  ──► Activity handler                    │
-│                  │  validate tenant/actor/project   │
-│                  │  persist job atomically          │
-│                  │  ack immediately (no long-poll)  │
-│                  ▼                                  │
-│             Worker loop                             │
-│               │  read DOCX/XLSX via Graph           │
-│               │  HMAC-sign + POST /v1/webhooks/llm  │
-│               │  parse validated JSON draft         │
-│               │  send Teams reply with @mention     │
-│               │  persist Teams message ID           │
-│                                                     │
-│  MCP server (port 3979) ◄─── Mantoman app-chat      │
-│    project_resources                                │
-│    read_requirement      per-user bearer auth       │
-│    post_assignment  ─────────────────────────────►  │
-│    assignment_status       Teams channel            │
-│                                                     │
-│  SQLite  (named volume /app/data)                   │
-│    jobs · routes · credentials · audit              │
-└─────────────────────────────────────────────────────┘
-         │                        │
-   Microsoft Graph          Mantoman gateway
-   (SharePoint files)       POST /v1/webhooks/llm
-```
+
 
 ### Flow 1 — Teams → Mantoman → Teams
 
@@ -77,10 +76,21 @@ This prevents cross-project or cross-actor history sharing regardless of timing.
 
 ### Job state machine
 
-```
-queued ──► reading ──► generating ──► ready_to_send ──► sending ──► sent
-                                                                 └──► delivery_unknown
-any stage ──────────────────────────────────────────────────────────► failed
+```mermaid
+stateDiagram-v2
+    [*] --> queued
+    queued --> reading
+    reading --> generating
+    generating --> ready_to_send
+    ready_to_send --> sending
+    sending --> sent
+    sending --> delivery_unknown: timeout or crash
+    reading --> failed
+    generating --> failed
+    ready_to_send --> failed
+    sent --> [*]
+    failed --> [*]
+    delivery_unknown --> [*]: operator reconcile
 ```
 
 Restart safety: `reading` and `generating` jobs are marked for operator review (not
