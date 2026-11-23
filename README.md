@@ -73,6 +73,9 @@ Single binary. Production-tested. Agents that orchestrate for you.
 - **Single Binary** — ~25 MB static Go binary, no Node.js runtime, <1s startup, runs on a $5 VPS
 - **Observability** — Built-in LLM call tracing with spans and prompt cache metrics, optional OpenTelemetry OTLP export
 
+An experimental standalone Microsoft Teams service is under development; see
+[`teams-bot/README.md`](teams-bot/README.md) for its scope and unverified acceptance gates.
+
 ## Desktop Edition (ManToManAgent Lite)
 
 A native desktop app for local AI agents — no Docker, no PostgreSQL, no infrastructure.

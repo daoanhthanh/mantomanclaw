@@ -1,0 +1,46 @@
+# Additive overlay; see teams-bot/README.md before enabling.
+services:
+  teams-bot:
+    build:
+      context: ./teams-bot
+    init: true
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    env_file:
+      - path: ./teams-bot/.env
+        required: false
+    environment:
+      TEAMS_BOT_CONFIG: /app/config.json
+      TEAMS_BOT_STATE_PATH: /app/data/teams-bot.sqlite
+      MICROSOFT_CLIENT_SECRET: ${MICROSOFT_CLIENT_SECRET:?set Microsoft client secret}
+    ports:
+      - "127.0.0.1:3978:3978"
+    volumes:
+      - ./teams-bot/config.json:/app/config.json:ro
+      - teams-bot-data:/app/data
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    depends_on:
+      mantomanagent:
+        condition: service_started
+    networks:
+      - default
+      - mantomanagent-net
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3978/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+          pids: 128
+
+volumes:
+  teams-bot-data:

@@ -183,7 +183,7 @@ Content-Type: application/json
 **Signing algorithm:**
 
 ```
-signing_key = hex.Decode(hmac_signing_key)   // decode the hex field to raw bytes
+signing_key = UTF8(raw_secret)
 payload     = "{unix_ts}.{request_body_bytes}"
 signature   = HMAC_SHA256(key=signing_key, data=payload)
 header      = "t={unix_ts},v1={hex(signature)}"
@@ -191,7 +191,7 @@ header      = "t={unix_ts},v1={hex(signature)}"
 
 **Timestamp skew:** The gateway rejects requests where `|now - t| > 300 seconds`. Ensure your clock is synchronized (NTP).
 
-**Key contract:** `hmac_signing_key` = `hex(SHA-256(raw_secret))`. The signing key is the **decoded bytes** of this hex string. The raw secret is never stored — only its hash.
+**Key contract:** use the raw webhook secret as UTF-8 bytes for HMAC signing. The gateway stores it encrypted for verification; the separate SHA-256 secret hash is used for bearer lookup, not as the HMAC key. Rotate older webhooks that lack an encrypted secret before using HMAC.
 
 ### HMAC Replay Protection
 

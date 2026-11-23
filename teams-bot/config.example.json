@@ -1,0 +1,39 @@
+{
+  "installationId": "replace-installation-id",
+  "microsoftTenantId": "replace-microsoft-tenant-id",
+  "mantomanTenantId": "replace-mantoman-tenant-id",
+  "mantomanBaseUrl": "http://mantomanagent:18790",
+  "clientId": "replace-client-id",
+  "teamsServiceUrl": "https://smba.trafficmanager.net/teams",
+  "statePath": "/app/data/teams-bot.sqlite",
+  "gatewaySyncTimeoutSec": 600,
+  "httpDeadlineSec": 630,
+  "mcpAllowedOrigins": [],
+  "mcpAllowedHosts": ["localhost", "127.0.0.1", "teams-bot"],
+  "actors": [
+    {
+      "id": "replace-actor-id",
+      "mantomanUserId": "replace-mantoman-user-id",
+      "entraObjectId": "replace-entra-object-id",
+      "displayName": "Example User"
+    }
+  ],
+  "projects": [
+    {
+      "id": "example",
+      "aliases": ["example"],
+      "webhookId": "replace-project-webhook-id",
+      "webhookSecretEnv": "TEAMS_WEBHOOK_EXAMPLE_SECRET",
+      "agentId": "replace-project-agent-id",
+      "siteId": "replace-site-id",
+      "driveId": "replace-drive-id",
+      "libraryPathPrefix": "Requirements",
+      "allowedHosts": ["replace-tenant.sharepoint.com"],
+      "actors": ["replace-actor-id"],
+      "destination": { "teamId": "replace-team-id", "channelId": "replace-channel-id" },
+      "recipients": [
+        { "alias": "example", "entraObjectId": "replace-recipient-object-id", "teamsUserId": "replace-teams-user-id", "displayName": "Example Recipient" }
+      ]
+    }
+  ]
+}

@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nextlevelbuilder/mantomanagent/internal/upgrade"
+	"github.com/nextlevelbuilder/goclaw/internal/upgrade"
 )
 
 // RestoreOptions configures a system restore run.

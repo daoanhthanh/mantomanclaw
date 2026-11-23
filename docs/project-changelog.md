@@ -4,6 +4,22 @@ Significant changes, features, and fixes in reverse chronological order.
 
 ---
 
+## Unreleased
+
+### Microsoft Teams bot service
+
+- `teams-bot/`: standalone TypeScript service (Node 24, pnpm, strict TS) with SDK-authenticated `/api/messages` on port 3978, authenticated MCP server on port 3979, and SQLite operation state on a named volume.
+- Policy layer enforces default-deny actor/project/destination checks; durable job state machine (`queued→reading→generating→ready_to_send→sending→sent`) with safe restart, deduplication and `delivery_unknown` handling.
+- Teams→Mantoman flow: validated activity handler persists job and acknowledges immediately; worker calls `POST /v1/webhooks/llm` with HMAC-signed envelope, session key derived as `teams:v1:sha256(JSON)` to prevent collisions, bounded 128 KiB input.
+- Mantoman app→Teams flow: Streamable HTTP MCP server exposes four tools (`project_resources`, `read_requirement`, `post_assignment`, `assignment_status`) with per-user bearer credentials; direct posting authorized by operator policy.
+- `docker-compose.teams.yml` additive overlay: non-root Node image, dropped capabilities, `no-new-privileges`, bounded resources, private 3979, public `127.0.0.1:3978`.
+- `teams-bot/teams-app.zip` app package generated with bot ID `a45471e3-e053-4919-befe-6b3f886ae946`; replace `TEAMS_APP_HOST` placeholder before uploading to Teams Admin.
+- Azure Bot MsTeamsChannel enabled (`isEnabled: true`) via `az rest PUT` confirmed with API GET.
+- 20/20 unit/contract tests pass; typecheck clean; Docker build reproducible; Compose config valid.
+- **Remaining for real acceptance:** install app package into Teams tenant, configure SharePoint `Sites.Selected` grants, provision dedicated webhook agent with isolation verified, set `TEAMS_APP_HOST` to public HTTPS endpoint, run smoke test against live gateway.
+
+---
+
 ## 2026-11-04
 
 ### ChatGPT Subscription (OAuth) model catalog refresh

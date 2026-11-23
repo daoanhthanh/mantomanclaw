@@ -14,7 +14,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/nextlevelbuilder/mantomanagent/internal/upgrade"
+	"github.com/nextlevelbuilder/goclaw/internal/upgrade"
 )
 
 // TenantRestoreOptions configures a tenant-scoped restore run.

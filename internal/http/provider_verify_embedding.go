@@ -13,9 +13,11 @@ import (
 )
 
 // handleVerifyEmbedding tests a provider's embedding capability with a minimal API call.
+// It mirrors buildEmbeddingProvider: dimensions default to RequiredMemoryEmbeddingDimensions
+// so the verify call exercises the same truncation that production embeddings will use.
 //
 //	POST /v1/providers/{id}/verify-embedding
-//	Body: {"model": "text-embedding-3-small"}  (optional, falls back to settings.embedding.model)
+//	Body: {"model": "text-embedding-3-small", "dimensions": 1536}  (both optional)
 //	Response: {"valid": true, "dimensions": 1536} or {"valid": false, "error": "..."}
 func (h *ProvidersHandler) handleVerifyEmbedding(w http.ResponseWriter, r *http.Request) {
 	locale := extractLocale(r)
@@ -66,11 +68,18 @@ func (h *ProvidersHandler) handleVerifyEmbedding(w http.ResponseWriter, r *http.
 
 	ep := memory.NewOpenAIEmbeddingProvider(p.Name, p.APIKey, apiBase, model)
 
-	// Apply dimension truncation: request body → provider settings → none.
-	// Clamp to reasonable range to avoid sending absurd values upstream.
+	// Apply dimension truncation: request body → provider settings → Ollama default.
+	// For Ollama providers the model may output larger native dims (e.g. qwen3-embedding:8b
+	// returns 4096); default to RequiredMemoryEmbeddingDimensions so verify matches what
+	// production embeddings will use. Other providers either output 1536 natively or have
+	// explicit dimensions configured — leave them on the original logic.
 	truncDims := req.Dimensions
 	if truncDims <= 0 && es != nil && es.Dimensions > 0 {
 		truncDims = es.Dimensions
+	}
+	isOllama := p.ProviderType == store.ProviderOllama || p.ProviderType == store.ProviderOllamaCloud
+	if truncDims <= 0 && isOllama {
+		truncDims = store.RequiredMemoryEmbeddingDimensions
 	}
 	if truncDims > 0 && truncDims <= 8192 {
 		ep.WithDimensions(truncDims)
@@ -90,7 +99,7 @@ func (h *ProvidersHandler) handleVerifyEmbedding(w http.ResponseWriter, r *http.
 		dims = len(vectors[0])
 	}
 	result := map[string]any{"valid": true, "dimensions": dims}
-	if dims > 0 && dims != 1536 {
+	if dims > 0 && dims != store.RequiredMemoryEmbeddingDimensions {
 		result["dimension_mismatch"] = true
 	}
 	writeJSON(w, http.StatusOK, result)

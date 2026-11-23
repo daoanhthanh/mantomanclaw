@@ -49,6 +49,14 @@ ui/desktop/frontend/dist/*.js
 ui/desktop/frontend/dist/*.css
 ui/desktop/frontend/dist/assets/
 ui/desktop/frontend/.vite/
+
+# Teams service local dependencies, configuration, secrets, and state
+/teams-bot/node_modules/
+/teams-bot/dist/
+/teams-bot/data/
+/teams-bot/config.json
+/teams-bot/secrets/
+/teams-bot/*.sqlite*
 ui/desktop/frontend/wailsjs/
 ui/desktop/frontend/package.json.md5
 ui/desktop/build/bin/
