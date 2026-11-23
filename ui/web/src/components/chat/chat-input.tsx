@@ -140,9 +140,8 @@ export function ChatInput({
         className="hidden"
       />
 
-      {/* Input container — attach + textarea + send/stop inside one rounded box.
-          items-end aligns icons with bottom of textarea when multi-line; single-line stays tight because textarea auto-sizes via useLayoutEffect above. */}
-      <div className="flex items-end rounded-xl border bg-background/95 backdrop-blur-sm shadow-sm transition-colors focus-within:ring-1 focus-within:ring-ring">
+      {/* Input container — attach + textarea + send/stop inside one rounded box. */}
+      <div className="flex items-center rounded-xl border bg-background/95 backdrop-blur-sm shadow-sm transition-colors focus-within:ring-1 focus-within:ring-ring">
         {/* Attach button inside input */}
         <button
           type="button"
