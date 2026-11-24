@@ -23,10 +23,10 @@ export function CopyButton({ text }: CopyButtonProps) {
     <button
       type="button"
       onClick={handleCopy}
-      className="inline-flex h-5 w-5 items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+      className="inline-flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
       title="Copy response"
     >
-      {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
     </button>
   );
 }

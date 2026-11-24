@@ -112,6 +112,8 @@
   "view": "查看",
   "yes": "是",
   "copyCode": "复制代码",
+  "forkMessage": "分叉到其他 Agent",
+  "forkTo": "分叉到",
   "copy": "复制",
   "download": "下载",
   "errorBoundary": "此部分渲染出错。",

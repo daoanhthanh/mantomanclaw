@@ -112,6 +112,8 @@
   "selectOrTypeSkills": "Select or type skill names...",
   "typeAndPressEnter": "Type and press Enter...",
   "copyCode": "Copy code",
+  "forkMessage": "Fork to another agent",
+  "forkTo": "Fork to",
   "copy": "Copy",
   "download": "Download",
   "errorBoundary": "Something went wrong rendering this section.",

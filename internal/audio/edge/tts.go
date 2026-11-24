@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/nextlevelbuilder/goclaw/internal/audio"
@@ -57,6 +58,33 @@ func (p *Provider) Name() string { return "edge" }
 // Zero value for rate/pitch/volume means no flag is added (preserves legacy behaviour).
 // MUST NOT mutate opts.Params.
 func (p *Provider) Synthesize(ctx context.Context, text string, opts audio.TTSOptions) (*audio.SynthResult, error) {
+	const maxAttempts = 3
+	var lastErr error
+	for attempt := range maxAttempts {
+		result, err := p.synthesizeOnce(ctx, text, opts)
+		if err == nil {
+			return result, nil
+		}
+		// Retry only the transient "No audio was received" error from Microsoft's
+		// WebSocket endpoint. All other errors (bad voice, context cancel, etc.) are
+		// returned immediately.
+		if !strings.Contains(err.Error(), "NoAudioReceived") {
+			return nil, err
+		}
+		lastErr = err
+		if attempt < maxAttempts-1 {
+			select {
+			case <-ctx.Done():
+				return nil, ctx.Err()
+			case <-time.After(500 * time.Millisecond):
+			}
+		}
+	}
+	return nil, lastErr
+}
+
+// synthesizeOnce runs edge-tts once and returns the audio bytes.
+func (p *Provider) synthesizeOnce(ctx context.Context, text string, opts audio.TTSOptions) (*audio.SynthResult, error) {
 	tmpDir := os.TempDir()
 	outPath := filepath.Join(tmpDir, fmt.Sprintf("tts-%d.mp3", time.Now().UnixNano()))
 	defer os.Remove(outPath)

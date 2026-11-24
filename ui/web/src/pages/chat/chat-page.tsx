@@ -17,6 +17,7 @@ import { useChatSend } from "./hooks/use-chat-send";
 import { isOwnSession, parseSessionKey } from "@/lib/session-key";
 import { useVirtualKeyboard } from "@/hooks/use-virtual-keyboard";
 import { TaskPanel } from "@/components/chat/task-panel";
+import type { ChatMessage } from "@/types/chat";
 
 export function ChatPage() {
   const { t } = useTranslation("chat");
@@ -167,6 +168,16 @@ export function ChatPage() {
     abort(sessionKey);
   }, [abort, sessionKey]);
 
+  const handleFork = useCallback(
+    (_message: ChatMessage, targetAgentKey: string) => {
+      const key = buildNewSessionKey(targetAgentKey);
+      setAgentIdFallback(targetAgentKey);
+      setComposerAgentId(targetAgentKey);
+      navigate(`/chat/${encodeURIComponent(key)}`);
+    },
+    [buildNewSessionKey, navigate],
+  );
+
   const isMobile = useIsMobile();
   useVirtualKeyboard();
   const [chatSidebarOpen, setChatSidebarOpen] = useState(false);
@@ -284,6 +295,7 @@ export function ChatPage() {
             loading={messagesLoading}
             scrollTrigger={scrollTrigger}
             onToggleTaskPanel={() => setTaskPanelOpen((v) => !v)}
+            onFork={handleFork}
           />}
 
           <div className={cn("mx-auto w-full max-w-3xl shrink-0", isEmptyChat && "my-auto min-h-0 shrink overflow-y-auto overscroll-contain py-6")}>

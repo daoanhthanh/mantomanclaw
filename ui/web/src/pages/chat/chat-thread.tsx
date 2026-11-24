@@ -25,6 +25,7 @@ interface ChatThreadProps {
   loading?: boolean;
   scrollTrigger?: number;
   onToggleTaskPanel?: () => void;
+  onFork?: (message: ChatMessage, agentKey: string) => void;
 }
 
 /** Check if a message is tool-only (no user-visible text content) */
@@ -76,7 +77,7 @@ function buildDisplayItems(messages: ChatMessage[]): DisplayItem[] {
 
 export const ChatThread = memo(function ChatThread({
   messages, streamText, thinkingText, toolStream, blockReplies,
-  activity, teamTasks, isRunning, isBusy, loading, scrollTrigger = 0, onToggleTaskPanel,
+  activity, teamTasks, isRunning, isBusy, loading, scrollTrigger = 0, onToggleTaskPanel, onFork,
 }: ChatThreadProps) {
   const { t } = useTranslation("chat");
   const { ref, onScroll } = useAutoScroll<HTMLDivElement>(
@@ -156,7 +157,7 @@ export const ChatThread = memo(function ChatThread({
               case "notification":
                 return <SystemNotification key={`notif-${item.idx}`} message={item.msg} />;
               case "message":
-                return <MessageBubble key={`msg-${item.idx}`} message={item.msg} />;
+                return <MessageBubble key={`msg-${item.idx}`} message={item.msg} onFork={onFork} />;
               case "merged-tools":
                 return <MergedToolGroup key={`tools-${item.idx}`} msgs={item.msgs} />;
             }

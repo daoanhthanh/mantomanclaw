@@ -1,5 +1,6 @@
 import { Bot, User } from "lucide-react";
 import { CopyButton } from "@/components/ui/copy-button";
+import { ForkButton } from "./fork-button";
 import { MessageContent } from "./message-content";
 import { ThinkingBlock } from "./thinking-block";
 import { ToolCallCard } from "./tool-call-card";
@@ -11,10 +12,12 @@ import type { ChatMessage } from "@/types/chat";
 
 interface MessageBubbleProps {
   message: ChatMessage;
+  onFork?: (message: ChatMessage, agentKey: string) => void;
 }
 
-export function MessageBubble({ message }: MessageBubbleProps) {
+export function MessageBubble({ message, onFork }: MessageBubbleProps) {
   const timezone = useUiStore((s) => s.timezone);
+  const language = useUiStore((s) => s.language);
   const isUser = message.role === "user";
   const isTool = message.role === "tool";
 
@@ -62,10 +65,10 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           )}
           {message.timestamp && (
             <div className="mt-1 text-2xs text-muted-foreground">
-              {new Intl.DateTimeFormat([], {
+              {new Intl.DateTimeFormat(language, {
                 timeZone: resolveTimezone(timezone),
-                hour: "numeric",
-                minute: "2-digit",
+                dateStyle: "medium",
+                timeStyle: "short",
               }).format(new Date(message.timestamp))}
             </div>
           )}
@@ -94,10 +97,13 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           {message.timestamp && (
             <div className="mt-1 flex items-center gap-1.5 text-2xs text-muted-foreground">
               <CopyButton text={message.content ?? ""} />
-              {new Intl.DateTimeFormat([], {
+              {onFork && (
+                <ForkButton onFork={(agentKey) => onFork(message, agentKey)} />
+              )}
+              {new Intl.DateTimeFormat(language, {
                 timeZone: resolveTimezone(timezone),
-                hour: "numeric",
-                minute: "2-digit",
+                dateStyle: "medium",
+                timeStyle: "short",
               }).format(new Date(message.timestamp))}
             </div>
           )}

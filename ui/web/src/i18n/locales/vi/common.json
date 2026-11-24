@@ -112,6 +112,8 @@
   "view": "Xem",
   "yes": "Có",
   "copyCode": "Sao chép mã",
+  "forkMessage": "Chia nhánh sang agent khác",
+  "forkTo": "Chia nhánh đến",
   "copy": "Sao chép",
   "download": "Tải xuống",
   "errorBoundary": "Đã xảy ra lỗi khi hiển thị phần này.",
