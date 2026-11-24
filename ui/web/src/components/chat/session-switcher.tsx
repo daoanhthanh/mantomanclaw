@@ -50,6 +50,12 @@ export const SessionSwitcher = memo(function SessionSwitcher({ sessions, activeK
   const { t: tc } = useTranslation("common");
   const [deleteTarget, setDeleteTarget] = useState<SessionInfo | null>(null);
 
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    onDelete?.(deleteTarget.key);
+    setDeleteTarget(null);
+  };
+
   if (sessions.length === 0 && loading) {
     return (
       <div className="space-y-2 p-2">
@@ -120,22 +126,21 @@ export const SessionSwitcher = memo(function SessionSwitcher({ sessions, activeK
       </div>
 
       <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-        <DialogContent>
+        <DialogContent
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              confirmDelete();
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{t("deleteChat")}</DialogTitle>
             <DialogDescription>{t("deleteChatConfirm")}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>{tc("cancel")}</Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                if (deleteTarget) {
-                  onDelete?.(deleteTarget.key);
-                  setDeleteTarget(null);
-                }
-              }}
-            >
+            <Button variant="destructive" onClick={confirmDelete}>
               {tc("delete")}
             </Button>
           </DialogFooter>
