@@ -1,4 +1,5 @@
 import { Bot, User } from "lucide-react";
+import { CopyButton } from "@/components/ui/copy-button";
 import { MessageContent } from "./message-content";
 import { ThinkingBlock } from "./thinking-block";
 import { ToolCallCard } from "./tool-call-card";
@@ -50,13 +51,28 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             <ToolCallCard key={entry.toolCallId} entry={entry} compact />
           ))}
         </div>
+      ) : isUser ? (
+        /* User message bubble — capped width, styled card */
+        <div className="max-w-[85%] rounded-lg px-4 py-2 bg-card text-card-foreground border border-border shadow-sm border-r-2 border-r-accent-foreground">
+          <MessageContent content={message.content} role={message.role} mediaBasenames={message.mediaItems?.map((m) => m.path.split("/").pop() ?? "").filter(Boolean)} />
+          {message.mediaItems && message.mediaItems.length > 0 && (
+            <div className="mt-2">
+              <MediaGallery items={message.mediaItems} />
+            </div>
+          )}
+          {message.timestamp && (
+            <div className="mt-1 text-2xs text-muted-foreground">
+              {new Intl.DateTimeFormat([], {
+                timeZone: resolveTimezone(timezone),
+                hour: "numeric",
+                minute: "2-digit",
+              }).format(new Date(message.timestamp))}
+            </div>
+          )}
+        </div>
       ) : (
-        /* Normal message bubble — assistant uses full width, user capped at 85% */
-        <div className={`rounded-lg px-4 py-2 ${
-          isUser
-            ? "max-w-[85%] bg-card text-card-foreground border border-border shadow-sm border-r-2 border-r-accent-foreground"
-            : "flex-1 min-w-0 bg-card text-card-foreground border border-border shadow-sm"
-        }`}>
+        /* Assistant message — no bubble, raw content */
+        <div className="flex-1 min-w-0">
           {hasThinking && (
             <div className="mb-2">
               <ThinkingBlock text={message.thinking!} />
@@ -76,7 +92,8 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             </div>
           )}
           {message.timestamp && (
-            <div className="mt-1 text-2xs text-muted-foreground">
+            <div className="mt-1 flex items-center gap-1.5 text-2xs text-muted-foreground">
+              <CopyButton text={message.content ?? ""} />
               {new Intl.DateTimeFormat([], {
                 timeZone: resolveTimezone(timezone),
                 hour: "numeric",
@@ -89,3 +106,4 @@ export function MessageBubble({ message }: MessageBubbleProps) {
     </div>
   );
 }
+
