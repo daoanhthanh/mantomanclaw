@@ -21,6 +21,20 @@ type SessionBranchOpts struct {
 	UpToIndex int
 	Label     string
 	Metadata  map[string]string
+
+	// Target agent binding for cross-agent branches. When AgentUUID is not
+	// uuid.Nil the branch is bound to that agent and takes Model/Provider/
+	// ContextWindow from these fields (empty/zero values are NOT inherited from
+	// the source, because they describe a different agent). When AgentUUID is
+	// uuid.Nil the branch inherits all of them from the source session.
+	AgentUUID     uuid.UUID
+	Model         string
+	Provider      string
+	ContextWindow int
+
+	// UserID, when non-empty, becomes the owner of the branch instead of the
+	// source session's owner (e.g. an admin forking another user's session).
+	UserID string
 }
 
 // SessionData holds conversation state for one session.

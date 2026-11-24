@@ -172,6 +172,12 @@ type Message struct {
 	// Anthropic requires thinking blocks to be passed back exactly as received.
 	RawAssistantContent json.RawMessage `json:"-"`
 
+	// ID is a stable identifier assigned when the message is persisted via
+	// SessionStore.AddMessage. Empty on history stored before this field existed.
+	// Used by clients to reference a point in the conversation (e.g. session fork).
+	// Never sent to LLM providers (wire payloads are built field-by-field).
+	ID string `json:"id,omitempty"`
+
 	// CreatedAt records when this message was added to the session.
 	// Pointer type so that older messages (stored before this field existed) deserialize as nil,
 	// allowing the frontend to fall back to synthetic timestamps.

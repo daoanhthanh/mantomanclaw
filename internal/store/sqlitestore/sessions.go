@@ -110,6 +110,10 @@ func (s *SQLiteSessionStore) AddMessage(ctx context.Context, key string, msg pro
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	// Stamp stable ID and creation time if not already set.
+	if msg.ID == "" {
+		msg.ID = uuid.Must(uuid.NewV7()).String()
+	}
 	if msg.CreatedAt == nil {
 		now := time.Now().UTC()
 		msg.CreatedAt = &now

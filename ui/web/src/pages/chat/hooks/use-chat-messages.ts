@@ -266,7 +266,9 @@ export function useChatMessages(sessionKey: string, agentId: string) {
             : undefined;
           if (streamed && !hadTools) {
             updateSessionMessages(sessionKeyRef.current, (prev) => [...prev, { role: "assistant", content: streamed, thinking, timestamp: Date.now(), mediaItems }]);
-          } else { loadHistory(mediaItems); }
+          }
+          // Always re-sync: the persisted message carries the server ID needed for fork.
+          loadHistory(mediaItems);
           break;
         }
         case "run.failed": {

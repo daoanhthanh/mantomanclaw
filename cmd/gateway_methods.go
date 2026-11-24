@@ -27,7 +27,9 @@ func registerAllMethods(server *gateway.Server, agents *agent.Router, sessStore 
 	chatMethods.SetTeamWorkClassification(agentStore, teamStore, agentLinkStore, teamWorkEmbedder)
 	chatMethods.Register(router)
 	methods.NewAgentsMethods(agents, cfg, cfgPath, workspace, agentStore, contextFileInterceptor, msgBus).Register(router)
-	methods.NewSessionsMethods(sessStore, msgBus, cfg).Register(router)
+	sessionsMethods := methods.NewSessionsMethods(sessStore, msgBus, cfg)
+	sessionsMethods.SetAgentStore(agentStore)
+	sessionsMethods.Register(router)
 	methods.NewRunTimelineMethods(runTimeline, cfg).Register(router)
 	configMethods := methods.NewConfigMethods(cfg, cfgPath, configSecretsStore, msgBus)
 	if sysConfigStore != nil {

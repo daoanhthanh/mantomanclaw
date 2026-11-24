@@ -71,6 +71,20 @@ func (s *SQLiteSessionStore) BranchSession(ctx context.Context, sourceKey string
 		teamID := *sourceSnapshot.TeamID
 		branch.TeamID = &teamID
 	}
+	if opts.UserID != "" {
+		branch.UserID = opts.UserID
+	}
+	if opts.AgentUUID != uuid.Nil {
+		// Cross-agent branch: bind to the target agent; source model/provider/
+		// context window/summary describe a different agent and must not leak.
+		branch.AgentUUID = opts.AgentUUID
+		branch.Model = opts.Model
+		branch.Provider = opts.Provider
+		branch.ContextWindow = opts.ContextWindow
+		if opts.AgentUUID != sourceSnapshot.AgentUUID {
+			branch.Summary = ""
+		}
+	}
 
 	msgsJSON, _ := json.Marshal(branch.Messages)
 	metaJSON := []byte("{}")

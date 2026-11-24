@@ -97,7 +97,7 @@ export function MessageBubble({ message, onFork }: MessageBubbleProps) {
           {message.timestamp && (
             <div className="mt-1 flex items-center gap-1.5 text-2xs text-muted-foreground">
               <CopyButton text={message.content ?? ""} />
-              {onFork && (
+              {onFork && message.id && (
                 <ForkButton onFork={(agentKey) => onFork(message, agentKey)} />
               )}
               {new Intl.DateTimeFormat(language, {

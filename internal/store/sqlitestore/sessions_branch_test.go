@@ -112,3 +112,90 @@ func TestBranchSessionRejectsExistingTargetWithoutOverwrite(t *testing.T) {
 		t.Fatalf("label = %q, want first label", reloaded.Label)
 	}
 }
+
+func TestAddMessageStampsStableID(t *testing.T) {
+	db := openTestDB(t)
+	if err := EnsureSchema(db); err != nil {
+		t.Fatalf("EnsureSchema: %v", err)
+	}
+	s := NewSQLiteSessionStore(db)
+	ctx := store.WithTenantID(context.Background(), store.MasterTenantID)
+	key := "agent:test-agent:direct:id-stamp"
+
+	s.AddMessage(ctx, key, providers.Message{Role: "user", Content: "a"})
+	s.AddMessage(ctx, key, providers.Message{Role: "assistant", Content: "b", ID: "preset"})
+
+	h := s.GetHistory(ctx, key)
+	if len(h) != 2 {
+		t.Fatalf("history len = %d, want 2", len(h))
+	}
+	if h[0].ID == "" {
+		t.Fatal("AddMessage must assign an ID when empty")
+	}
+	if h[1].ID != "preset" {
+		t.Fatalf("AddMessage must keep a preset ID, got %q", h[1].ID)
+	}
+	if h[0].ID == h[1].ID {
+		t.Fatal("message IDs must be unique")
+	}
+}
+
+func TestBranchSessionCrossAgentRebindsIdentityAndOwner(t *testing.T) {
+	db := openTestDB(t)
+	if err := EnsureSchema(db); err != nil {
+		t.Fatalf("EnsureSchema: %v", err)
+	}
+	ctx := store.WithTenantID(context.Background(), store.MasterTenantID)
+	targetID := seedSQLiteLinkAgent(t, db, store.MasterTenantID, "coder")
+
+	s := NewSQLiteSessionStore(db)
+	sourceKey := "agent:writer:ws:direct:src-cross"
+	src := s.GetOrCreate(ctx, sourceKey)
+	src.UserID = "alice"
+	src.Summary = "writer-specific summary"
+	src.Model, src.Provider, src.ContextWindow = "writer-model", "writer-provider", 1000
+	s.AddMessage(ctx, sourceKey, providers.Message{Role: "user", Content: "hi"})
+	s.AddMessage(ctx, sourceKey, providers.Message{Role: "assistant", Content: "yo"})
+	if err := s.Save(ctx, sourceKey); err != nil {
+		t.Fatalf("Save source: %v", err)
+	}
+	srcIDs := s.GetHistory(ctx, sourceKey)
+
+	newKey := "agent:coder:ws:direct:dst-cross"
+	branch, copied, err := s.BranchSession(ctx, sourceKey, store.SessionBranchOpts{
+		NewKey: newKey, UpToIndex: 2,
+		AgentUUID: targetID, Model: "coder-model", Provider: "coder-provider", ContextWindow: 2000,
+		UserID: "bob",
+	})
+	if err != nil {
+		t.Fatalf("BranchSession: %v", err)
+	}
+	if copied != 2 {
+		t.Fatalf("copied = %d, want 2", copied)
+	}
+
+	got := NewSQLiteSessionStore(db).Get(ctx, newKey) // fresh store: proves what was persisted
+	if got == nil {
+		t.Fatal("reloaded branch = nil")
+	}
+	if got.AgentUUID != targetID {
+		t.Errorf("AgentUUID = %v, want target %v", got.AgentUUID, targetID)
+	}
+	if got.Model != "coder-model" || got.Provider != "coder-provider" {
+		t.Errorf("target agent runtime not applied: %q/%q", got.Model, got.Provider)
+	}
+	// context_window is a cache-only field (not a sessions column); it is checked on the
+	// in-memory branch below. Listings read the persisted value from the agents table.
+	if branch.ContextWindow != 2000 {
+		t.Errorf("in-memory ContextWindow = %d, want 2000 (target agent)", branch.ContextWindow)
+	}
+	if got.Summary != "" {
+		t.Errorf("cross-agent branch must not inherit source summary, got %q", got.Summary)
+	}
+	if got.UserID != "bob" {
+		t.Errorf("UserID = %q, want caller bob", got.UserID)
+	}
+	if len(got.Messages) != 2 || got.Messages[0].ID != srcIDs[0].ID || got.Messages[1].ID != srcIDs[1].ID {
+		t.Errorf("message IDs must be preserved across the branch: %+v vs %+v", got.Messages, srcIDs)
+	}
+}

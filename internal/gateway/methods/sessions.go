@@ -11,19 +11,27 @@ import (
 	httpapi "github.com/nextlevelbuilder/goclaw/internal/http"
 	"github.com/nextlevelbuilder/goclaw/internal/i18n"
 	"github.com/nextlevelbuilder/goclaw/internal/providers"
+	"github.com/nextlevelbuilder/goclaw/internal/sessions"
 	"github.com/nextlevelbuilder/goclaw/internal/store"
 	"github.com/nextlevelbuilder/goclaw/pkg/protocol"
 )
 
-// SessionsMethods handles sessions.list, sessions.preview, sessions.patch, sessions.delete, sessions.reset.
+// SessionsMethods handles sessions.list, sessions.preview, sessions.patch, sessions.delete, sessions.reset, sessions.compact, sessions.fork.
 type SessionsMethods struct {
-	sessions store.SessionStore
-	eventBus bus.EventPublisher
-	cfg      *config.Config
+	sessions   store.SessionStore
+	agentStore store.AgentStore // optional: resolves the target agent for sessions.fork
+	eventBus   bus.EventPublisher
+	cfg        *config.Config
 }
 
 func NewSessionsMethods(sess store.SessionStore, eventBus bus.EventPublisher, cfg *config.Config) *SessionsMethods {
 	return &SessionsMethods{sessions: sess, eventBus: eventBus, cfg: cfg}
+}
+
+// SetAgentStore wires the agent store used by sessions.fork to bind a forked
+// session to its target agent.
+func (m *SessionsMethods) SetAgentStore(as store.AgentStore) {
+	m.agentStore = as
 }
 
 func (m *SessionsMethods) Register(router *gateway.MethodRouter) {
@@ -306,14 +314,51 @@ func (m *SessionsMethods) handleCompact(ctx context.Context, client *gateway.Cli
 }
 
 type sessionForkParams struct {
-	SourceKey  string `json:"sourceKey"`
-	NewKey     string `json:"newKey"`
-	UpToIndex  int    `json:"upToIndex"`
-	Label      string `json:"label"`
+	SourceKey string `json:"sourceKey"`
+	NewKey    string `json:"newKey"`
+	// UpToMessageID is the ID of the last message to copy (inclusive).
+	UpToMessageID string `json:"upToMessageId"`
+	Label         string `json:"label"`
+}
+
+// snapForkEnd takes the exclusive end index of a fork and moves it so the copied
+// history stays valid for LLM providers: an assistant turn with tool_calls is
+// either copied together with all of its tool results, or dropped entirely.
+func snapForkEnd(history []providers.Message, end int) int {
+	if end > len(history) {
+		end = len(history)
+	}
+	if end <= 0 {
+		return 0
+	}
+	// Pull in tool results that follow the cut and belong to the same turn.
+	for end < len(history) && history[end].Role == "tool" &&
+		(history[end-1].Role == "tool" || (history[end-1].Role == "assistant" && len(history[end-1].ToolCalls) > 0)) {
+		end++
+	}
+	// Find the assistant turn that owns the tail of the range.
+	owner := end - 1
+	for owner >= 0 && history[owner].Role == "tool" {
+		owner--
+	}
+	if owner < 0 || history[owner].Role != "assistant" || len(history[owner].ToolCalls) == 0 {
+		return end
+	}
+	answered := make(map[string]bool, end-owner)
+	for _, m := range history[owner+1 : end] {
+		answered[m.ToolCallID] = true
+	}
+	for _, tc := range history[owner].ToolCalls {
+		if !answered[tc.ID] {
+			return owner // incomplete turn: drop it rather than send dangling tool_calls
+		}
+	}
+	return end
 }
 
 // handleFork branches a session into a new key (possibly under a different agent),
-// copying messages up to upToIndex. Used by the UI fork-to-agent feature.
+// copying history up to and including the message identified by upToMessageId.
+// The branch is owned by the caller and bound to the agent named in newKey.
 func (m *SessionsMethods) handleFork(ctx context.Context, client *gateway.Client, req *protocol.RequestFrame) {
 	locale := store.LocaleFromContext(ctx)
 	var params sessionForkParams
@@ -321,16 +366,20 @@ func (m *SessionsMethods) handleFork(ctx context.Context, client *gateway.Client
 		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgInvalidJSON)))
 		return
 	}
-	if params.SourceKey == "" {
+	switch {
+	case params.SourceKey == "":
 		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgRequired, "sourceKey")))
 		return
-	}
-	if params.NewKey == "" {
+	case params.NewKey == "":
 		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgRequired, "newKey")))
 		return
+	case params.UpToMessageID == "":
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgRequired, "upToMessageId")))
+		return
 	}
-	if params.UpToIndex < 0 {
-		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgInvalidRequest, "upToIndex")))
+	targetKey, _ := sessions.ParseSessionKey(params.NewKey)
+	if targetKey == "" {
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgInvalidRequest, "invalid newKey")))
 		return
 	}
 
@@ -341,47 +390,56 @@ func (m *SessionsMethods) handleFork(ctx context.Context, client *gateway.Client
 
 	brancher, ok := m.sessions.(store.SessionBranchStore)
 	if !ok {
-		// Fallback: store doesn't support branching — seed the new session manually.
-		history := m.sessions.GetHistory(ctx, params.SourceKey)
-		end := params.UpToIndex
-		if end > len(history) {
-			end = len(history)
-		}
-		dest := m.sessions.GetOrCreate(ctx, params.NewKey)
-		m.sessions.SetHistory(ctx, params.NewKey, history[:end])
-		if params.Label != "" {
-			m.sessions.SetLabel(ctx, params.NewKey, params.Label)
-		}
-		if err := m.sessions.Save(ctx, params.NewKey); err != nil {
-			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInternal, err.Error()))
-			return
-		}
-		client.SendResponse(protocol.NewOKResponse(req.ID, map[string]any{
-			"ok":              true,
-			"session_key":     params.NewKey,
-			"copied_messages": end,
-			"fallback":        true,
-		}))
-		_ = dest
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInternal, i18n.T(locale, i18n.MsgInvalidRequest, "session branching unavailable")))
 		return
 	}
 
-	branch, copied, err := brancher.BranchSession(ctx, params.SourceKey, store.SessionBranchOpts{
+	// Resolve the cut point from the message ID, not a client-side position.
+	history := m.sessions.GetHistory(ctx, params.SourceKey)
+	end := -1
+	for i := range history {
+		if history[i].ID == params.UpToMessageID {
+			end = i + 1
+			break
+		}
+	}
+	if end < 0 {
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrNotFound, i18n.T(locale, i18n.MsgNotFound, "message", params.UpToMessageID)))
+		return
+	}
+	end = snapForkEnd(history, end)
+	if end == 0 {
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgInvalidRequest, "nothing to fork")))
+		return
+	}
+
+	opts := store.SessionBranchOpts{
 		NewKey:    params.NewKey,
-		UpToIndex: params.UpToIndex,
+		UpToIndex: end,
 		Label:     params.Label,
-	})
+		UserID:    client.UserID(),
+	}
+	// Bind the branch to the target agent so listings, usage and the agent loop
+	// attribute it correctly instead of inheriting the source agent's identity.
+	if m.agentStore != nil {
+		target, err := m.agentStore.GetByKey(ctx, targetKey)
+		if err != nil || target == nil || target.Status != store.AgentStatusActive {
+			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrNotFound, i18n.T(locale, i18n.MsgNotFound, "agent", targetKey)))
+			return
+		}
+		opts.AgentUUID = target.ID
+		opts.Model = target.Model
+		opts.Provider = target.Provider
+		opts.ContextWindow = target.ContextWindow
+	}
+
+	branch, copied, err := brancher.BranchSession(ctx, params.SourceKey, opts)
 	if err != nil {
 		switch {
 		case errors.Is(err, store.ErrSessionAlreadyExists):
-			// Already forked — treat as success, just navigate.
-			client.SendResponse(protocol.NewOKResponse(req.ID, map[string]any{
-				"ok":          true,
-				"session_key": params.NewKey,
-				"already_exists": true,
-			}))
+			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrFailedPrecondition, i18n.T(locale, i18n.MsgAlreadyExists, "session", params.NewKey)))
 		case errors.Is(err, store.ErrInvalidSessionBranch):
-			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgInvalidRequest, "upToIndex out of range")))
+			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgInvalidRequest, "fork point out of range")))
 		case errors.Is(err, store.ErrSessionNotFound):
 			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrNotFound, i18n.T(locale, i18n.MsgNotFound, "session", params.SourceKey)))
 		default:
@@ -390,9 +448,10 @@ func (m *SessionsMethods) handleFork(ctx context.Context, client *gateway.Client
 		return
 	}
 
+	emitAudit(m.eventBus, client, "session.forked", "session", branch.Key)
 	client.SendResponse(protocol.NewOKResponse(req.ID, map[string]any{
-		"ok":              true,
-		"session_key":     branch.Key,
-		"copied_messages": copied,
+		"ok":             true,
+		"sessionKey":     branch.Key,
+		"copiedMessages": copied,
 	}))
 }

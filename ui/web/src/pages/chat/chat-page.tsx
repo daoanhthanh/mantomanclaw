@@ -175,14 +175,13 @@ export function ChatPage() {
 
   const handleFork = useCallback(
     async (message: ChatMessage, targetAgentKey: string) => {
+      if (!message.id) return; // fork point must be a persisted message (ForkButton is hidden otherwise)
       const newKey = buildNewSessionKey(targetAgentKey);
-      const msgIndex = messages.indexOf(message);
-      const upToIndex = msgIndex >= 0 ? msgIndex + 1 : messages.length;
       try {
         await ws.call(Methods.SESSIONS_FORK, {
           sourceKey: sessionKey,
           newKey,
-          upToIndex,
+          upToMessageId: message.id,
         });
       } catch (err) {
         console.error("[handleFork] sessions.fork failed:", err);
@@ -193,7 +192,7 @@ export function ChatPage() {
       setComposerAgentId(targetAgentKey);
       navigate(`/chat/${encodeURIComponent(newKey)}`);
     },
-    [buildNewSessionKey, messages, sessionKey, ws, navigate, t],
+    [buildNewSessionKey, sessionKey, ws, navigate, t],
   );
 
   const isMobile = useIsMobile();

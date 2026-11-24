@@ -80,7 +80,6 @@ export const Methods = {
   SESSIONS_DELETE: "sessions.delete",
   SESSIONS_RESET: "sessions.reset",
   RUN_TIMELINE_GET: "run.timeline.get",
-  SESSIONS_BRANCH: "sessions.branch",
   SESSIONS_FORK: "sessions.fork",
 
   // Phase 2 - NEEDED

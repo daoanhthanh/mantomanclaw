@@ -27,6 +27,8 @@ export interface SessionPreview {
 
 /** Message format from Go providers.Message */
 export interface Message {
+  /** Stable server-assigned ID (absent for history stored before IDs existed and for optimistic local messages). */
+  id?: string;
   role: "user" | "assistant" | "tool";
   content: string;
   thinking?: string;
