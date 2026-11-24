@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { CloudUpload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import type { CreateWorkstationParams, WorkstationBackendType } from "./hooks/use-workstations";
 import {
   buildWorkstationCreatePayload,
@@ -46,7 +46,7 @@ export function WorkstationCreateDialog({
   const [port, setPort] = useState("22");
   const [user, setUser] = useState("");
   const [authMethod, setAuthMethod] = useState<SshAuthMethod>("privateKey");
-  const [privateKey, setPrivateKey] = useState("");
+  const [privateKeyFile, setPrivateKeyFile] = useState<File | null>(null);
   const [password, setPassword] = useState("");
   // Docker fields
   const [container, setContainer] = useState("");
@@ -64,7 +64,7 @@ export function WorkstationCreateDialog({
     setPort("22");
     setUser("");
     setAuthMethod("privateKey");
-    setPrivateKey("");
+    setPrivateKeyFile(null);
     setPassword("");
     setContainer("");
     setImage("");
@@ -74,6 +74,18 @@ export function WorkstationCreateDialog({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+    let privateKey = "";
+    if (backend === "ssh" && authMethod === "privateKey" && privateKeyFile) {
+      try {
+        privateKey = await privateKeyFile.text();
+      } catch {
+        setFieldError(t("createDialog.errors.privateKeyReadFailed"));
+        setSubmitting(false);
+        return;
+      }
+    }
 
     const built = buildWorkstationCreatePayload({
       key,
@@ -91,6 +103,7 @@ export function WorkstationCreateDialog({
     });
     if (built.kind === "error") {
       setFieldError(t(`createDialog.errors.${built.errorKey}`));
+      setSubmitting(false);
       return;
     }
 
@@ -109,7 +122,10 @@ export function WorkstationCreateDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!submitting) { resetForm(); onOpenChange(v); } }}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent
+        className="max-h-dvh overflow-y-auto overscroll-contain sm:max-h-[calc(100dvh-2rem)] sm:max-w-lg"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>{t("createDialog.title")}</DialogTitle>
@@ -207,17 +223,44 @@ export function WorkstationCreateDialog({
                 {authMethod === "privateKey" ? (
                   <div className="space-y-1.5">
                     <Label htmlFor="ws-private-key">{t("createDialog.privateKeyLabel")}</Label>
-                    <Textarea
-                      id="ws-private-key"
-                      value={privateKey}
-                      onChange={(e) => setPrivateKey(e.target.value)}
-                      placeholder={t("createDialog.privateKeyPlaceholder")}
-                      rows={5}
-                      spellCheck={false}
-                      autoComplete="off"
-                      className="font-mono text-base md:text-sm"
-                    />
-                    <p className="text-xs text-muted-foreground">{t("createDialog.privateKeyHint")}</p>
+                    <div
+                      className={`relative flex flex-col items-center gap-3 rounded-2xl border border-border px-4 py-6 text-center transition-colors focus-within:ring-2 focus-within:ring-ring ${submitting ? "opacity-50" : "hover:border-primary/50 hover:bg-muted/30"}`}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        if (!submitting && e.dataTransfer.files.length === 1) {
+                          setPrivateKeyFile(e.dataTransfer.files.item(0));
+                          setFieldError(null);
+                        }
+                      }}
+                    >
+                      <div className="rounded-full bg-muted/50 p-3 ring-8 ring-muted/20">
+                        <CloudUpload className="size-6 text-muted-foreground" aria-hidden="true" />
+                      </div>
+                      <p className="text-base">
+                        <span className="font-semibold text-blue-600 dark:text-blue-400">{t("createDialog.privateKeyUpload")}</span>{" "}
+                        <span>{t("createDialog.privateKeyDropHint")}</span>
+                      </p>
+                      <p className="max-w-full break-all text-sm text-muted-foreground" aria-live="polite">
+                        {privateKeyFile?.name ?? t("createDialog.privateKeyFileHint")}
+                      </p>
+                      <Input
+                        id="ws-private-key"
+                        type="file"
+                        disabled={submitting}
+                        aria-describedby="ws-private-key-hint"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setPrivateKeyFile(file);
+                            setFieldError(null);
+                          }
+                          e.target.value = "";
+                        }}
+                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+                      />
+                    </div>
+                    <p id="ws-private-key-hint" className="text-xs text-muted-foreground">{t("createDialog.privateKeyHint")}</p>
                   </div>
                 ) : (
                   <div className="space-y-1.5">
