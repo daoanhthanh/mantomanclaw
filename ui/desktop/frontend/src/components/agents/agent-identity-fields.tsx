@@ -3,6 +3,7 @@ import { Combobox } from '../common/Combobox'
 import { Switch } from '../common/Switch'
 import type { UseFormRegister, UseFormWatch, UseFormSetValue, FieldErrors } from 'react-hook-form'
 import type { AgentFormData } from '../../schemas/agent.schema'
+import { AgentIconPicker } from './AgentIconPicker'
 
 interface AgentIdentityFieldsProps {
   isEditing: boolean
@@ -35,9 +36,9 @@ export function AgentIdentityFields({
           <label className="text-xs font-medium text-text-secondary">{t('agents:create.displayName').replace(' *', '')}</label>
           <input {...register('displayName')} placeholder={t('agents:create.displayNamePlaceholder')} className="w-full bg-surface-tertiary border border-border rounded-lg px-3 py-2 text-base md:text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent" />
         </div>
-        <div className="space-y-1 w-16">
+        <div className="space-y-1">
           <label className="text-xs font-medium text-text-secondary">{t('agents:identity.emoji')}</label>
-          <input value={watch('emoji') ?? ''} onChange={(e) => setValue('emoji', e.target.value.slice(0, 2))} maxLength={2} className="w-full bg-surface-tertiary border border-border rounded-lg px-3 py-2 text-base md:text-sm text-text-primary text-center focus:outline-none focus:ring-1 focus:ring-accent" />
+          <AgentIconPicker value={watch('emoji') ?? ''} onChange={(v) => setValue('emoji', v)} />
         </div>
       </div>
 

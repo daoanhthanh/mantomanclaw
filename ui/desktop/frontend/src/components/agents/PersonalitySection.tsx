@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { Switch } from '../common/Switch'
 import { Combobox } from '../common/Combobox'
+import { AgentIconPicker } from './AgentIconPicker'
+import { AgentIcon } from './AgentIcon'
 
 interface PersonalitySectionProps {
   emoji: string
@@ -32,14 +34,11 @@ export function PersonalitySection({
 
       {/* Emoji + Display name */}
       <div className="grid grid-cols-[auto_1fr] gap-4 items-start">
-        <div className="space-y-1 text-center">
-          <input
-            value={emoji}
-            onChange={(e) => onEmojiChange(e.target.value.slice(0, 2))}
-            maxLength={2}
-            className="w-12 h-12 rounded-xl bg-accent/10 border border-border text-2xl text-center focus:outline-none focus:ring-1 focus:ring-accent"
-          />
-          <p className="text-[10px] text-text-muted">{t('identity.emoji')}</p>
+        <div className="flex flex-col items-center gap-1.5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent">
+            <AgentIcon emoji={emoji} size="lg" />
+          </div>
+          <AgentIconPicker value={emoji} onChange={onEmojiChange} />
         </div>
         <div className="space-y-3">
           <div className="space-y-1">

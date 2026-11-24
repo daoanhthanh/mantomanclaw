@@ -26,6 +26,7 @@ import { useDesktopTtsConfig } from '../../hooks/use-tts-config'
 import { useTtsCapabilities } from '../../hooks/use-tts-capabilities'
 import type { AgentData } from '../../types/agent'
 import type { TtsProviderId } from '@/data/tts-providers'
+import { AgentIcon } from './AgentIcon'
 
 type DetailTab = 'overview' | 'evolution' | 'files'
 
@@ -98,7 +99,7 @@ export function AgentDetailPanel({ agent, onSave, onResummon, onClose }: AgentDe
           </svg>
         </button>
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-xl shrink-0">
-          {s.emoji || '🤖'}
+          <AgentIcon emoji={s.emoji} size="lg" />
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="text-sm font-semibold text-text-primary truncate">

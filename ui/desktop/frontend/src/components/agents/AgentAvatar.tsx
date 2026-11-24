@@ -1,4 +1,5 @@
 import type { AgentStatus } from '../../stores/agent-store'
+import { AgentIcon } from './AgentIcon'
 
 interface AgentAvatarProps {
   name: string
@@ -21,10 +22,10 @@ export function AgentAvatar({ name, status, size = 'sm', emoji }: AgentAvatarPro
   return (
     <div className="relative shrink-0" style={{ width: dim, height: dim }}>
       <div
-        className={`flex items-center justify-center rounded-full ${emoji ? 'bg-accent/10' : 'bg-accent text-white'} font-semibold select-none ${textSize}`}
+        className={`flex items-center justify-center rounded-full ${emoji ? 'bg-accent/10 text-accent' : 'bg-accent text-white'} font-semibold select-none ${textSize}`}
         style={{ width: dim, height: dim }}
       >
-        {emoji || name.charAt(0).toUpperCase()}
+        {emoji ? <AgentIcon emoji={emoji} size="sm" /> : name.charAt(0).toUpperCase()}
       </div>
       <span
         className={`absolute bottom-0 right-0 w-2 h-2 rounded-full ring-1 ring-surface-secondary ${STATUS_CLASSES[status]}`}

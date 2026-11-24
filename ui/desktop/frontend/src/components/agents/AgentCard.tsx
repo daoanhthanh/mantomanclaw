@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import type { AgentData } from '../../types/agent'
+import { AgentIcon } from './AgentIcon'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -29,11 +30,7 @@ export function AgentCard({ agent, onEdit, onDelete, onResummon }: AgentCardProp
       {/* Top row: icon + name + status */}
       <div className="flex items-center gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-          {emoji ? <span className="text-lg leading-none">{emoji}</span> : (
-            <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" />
-            </svg>
-          )}
+          <AgentIcon emoji={emoji} size="md" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">

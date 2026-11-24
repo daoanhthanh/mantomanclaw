@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2, Bot, Users, PanelRightOpen, PanelRightClose } from "lucide-react";
+import { Loader2, Users, PanelRightOpen, PanelRightClose } from "lucide-react";
 import { useHttp } from "@/hooks/use-ws";
 import { useAuthStore } from "@/stores/use-auth-store";
 import type { RunActivity, ActiveTeamTask } from "@/types/chat";
 import type { AgentData } from "@/types/agent";
 import type { SessionInfo } from "@/types/session";
+import { AgentIcon } from "@/components/agents/agent-icon";
 
 interface ChatTopBarProps {
   agentId: string;
@@ -84,11 +85,7 @@ export function ChatTopBar({ agentId, isRunning, isBusy, activity, teamTasks, on
   return (
     <div className="flex items-center justify-between border-b px-4 py-1.5">
       <div className="flex items-center gap-2">
-        {emoji ? (
-          <span className="text-base">{emoji}</span>
-        ) : (
-          <Bot className="h-4 w-4 text-muted-foreground" />
-        )}
+        <AgentIcon emoji={emoji} size="md" className="text-foreground" />
         <span className="text-sm font-semibold">{displayName}</span>
       </div>
 

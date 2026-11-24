@@ -1,4 +1,4 @@
-import { Bot, Star, RotateCcw, Trash2, Sparkles } from "lucide-react";
+import { Star, RotateCcw, Trash2, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import type { AgentData } from "@/types/agent";
 import { cn } from "@/lib/utils";
 import { UUID_RE, agentDisplayName, hasActiveChatGPTOAuthRouting, readPromptMode } from "./agent-detail/agent-display-utils";
 import { promptModeBadgeClass } from "./agent-detail/prompt-mode-badge-utils";
-
+import { AgentIcon } from "@/components/agents/agent-icon";
 interface AgentCardProps {
   agent: AgentData;
   onClick: () => void;
@@ -35,7 +35,7 @@ export function AgentCard({ agent, onClick, onResummon, onDelete }: AgentCardPro
       {/* Top row: icon + name + status */}
       <div className="flex items-center gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          {emoji ? <span className="text-lg leading-none">{emoji}</span> : <Bot className="h-4.5 w-4.5" />}
+          {emoji ? <AgentIcon emoji={emoji} size="md" /> : <AgentIcon size="md" />}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">

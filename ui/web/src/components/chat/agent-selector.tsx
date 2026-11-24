@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { Bot, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useHttp } from "@/hooks/use-ws";
 import { usePortalDropdownClose } from "@/hooks/use-portal-dropdown-close";
 import { useAuthStore } from "@/stores/use-auth-store";
 import type { AgentData } from "@/types/agent";
+import { AgentIcon } from "@/components/agents/agent-icon";
 
 interface AgentSelectorProps {
   value: string;
@@ -16,10 +17,6 @@ interface AgentSelectorProps {
   variant?: "default" | "ghost";
 }
 
-/** Extract emoji from agent top-level field */
-function agentEmoji(agent: AgentData): string | undefined {
-  return agent.emoji || undefined;
-}
 
 export function AgentSelector({ value, onChange, dropUp, variant = "default" }: AgentSelectorProps) {
   const { t } = useTranslation("common");
@@ -63,7 +60,7 @@ export function AgentSelector({ value, onChange, dropUp, variant = "default" }: 
   });
 
   const selected = agents.find((a) => a.agent_key === value);
-  const selectedEmoji = selected ? agentEmoji(selected) : undefined;
+  const selectedEmoji = selected?.emoji || undefined;
 
   return (
     <div ref={containerRef} className={variant === "ghost" ? "relative min-w-0" : "relative"}>
@@ -76,11 +73,7 @@ export function AgentSelector({ value, onChange, dropUp, variant = "default" }: 
             : "flex w-full items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm hover:bg-accent"
         }
       >
-        {selectedEmoji ? (
-          <span className="text-base shrink-0">{selectedEmoji}</span>
-        ) : (
-          <Bot className="h-4 w-4 shrink-0 text-muted-foreground" />
-        )}
+          <AgentIcon emoji={selectedEmoji} size="md" className="shrink-0 text-foreground" />
         <span className="flex-1 truncate text-left font-medium">
           {selected?.display_name ?? selected?.agent_key ?? (value || t("selectAgent"))}
         </span>
@@ -99,7 +92,7 @@ export function AgentSelector({ value, onChange, dropUp, variant = "default" }: 
             </div>
           )}
           {agents.map((agent) => {
-            const emoji = agentEmoji(agent);
+            const emoji = agent.emoji || undefined;
             return (
               <button
                 key={agent.agent_key}
@@ -110,11 +103,7 @@ export function AgentSelector({ value, onChange, dropUp, variant = "default" }: 
                   agent.agent_key === value ? "bg-accent" : ""
                 }`}
               >
-                {emoji ? (
-                  <span className="text-base shrink-0">{emoji}</span>
-                ) : (
-                  <Bot className="h-4 w-4 shrink-0 text-muted-foreground" />
-                )}
+                <AgentIcon emoji={emoji} size="md" className="shrink-0 text-foreground" />
                 <span className="flex-1 truncate text-left">
                   {agent.display_name || agent.agent_key}
                 </span>

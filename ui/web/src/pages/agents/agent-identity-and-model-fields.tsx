@@ -16,6 +16,7 @@ import { slugify } from "@/lib/slug";
 import type { AgentCreateFormData } from "@/schemas/agent.schema";
 import type { ProviderData } from "@/pages/providers/hooks/use-providers";
 import type { ModelInfo } from "@/pages/providers/hooks/use-provider-models";
+import { AgentIconPicker } from "@/components/agents/agent-icon-picker";
 
 interface AgentIdentityAndModelFieldsProps {
   form: UseFormReturn<AgentCreateFormData>;
@@ -55,13 +56,15 @@ export function AgentIdentityAndModelFields({
         <div className="space-y-2">
           <Label htmlFor="displayName">{t("create.displayName")}</Label>
           <div className="flex gap-2">
-            <Input
-              id="emoji"
-              {...register("emoji")}
-              placeholder="🤖"
-              className="w-14 shrink-0 text-center text-lg"
-              maxLength={2}
-              title={t("create.emojiHint")}
+            <Controller
+              control={control}
+              name="emoji"
+              render={({ field }) => (
+                <AgentIconPicker
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
             />
             <Input
               id="displayName"

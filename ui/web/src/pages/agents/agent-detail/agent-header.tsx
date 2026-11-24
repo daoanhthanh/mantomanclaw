@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ArrowLeft, Bot, Eye, Heart, Settings, Sparkles, Star, Trash2 } from "lucide-react";
+import { ArrowLeft, Eye, Heart, Settings, Sparkles, Star, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { AgentData } from "@/types/agent";
 import type { HeartbeatConfig } from "@/pages/agents/hooks/use-agent-heartbeat";
@@ -11,6 +11,7 @@ import { agentDisplayName, agentKeyDisplay, hasActiveChatGPTOAuthRouting, readPr
 import { cn } from "@/lib/utils";
 import { promptModeBadgeClass } from "./prompt-mode-badge-utils";
 import { V3CapabilitiesModal } from "@/components/agents/v3-capabilities-modal/v3-capabilities-modal";
+import { AgentIcon } from "@/components/agents/agent-icon";
 
 interface AgentHeaderProps {
   agent: AgentData;
@@ -46,9 +47,7 @@ export function AgentHeader({ agent, heartbeat, onBack, onDelete, onAdvanced, on
 
         {/* Emoji avatar */}
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary sm:h-12 sm:w-12">
-          {emoji
-            ? <span className="text-xl leading-none sm:text-2xl">{emoji}</span>
-            : <Bot className="h-5 w-5 sm:h-6 sm:w-6" />}
+            <AgentIcon emoji={emoji} size="lg" />
         </div>
 
         {/* Agent info */}

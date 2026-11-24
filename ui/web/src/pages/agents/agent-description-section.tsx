@@ -38,7 +38,7 @@ export function AgentDescriptionSection({ form, agentPresets }: AgentDescription
       <Textarea
         {...register("description")}
         placeholder={t("create.descriptionPlaceholder")}
-        className="min-h-[120px]"
+        className="min-h-30"
       />
       <p className="text-xs text-muted-foreground">{t("create.descriptionHint")}</p>
       <div className="flex items-center justify-between gap-4 rounded-md border px-3 py-2.5">

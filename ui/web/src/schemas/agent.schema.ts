@@ -2,7 +2,7 @@ import { z } from "zod";
 import { isValidSlug } from "@/lib/slug";
 
 export const agentCreateSchema = z.object({
-  emoji: z.string().max(2).optional(),
+  emoji: z.string().max(50).optional(),
   displayName: z.string().min(1, "Required"),
   agentKey: z
     .string()

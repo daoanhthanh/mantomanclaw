@@ -1,4 +1,4 @@
-import { Bot, Star, Trash2, RotateCcw, Sparkles } from "lucide-react";
+import { Star, Trash2, RotateCcw, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import type { AgentData } from "@/types/agent";
 import { cn } from "@/lib/utils";
 import { UUID_RE, agentDisplayName, hasActiveChatGPTOAuthRouting, readPromptMode } from "./agent-detail/agent-display-utils";
 import { promptModeBadgeClass } from "./agent-detail/prompt-mode-badge-utils";
+import { AgentIcon } from "@/components/agents/agent-icon";
 
 interface AgentListRowProps {
   agent: AgentData;
@@ -32,7 +33,7 @@ export function AgentListRow({ agent, ownerName, onClick, onResummon, onDelete }
     >
       {/* Icon */}
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-        {emoji ? <span className="text-base leading-none">{emoji}</span> : <Bot className="h-4 w-4" />}
+        {emoji ? <AgentIcon emoji={emoji} size="md" /> : <AgentIcon size="md" />}
       </div>
 
       {/* Name + key */}

@@ -3,7 +3,7 @@ import { isValidSlug } from '../lib/slug'
 
 export const agentFormSchema = z.object({
   displayName: z.string().min(1, 'Required'),
-  emoji: z.string().max(2),
+  emoji: z.string().max(50),
   agentKey: z
     .string()
     .min(1, 'Required')
