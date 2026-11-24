@@ -1,4 +1,9 @@
 {
+  "pinChat": "Pin conversation",
+  "unpinChat": "Unpin conversation",
+  "chatActions": "Conversation actions",
+  "renameChat": "Rename conversation",
+  "updateChatFailed": "Failed to update conversation",
   "deleteChat": "Delete chat",
   "deleteChatConfirm": "This will permanently delete this conversation and all its messages.",
   "newChat": "New Chat",

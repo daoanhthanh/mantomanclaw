@@ -1,4 +1,9 @@
 {
+  "pinChat": "置顶对话",
+  "unpinChat": "取消置顶对话",
+  "chatActions": "对话操作",
+  "renameChat": "重命名对话",
+  "updateChatFailed": "更新对话失败",
   "contextUsage": {
     "tooltip": "{{used}} / {{max}} tokens ({{percent}}%) · 压缩 {{compactions}} 次 · 最近：{{lastCompact}}",
     "never": "无"

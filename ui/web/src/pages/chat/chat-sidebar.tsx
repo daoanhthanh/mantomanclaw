@@ -14,6 +14,8 @@ interface ChatSidebarProps {
   activeSessionKey: string;
   onSessionSelect: (key: string) => void;
   onDeleteSession?: (key: string) => void;
+  onRenameSession: (key: string, title: string) => Promise<boolean>;
+  onPinSession: (key: string, pinned: boolean) => Promise<boolean>;
   onNewChat: () => void;
 }
 
@@ -25,6 +27,8 @@ export const ChatSidebar = memo(function ChatSidebar({
   activeSessionKey,
   onSessionSelect,
   onDeleteSession,
+  onRenameSession,
+  onPinSession,
   onNewChat,
 }: ChatSidebarProps) {
   const { t } = useTranslation("chat");
@@ -54,6 +58,8 @@ export const ChatSidebar = memo(function ChatSidebar({
           activeKey={activeSessionKey}
           onSelect={onSessionSelect}
           onDelete={onDeleteSession}
+          onRename={onRenameSession}
+          onPin={onPinSession}
           loading={sessionsLoading}
         />
       </div>

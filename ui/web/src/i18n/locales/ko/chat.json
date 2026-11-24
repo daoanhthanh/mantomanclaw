@@ -1,4 +1,9 @@
 {
+  "pinChat": "대화 고정",
+  "unpinChat": "대화 고정 해제",
+  "chatActions": "대화 작업",
+  "renameChat": "대화 이름 변경",
+  "updateChatFailed": "대화를 업데이트하지 못했습니다",
   "deleteChat": "채팅 삭제",
   "deleteChatConfirm": "이 대화와 모든 메시지가 영구적으로 삭제됩니다.",
   "newChat": "새 채팅",

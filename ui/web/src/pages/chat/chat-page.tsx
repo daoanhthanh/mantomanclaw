@@ -58,6 +58,8 @@ export function ChatPage() {
     refresh: refreshSessions,
     buildNewSessionKey,
     deleteSession,
+    renameSession,
+    pinSession,
   } = useChatSessions(agentId);
 
   const {
@@ -248,6 +250,8 @@ export function ChatPage() {
               activeSessionKey={sessionKey}
               onSessionSelect={handleSessionSelectMobile}
               onDeleteSession={handleDeleteSession}
+              onRenameSession={renameSession}
+              onPinSession={pinSession}
               onNewChat={handleNewChatMobile}
             />
           </div>
@@ -261,6 +265,8 @@ export function ChatPage() {
           activeSessionKey={sessionKey}
           onSessionSelect={handleSessionSelect}
           onDeleteSession={handleDeleteSession}
+          onRenameSession={renameSession}
+          onPinSession={pinSession}
           onNewChat={handleNewChat}
         />
       )}

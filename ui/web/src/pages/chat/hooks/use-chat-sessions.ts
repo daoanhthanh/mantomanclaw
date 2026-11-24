@@ -62,6 +62,33 @@ export function useChatSessions(agentId: string) {
     }
   }, [ws, connected, loadSessions]);
 
+  const updateSession = useCallback(async (
+    key: string,
+    patch: { label?: string; metadata: Record<string, string> },
+  ): Promise<boolean> => {
+    try {
+      if (!connected) throw new Error(i18next.t("chat:error.notConnected"));
+      await ws.call(Methods.SESSIONS_PATCH, { key, ...patch });
+      setSessions((prev) => prev.map((session) => session.key === key ? {
+        ...session,
+        ...(patch.label !== undefined ? { label: patch.label } : {}),
+        metadata: { ...session.metadata, ...patch.metadata },
+      } : session));
+      return true;
+    } catch (err) {
+      toast.error(i18next.t("chat:updateChatFailed"), userFriendlyError(err));
+      return false;
+    }
+  }, [ws, connected]);
+
+  const renameSession = useCallback((key: string, title: string) =>
+    updateSession(key, { label: title, metadata: { chat_title: title } }),
+  [updateSession]);
+
+  const pinSession = useCallback((key: string, pinned: boolean) =>
+    updateSession(key, { metadata: { pinned: String(pinned) } }),
+  [updateSession]);
+
   // Update session label in-place when backend generates a title.
   const handleSessionUpdated = useCallback((payload: unknown) => {
     const event = payload as { sessionKey?: string; label?: string };
@@ -81,5 +108,7 @@ export function useChatSessions(agentId: string) {
     refresh: loadSessions,
     buildNewSessionKey,
     deleteSession,
+    renameSession,
+    pinSession,
   };
 }

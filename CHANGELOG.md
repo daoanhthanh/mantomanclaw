@@ -33,6 +33,11 @@ All notable changes to ManToManAgent are documented here. For full documentation
 
 ### Added
 
+- **Web chat conversation actions** — pin/unpin conversations to keep them at
+  the top of the sidebar, and rename or delete them from the three-dot menu.
+  Pins and names persist in session metadata; deletion keeps its existing
+  confirmation and active-conversation navigation behavior.
+
 - **Storage remembers the open file in the URL** — `?file=...` restores the
   preview after refresh and browser Back/Forward, expands selected folders,
   and reopens the preview directly on mobile. Deleting or moving the selected

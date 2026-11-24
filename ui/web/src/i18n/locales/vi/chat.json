@@ -1,4 +1,9 @@
 {
+  "pinChat": "Ghim cuộc trò chuyện",
+  "unpinChat": "Bỏ ghim cuộc trò chuyện",
+  "chatActions": "Thao tác cuộc trò chuyện",
+  "renameChat": "Đổi tên cuộc trò chuyện",
+  "updateChatFailed": "Không thể cập nhật cuộc trò chuyện",
   "contextUsage": {
     "tooltip": "{{used}} / {{max}} token ({{percent}}%) · {{compactions}} lần compact · gần nhất: {{lastCompact}}",
     "never": "chưa có"
