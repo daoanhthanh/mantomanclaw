@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/spf13/cobra"
-
 	"github.com/nextlevelbuilder/goclaw/pkg/protocol"
+	"github.com/spf13/cobra"
 )
 
 // Version is set at build time via -ldflags "-X github.com/nextlevelbuilder/goclaw/cmd.Version=v1.0.0"
@@ -39,7 +38,7 @@ var (
 var rootCmd = &cobra.Command{
 	Use:   "mantomanagent",
 	Short: "ManToManAgent — AI agent gateway",
-	Long:  "ManToManAgent: multi-agent AI platform with WebSocket RPC, tool execution, and channel integration. A Go port of OpenClaw with enhanced security and multi-tenant support.",
+	Long:  "ManToManAgent: multi-agent AI platform with WebSocket RPC, tool execution, and channel integration. A customized version of GoClaw. See https://goclaw.sh/",
 	Run: func(cmd *cobra.Command, args []string) {
 		runGateway()
 	},
@@ -72,6 +71,7 @@ func init() {
 	rootCmd.AddCommand(tenantRestoreCmd())
 	rootCmd.AddCommand(authCmd())
 	rootCmd.AddCommand(setupCmd())
+	rootCmd.AddCommand(installCmd())
 }
 
 func versionCmd() *cobra.Command {
