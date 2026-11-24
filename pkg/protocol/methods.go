@@ -41,6 +41,7 @@ const (
 	MethodSessionsDelete  = "sessions.delete"
 	MethodSessionsReset   = "sessions.reset"
 	MethodSessionsCompact = "sessions.compact"
+	MethodSessionsFork    = "sessions.fork"
 	MethodRunTimelineGet  = "run.timeline.get"
 
 	// System

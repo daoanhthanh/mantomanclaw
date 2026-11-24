@@ -31,5 +31,6 @@
     "title": "Chọn agent",
     "description": "Chọn agent để bắt đầu trò chuyện"
   },
-  "imageGenDownloadName": "generated-{{timestamp}}.png"
+  "imageGenDownloadName": "generated-{{timestamp}}.png",
+  "forkFailed": "Chia nhánh cuộc trò chuyện thất bại"
 }

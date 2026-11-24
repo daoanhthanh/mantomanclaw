@@ -3,6 +3,7 @@ package methods
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
 	"github.com/nextlevelbuilder/goclaw/internal/bus"
 	"github.com/nextlevelbuilder/goclaw/internal/config"
@@ -32,6 +33,7 @@ func (m *SessionsMethods) Register(router *gateway.MethodRouter) {
 	router.Register(protocol.MethodSessionsDelete, m.handleDelete)
 	router.Register(protocol.MethodSessionsReset, m.handleReset)
 	router.Register(protocol.MethodSessionsCompact, m.handleCompact)
+	router.Register(protocol.MethodSessionsFork, m.handleFork)
 }
 
 type sessionsListParams struct {
@@ -301,4 +303,96 @@ func (m *SessionsMethods) handleCompact(ctx context.Context, client *gateway.Cli
 		"kept":     keepLast,
 	}))
 	emitAudit(m.eventBus, client, "session.compacted", "session", params.Key)
+}
+
+type sessionForkParams struct {
+	SourceKey  string `json:"sourceKey"`
+	NewKey     string `json:"newKey"`
+	UpToIndex  int    `json:"upToIndex"`
+	Label      string `json:"label"`
+}
+
+// handleFork branches a session into a new key (possibly under a different agent),
+// copying messages up to upToIndex. Used by the UI fork-to-agent feature.
+func (m *SessionsMethods) handleFork(ctx context.Context, client *gateway.Client, req *protocol.RequestFrame) {
+	locale := store.LocaleFromContext(ctx)
+	var params sessionForkParams
+	if err := json.Unmarshal(req.Params, &params); err != nil {
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgInvalidJSON)))
+		return
+	}
+	if params.SourceKey == "" {
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgRequired, "sourceKey")))
+		return
+	}
+	if params.NewKey == "" {
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgRequired, "newKey")))
+		return
+	}
+	if params.UpToIndex < 0 {
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgInvalidRequest, "upToIndex")))
+		return
+	}
+
+	// Ownership check on source session.
+	if !requireSessionOwner(ctx, m.sessions, m.cfg, client, req.ID, params.SourceKey) {
+		return
+	}
+
+	brancher, ok := m.sessions.(store.SessionBranchStore)
+	if !ok {
+		// Fallback: store doesn't support branching — seed the new session manually.
+		history := m.sessions.GetHistory(ctx, params.SourceKey)
+		end := params.UpToIndex
+		if end > len(history) {
+			end = len(history)
+		}
+		dest := m.sessions.GetOrCreate(ctx, params.NewKey)
+		m.sessions.SetHistory(ctx, params.NewKey, history[:end])
+		if params.Label != "" {
+			m.sessions.SetLabel(ctx, params.NewKey, params.Label)
+		}
+		if err := m.sessions.Save(ctx, params.NewKey); err != nil {
+			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInternal, err.Error()))
+			return
+		}
+		client.SendResponse(protocol.NewOKResponse(req.ID, map[string]any{
+			"ok":              true,
+			"session_key":     params.NewKey,
+			"copied_messages": end,
+			"fallback":        true,
+		}))
+		_ = dest
+		return
+	}
+
+	branch, copied, err := brancher.BranchSession(ctx, params.SourceKey, store.SessionBranchOpts{
+		NewKey:    params.NewKey,
+		UpToIndex: params.UpToIndex,
+		Label:     params.Label,
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, store.ErrSessionAlreadyExists):
+			// Already forked — treat as success, just navigate.
+			client.SendResponse(protocol.NewOKResponse(req.ID, map[string]any{
+				"ok":          true,
+				"session_key": params.NewKey,
+				"already_exists": true,
+			}))
+		case errors.Is(err, store.ErrInvalidSessionBranch):
+			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgInvalidRequest, "upToIndex out of range")))
+		case errors.Is(err, store.ErrSessionNotFound):
+			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrNotFound, i18n.T(locale, i18n.MsgNotFound, "session", params.SourceKey)))
+		default:
+			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInternal, err.Error()))
+		}
+		return
+	}
+
+	client.SendResponse(protocol.NewOKResponse(req.ID, map[string]any{
+		"ok":              true,
+		"session_key":     branch.Key,
+		"copied_messages": copied,
+	}))
 }

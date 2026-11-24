@@ -357,6 +357,7 @@ func isWriteMethod(method string) bool {
 		protocol.MethodSessionsReset,
 		protocol.MethodSessionsPatch,
 		protocol.MethodSessionsCompact,
+		protocol.MethodSessionsFork,
 		protocol.MethodCronCreate,
 		protocol.MethodCronUpdate,
 		protocol.MethodCronDelete,

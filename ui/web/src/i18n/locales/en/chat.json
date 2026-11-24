@@ -31,5 +31,6 @@
     "title": "Select an agent",
     "description": "Choose an agent to start chatting"
   },
-  "imageGenDownloadName": "generated-{{timestamp}}.png"
+  "imageGenDownloadName": "generated-{{timestamp}}.png",
+  "forkFailed": "Failed to fork conversation"
 }

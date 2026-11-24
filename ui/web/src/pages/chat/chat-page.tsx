@@ -14,7 +14,11 @@ import { DropZone } from "@/components/chat/drop-zone";
 import { useChatSessions } from "./hooks/use-chat-sessions";
 import { useChatMessages } from "./hooks/use-chat-messages";
 import { useChatSend } from "./hooks/use-chat-send";
+import { useWs } from "@/hooks/use-ws";
+import { Methods } from "@/api/protocol";
 import { isOwnSession, parseSessionKey } from "@/lib/session-key";
+import { toast } from "@/stores/use-toast-store";
+import { userFriendlyError } from "@/lib/error-utils";
 import { useVirtualKeyboard } from "@/hooks/use-virtual-keyboard";
 import { TaskPanel } from "@/components/chat/task-panel";
 import type { ChatMessage } from "@/types/chat";
@@ -107,6 +111,7 @@ export function ChatPage() {
     onMessageAdded: handleMessageAdded,
     onExpectRun: expectRun,
   });
+  const ws = useWs();
 
   const handleNewChat = useCallback(() => {
     navigate("/chat");
@@ -169,13 +174,26 @@ export function ChatPage() {
   }, [abort, sessionKey]);
 
   const handleFork = useCallback(
-    (_message: ChatMessage, targetAgentKey: string) => {
-      const key = buildNewSessionKey(targetAgentKey);
+    async (message: ChatMessage, targetAgentKey: string) => {
+      const newKey = buildNewSessionKey(targetAgentKey);
+      const msgIndex = messages.indexOf(message);
+      const upToIndex = msgIndex >= 0 ? msgIndex + 1 : messages.length;
+      try {
+        await ws.call(Methods.SESSIONS_FORK, {
+          sourceKey: sessionKey,
+          newKey,
+          upToIndex,
+        });
+      } catch (err) {
+        console.error("[handleFork] sessions.fork failed:", err);
+        toast.error(t("forkFailed"), userFriendlyError(err));
+        return;
+      }
       setAgentIdFallback(targetAgentKey);
       setComposerAgentId(targetAgentKey);
-      navigate(`/chat/${encodeURIComponent(key)}`);
+      navigate(`/chat/${encodeURIComponent(newKey)}`);
     },
-    [buildNewSessionKey, navigate],
+    [buildNewSessionKey, messages, sessionKey, ws, navigate, t],
   );
 
   const isMobile = useIsMobile();

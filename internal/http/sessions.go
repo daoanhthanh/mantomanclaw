@@ -101,8 +101,8 @@ func (h *SessionsHandler) handleBranch(w http.ResponseWriter, r *http.Request) {
 	newKey := body.NewSessionKey
 	if newKey == "" {
 		newKey = "agent:" + sourceAgent + ":branch:direct:" + uuid.NewString()
-	} else if targetAgent, _ := sessions.ParseSessionKey(newKey); targetAgent == "" || targetAgent != sourceAgent {
-		writeError(w, http.StatusBadRequest, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgInvalidRequest, "new_session_key must use the same agent key"))
+	} else if targetAgent, _ := sessions.ParseSessionKey(newKey); targetAgent == "" {
+		writeError(w, http.StatusBadRequest, protocol.ErrInvalidRequest, i18n.T(locale, i18n.MsgInvalidRequest, "invalid new_session_key"))
 		return
 	}
 
