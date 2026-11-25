@@ -70,6 +70,9 @@ function DialogContent({
           "max-sm:inset-0 max-sm:overflow-y-auto max-sm:safe-bottom max-sm:data-[state=open]:slide-in-from-bottom-4 max-sm:data-[state=closed]:slide-out-to-bottom-4",
           className
         )}
+        // Prevent clicking outside from closing the dialog globally
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
         {...props}
       >
         {children}

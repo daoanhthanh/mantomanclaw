@@ -2415,3 +2415,25 @@ CREATE TABLE IF NOT EXISTS msteams_conversations (
 );
 CREATE INDEX IF NOT EXISTS idx_msteams_conv_user ON msteams_conversations(tenant_id, channel_instance, user_aad_id)
     WHERE user_aad_id IS NOT NULL;
+
+-- ============================================================
+-- Table: msteams_conversations (migration 000100)
+-- Stores per-tenant MS Teams conversation references for proactive sends.
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS msteams_conversations (
+    tenant_id        TEXT NOT NULL REFERENCES tenants(id),
+    channel_instance VARCHAR(255) NOT NULL,
+    conversation_id  TEXT NOT NULL,
+    kind             VARCHAR(16) NOT NULL,
+    service_url      TEXT NOT NULL,
+    ms_tenant_id     VARCHAR(64) NOT NULL,
+    team_id          TEXT,
+    teams_channel_id TEXT,
+    user_aad_id      VARCHAR(64),
+    title            TEXT,
+    updated_at       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    PRIMARY KEY (tenant_id, channel_instance, conversation_id)
+);
+CREATE INDEX IF NOT EXISTS idx_msteams_conv_user ON msteams_conversations(tenant_id, channel_instance, user_aad_id)
+    WHERE user_aad_id IS NOT NULL;
