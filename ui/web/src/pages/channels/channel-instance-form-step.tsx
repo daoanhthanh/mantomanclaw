@@ -5,14 +5,9 @@ import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { AgentSelector } from "@/components/chat/agent-selector";
+import { ChannelSelector } from "@/components/channels/channel-selector";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { ChannelInstanceData } from "./hooks/use-channel-instances";
@@ -23,7 +18,7 @@ import { ChannelFields } from "./channel-fields";
 import { ChannelScopesInfo } from "./channel-scopes-info";
 import { wizardEditConfigs } from "./channel-wizard-registry";
 import { TelegramGroupOverrides, type GroupConfigWithTopics } from "./telegram-group-overrides";
-import { CHANNEL_TYPES } from "@/constants/channels";
+
 import type { ChannelInstanceFormData } from "@/schemas/channel.schema";
 
 interface ChannelInstanceFormStepProps {
@@ -104,14 +99,11 @@ export function ChannelInstanceFormStep({
             control={control}
             name="channelType"
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange} disabled={!!instance}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {CHANNEL_TYPES.map((ct) => (
-                    <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ChannelSelector
+                value={field.value}
+                onChange={field.onChange}
+                disabled={!!instance}
+              />
             )}
           />
         </div>
