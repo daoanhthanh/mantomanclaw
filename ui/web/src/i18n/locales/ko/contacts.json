@@ -23,7 +23,8 @@
     "zalo": "Zalo — 표시 이름이 자동으로 제공됩니다.",
     "slack": "Slack — Slack API를 통해 표시 이름이 해석됩니다 (봇이 워크스페이스에 있어야 함).",
     "mattermost": "Mattermost — Mattermost API를 통해 표시 이름이 해석됩니다 (봇이 팀 멤버여야 함).",
-    "feishu": "Feishu/Lark — contact:user.base:readonly 권한이 필요합니다. 없으면 이름이 비어 있습니다."
+    "feishu": "Feishu/Lark — contact:user.base:readonly 권한이 필요합니다. 없으면 이름이 비어 있습니다.",
+    "msteams": "Microsoft Teams — Microsoft Graph API를 통해 표시 이름이 해석됩니다. User.Read.All 또는 Directory.Read.All 애플리케이션 권한이 필요합니다."
   },
   "selectedCount": "{{count}}개 선택됨",
   "merge": {

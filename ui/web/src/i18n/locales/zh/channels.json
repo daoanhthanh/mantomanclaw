@@ -856,5 +856,8 @@
         "urlUnknown": "无法获取安装 URL。请通过公网 URL 打开 mantomanagent UI 后从下拉框重试。"
       }
     }
+  },
+  "msteams": {
+    "label": "Microsoft Teams"
   }
 }

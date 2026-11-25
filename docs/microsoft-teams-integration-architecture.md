@@ -249,7 +249,7 @@ Existing repository extension points identified during investigation:
 - `internal/channels/instance_loader.go`: channel factory registration.
 - `cmd/gateway_channels_setup.go`: configuration-based channel setup.
 
-No Microsoft Teams adapter currently exists. These paths are integration context, not evidence that the proposed feature is already supported.
+A native `msteams` channel is now implemented in `internal/channels/msteams` via the Bot Connector REST protocol. See the gateway and channel package for current capabilities. The remaining proposal text below applies to the TypeScript connector integration, which is a separate effort.
 
 ## Acceptance Scenarios
 

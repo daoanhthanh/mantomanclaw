@@ -12,6 +12,7 @@ import (
 	"github.com/nextlevelbuilder/goclaw/internal/cache"
 	"github.com/nextlevelbuilder/goclaw/internal/channels"
 	"github.com/nextlevelbuilder/goclaw/internal/channels/bitrix24"
+	"github.com/nextlevelbuilder/goclaw/internal/channels/msteams"
 	"github.com/nextlevelbuilder/goclaw/internal/config"
 	"github.com/nextlevelbuilder/goclaw/internal/edition"
 	"github.com/nextlevelbuilder/goclaw/internal/heartbeat"
@@ -377,6 +378,15 @@ func (d *gatewayDeps) runLifecycle(
 	// is idempotent (first-claim-wins via CompareAndSwap), so this is a no-op
 	// if a bitrix24 Channel already claimed the route in the loop above.
 	if router := bitrix24.WebhookRouter(); router != nil {
+		if path, handler := router.ClaimWebhookRoute(); path != "" && handler != nil {
+			mux.Handle(path, handler)
+			slog.Info("webhook route mounted on gateway", "path", path)
+		}
+	}
+	// MS Teams: also claim+mount the shared webhook router directly so the
+	// /v1/channels/msteams/messages endpoint is live even before any channel
+	// instance has completed setup. ClaimWebhookRoute is idempotent.
+	if router := msteams.WebhookRouter(); router != nil {
 		if path, handler := router.ClaimWebhookRoute(); path != "" && handler != nil {
 			mux.Handle(path, handler)
 			slog.Info("webhook route mounted on gateway", "path", path)

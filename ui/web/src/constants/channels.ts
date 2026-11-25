@@ -4,7 +4,7 @@ export const CHANNEL_TYPES = [
   { value: "facebook", label: "Facebook" },
   { value: "feishu", label: "Feishu / Lark" },
   { value: "mattermost", label: "Mattermost" },
-  { value: "pancake", label: "Pancake (pages.fm)" },
+  { value: "msteams", label: "Microsoft Teams" },
   { value: "slack", label: "Slack" },
   { value: "telegram", label: "Telegram" },
   { value: "whatsapp", label: "WhatsApp" },

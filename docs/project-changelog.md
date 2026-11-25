@@ -16,6 +16,7 @@ Significant changes, features, and fixes in reverse chronological order.
 - `teams-bot/teams-app.zip` app package generated with bot ID `a45471e3-e053-4919-befe-6b3f886ae946`; replace `TEAMS_APP_HOST` placeholder before uploading to Teams Admin.
 - Azure Bot MsTeamsChannel enabled (`isEnabled: true`) via `az rest PUT` confirmed with API GET.
 - 20/20 unit/contract tests pass; typecheck clean; Docker build reproducible; Compose config valid.
+- feat: native Microsoft Teams channel (msteams) — inbound/outbound messages via Bot Connector REST protocol, file/SharePoint reading, Adaptive Card tables, certificate credentials
 - **Remaining for real acceptance:** install app package into Teams tenant, configure SharePoint `Sites.Selected` grants, provision dedicated webhook agent with isolation verified, set `TEAMS_APP_HOST` to public HTTPS endpoint, run smoke test against live gateway.
 
 ---

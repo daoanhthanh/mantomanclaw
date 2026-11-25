@@ -45,6 +45,7 @@ var mediaCapableTypes = map[string]bool{
 	TypePancake:      true,
 	TypeFacebook:     true,
 	TypeMattermost:   true,
+	TypeMSTeams:      true,
 }
 
 var mediaBatchCapabilities = map[string]MediaBatchCapability{
@@ -67,6 +68,11 @@ var mediaBatchCapabilities = map[string]MediaBatchCapability{
 		Supported:      true,
 		MaxAttachments: 10,
 		Grouping:       MediaBatchGroupingSingleMessage,
+	},
+	TypeMSTeams: {
+		Supported:      true,
+		MaxAttachments: 1,
+		Grouping:       MediaBatchGroupingOrdered,
 	},
 }
 

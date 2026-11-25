@@ -34,6 +34,7 @@ const CHANNEL_PREFIX_LABELS: Array<[string, string]> = [
   ["slack", "Slack"],
   ["mattermost", "Mattermost"],
   ["zalo", "Zalo"],
+  ["msteams", "Microsoft Teams"],
 ];
 
 export function getAgentInstanceResolveIds(instances: AgentInstanceLike[]): string[] {

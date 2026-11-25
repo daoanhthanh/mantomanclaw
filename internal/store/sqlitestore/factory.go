@@ -79,6 +79,7 @@ func NewSQLiteStores(cfg store.StoreConfig) (*store.Stores, error) {
 		KnowledgeGraph:         NewSQLiteKnowledgeGraphStore(db),
 		Vault:                  NewSQLiteVaultStore(db),
 		BitrixPortals:          NewSQLiteBitrixPortalStore(db, cfg.EncryptionKey),
+		MSTeamsConversations:   NewSQLiteMSTeamsConversationStore(db),
 		Hooks:                  NewSQLiteHookStore(db),
 		Webhooks:               NewSQLiteWebhookStore(db),
 		WebhookCalls:           NewSQLiteWebhookCallStore(db),

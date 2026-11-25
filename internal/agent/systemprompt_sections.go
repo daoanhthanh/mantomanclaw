@@ -561,6 +561,15 @@ func buildChannelFormattingHint(channelType string) []string {
 			"The block is removed from the text and rendered as a card under your message. Use it only when a card is clearly better than plain Markdown.",
 			"",
 		}
+	case "msteams":
+		return []string{
+			"## Output Formatting",
+			"",
+			"This channel (Microsoft Teams) renders a subset of Markdown: bold (**text**), italic (*text*), inline code (`code`), fenced code blocks, and hyperlinks.",
+			"Headings are rendered as bold text. Bullet and numbered lists are supported.",
+			"Avoid HTML tags — Teams strips them. Tables are supported in channel posts but not in personal chats; prefer bullet lists for tabular data in DMs.",
+			"",
+		}
 	case "zalo", "zalo_personal":
 		return []string{
 			"## Output Formatting",

@@ -16,7 +16,7 @@ var schemaSQL string
 
 // SchemaVersion is the current SQLite schema version.
 // Bump this when adding new migration steps below.
-const SchemaVersion = 60
+const SchemaVersion = 61
 
 // migrations maps version → SQL to apply when upgrading FROM that version.
 // schema.sql always represents the LATEST full schema (for fresh DBs).
@@ -1048,6 +1048,24 @@ UPDATE mcp_servers
                    SELECT a.tenant_id FROM agents a WHERE a.id = channel_instances.agent_id
                )
         );`,
+	// Version 60 → 61: msteams_conversations table (mirrors PG migration 000100).
+	// Stores per-tenant Teams conversation references for proactive sends.
+	60: `CREATE TABLE IF NOT EXISTS msteams_conversations (
+    tenant_id        TEXT NOT NULL REFERENCES tenants(id),
+    channel_instance VARCHAR(255) NOT NULL,
+    conversation_id  TEXT NOT NULL,
+    kind             VARCHAR(16) NOT NULL,
+    service_url      TEXT NOT NULL,
+    ms_tenant_id     VARCHAR(64) NOT NULL,
+    team_id          TEXT,
+    teams_channel_id TEXT,
+    user_aad_id      VARCHAR(64),
+    title            TEXT,
+    updated_at       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    PRIMARY KEY (tenant_id, channel_instance, conversation_id)
+);
+CREATE INDEX IF NOT EXISTS idx_msteams_conv_user ON msteams_conversations(tenant_id, channel_instance, user_aad_id)
+    WHERE user_aad_id IS NOT NULL;`,
 }
 
 const addUsageEventAnalyticsTables = `

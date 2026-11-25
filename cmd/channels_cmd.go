@@ -97,6 +97,7 @@ func runChannelsAdd() {
 		{"Discord", "discord"},
 		{"Slack", "slack"},
 		{"Mattermost", "mattermost"},
+		{"Microsoft Teams", "msteams"},
 	}
 	channelType, err := promptSelect("Channel type", typeOptions, 0)
 	if err != nil {
@@ -155,6 +156,55 @@ func runChannelsAdd() {
 			return
 		}
 		creds["bot_token"] = token
+	case "msteams":
+		appID, err := promptString("App ID (Azure AD)", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", "")
+		if err != nil || appID == "" {
+			fmt.Println("Cancelled.")
+			return
+		}
+		creds["app_id"] = appID
+		tenantID, err := promptString("Tenant ID (Azure AD)", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", "")
+		if err != nil || tenantID == "" {
+			fmt.Println("Cancelled.")
+			return
+		}
+		creds["tenant_id"] = tenantID
+		fmt.Println("Authentication: enter a client secret OR paths to certificate/key PEM files.")
+		clientSecret, err := promptPassword("Client secret (leave empty to use certificate)", "")
+		if err != nil {
+			fmt.Println("Cancelled.")
+			return
+		}
+		if clientSecret != "" {
+			creds["client_secret"] = clientSecret
+		} else {
+			certPath, err := promptString("Certificate PEM path", "e.g. /etc/ssl/bot.crt", "")
+			if err != nil {
+				fmt.Println("Cancelled.")
+				return
+			}
+			if certPath != "" {
+				certData, err := os.ReadFile(certPath)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error reading certificate: %v\n", err)
+					return
+				}
+				creds["certificate_pem"] = string(certData)
+			}
+			keyPath, err := promptString("Private key PEM path", "e.g. /etc/ssl/bot.key", "")
+			if err != nil {
+				fmt.Println("Cancelled.")
+				return
+			}
+			if keyPath != "" {
+				keyData, err := os.ReadFile(keyPath)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error reading private key: %v\n", err)
+					return
+				}
+				creds["private_key_pem"] = string(keyData)
+			}
+		}
 	}
 
 	// Step 4: Bind to agent

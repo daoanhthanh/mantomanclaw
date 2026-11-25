@@ -560,5 +560,8 @@
     "relinkDevice": "기기 재연결",
     "connectedSuccess": "✅ WhatsApp이 성공적으로 연결되었습니다!",
     "tabQrCode": "QR 코드"
+  },
+  "msteams": {
+    "label": "Microsoft Teams"
   }
 }

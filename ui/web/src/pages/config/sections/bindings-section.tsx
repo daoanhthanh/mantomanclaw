@@ -115,6 +115,7 @@ export function BindingsSection({ data, onSave, saving }: Props) {
                       <SelectItem value="whatsapp">WhatsApp</SelectItem>
                       <SelectItem value="zalo">Zalo</SelectItem>
                       <SelectItem value="feishu">Feishu</SelectItem>
+                      <SelectItem value="msteams">Microsoft Teams</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

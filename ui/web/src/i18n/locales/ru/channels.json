@@ -790,5 +790,8 @@
         "urlUnknown": "URL установки недоступен. Откройте UI mantomanagent через ваш публичный URL и повторите из выпадающего списка."
       }
     }
+  },
+  "msteams": {
+    "label": "Microsoft Teams"
   }
 }

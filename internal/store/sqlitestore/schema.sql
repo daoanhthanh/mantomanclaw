@@ -2393,3 +2393,25 @@ CREATE UNIQUE INDEX IF NOT EXISTS mcp_oauth_tokens_global_uq
 CREATE UNIQUE INDEX IF NOT EXISTS mcp_oauth_tokens_user_uq
     ON mcp_oauth_tokens (server_id, tenant_id, user_id) WHERE user_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_mcp_oauth_tokens_server_tenant ON mcp_oauth_tokens (server_id, tenant_id);
+
+-- ============================================================
+-- Table: msteams_conversations (migration 000100)
+-- Stores per-tenant MS Teams conversation references for proactive sends.
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS msteams_conversations (
+    tenant_id        TEXT NOT NULL REFERENCES tenants(id),
+    channel_instance VARCHAR(255) NOT NULL,
+    conversation_id  TEXT NOT NULL,
+    kind             VARCHAR(16) NOT NULL,
+    service_url      TEXT NOT NULL,
+    ms_tenant_id     VARCHAR(64) NOT NULL,
+    team_id          TEXT,
+    teams_channel_id TEXT,
+    user_aad_id      VARCHAR(64),
+    title            TEXT,
+    updated_at       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    PRIMARY KEY (tenant_id, channel_instance, conversation_id)
+);
+CREATE INDEX IF NOT EXISTS idx_msteams_conv_user ON msteams_conversations(tenant_id, channel_instance, user_aad_id)
+    WHERE user_aad_id IS NOT NULL;

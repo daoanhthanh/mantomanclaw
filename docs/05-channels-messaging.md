@@ -277,6 +277,19 @@ flowchart TD
 | Pairing support | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
 | Status reactions | Yes | Yes | -- | Yes | -- | -- | -- | -- |
 
+### Microsoft Teams
+
+| Feature | Microsoft Teams |
+|---------|-----------------|
+| Personal DM | ✓ |
+| Group chat | ✓ |
+| Channels | ✓ |
+| Files / SharePoint | ✓ |
+| Connection | Webhook (Bot Connector REST) |
+| Streaming | Edit-in-place via update activity |
+| Rich formatting | Adaptive Cards |
+| Pairing support | Yes |
+
 ---
 
 ## 5. Telegram

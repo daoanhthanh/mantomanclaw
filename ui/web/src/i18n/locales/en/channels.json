@@ -857,5 +857,8 @@
         "urlUnknown": "Install URL is unavailable. Open the mantomanagent UI via your public URL and retry from the dropdown."
       }
     }
+  },
+  "msteams": {
+    "label": "Microsoft Teams"
   }
 }

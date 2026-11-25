@@ -856,5 +856,8 @@
         "urlUnknown": "Không có install URL. Mở UI qua public URL rồi retry từ dropdown."
       }
     }
+  },
+  "msteams": {
+    "label": "Microsoft Teams"
   }
 }

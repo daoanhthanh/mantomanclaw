@@ -46,6 +46,7 @@ type Stores struct {
 	EvolutionMetrics      EvolutionMetricsStore
 	EvolutionSuggestions  EvolutionSuggestionStore
 	BitrixPortals         BitrixPortalStore
+	MSTeamsConversations  MSTeamsConversationStore
 	// Hooks is hooks.HookStore — typed as any to avoid import cycle
 	// (hooks package imports store for context helpers).
 	// Callers: type-assert to hooks.HookStore before use.

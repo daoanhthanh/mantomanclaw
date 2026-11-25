@@ -125,6 +125,13 @@ export const credentialsSchema: Record<string, FieldDef[]> = {
   // lives on the bitrix_portals row, not the channel instance. Authorize the portal
   // once via /bitrix24/install, then create channel instances against that portal.
   bitrix24: [],
+  msteams: [
+    { key: "app_id", label: "App ID", type: "text", required: true, placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", help: "Azure AD application (client) ID registered in Bot Framework" },
+    { key: "tenant_id", label: "Tenant ID", type: "text", required: true, placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", help: "Azure AD tenant ID (use 'common' for multi-tenant apps)" },
+    { key: "client_secret", label: "Client Secret", type: "password", required: false, help: "Client secret from Azure AD App Registrations. Leave empty when using certificate authentication." },
+    { key: "certificate_pem", label: "Certificate PEM", type: "textarea", required: false, help: "PEM-encoded certificate for certificate-based authentication. Provide both Certificate PEM and Private Key PEM, or use Client Secret instead." },
+    { key: "private_key_pem", label: "Private Key PEM", type: "textarea", required: false, help: "PEM-encoded private key paired with the certificate above." },
+  ],
 };
 
 // --- Pancake platform options ---
@@ -324,6 +331,20 @@ export const configSchema: Record<string, FieldDef[]> = {
     // mcp_server_id and drops these entries.
     { key: "mcp_server_name", label: "MCP Server Name (legacy)", type: "text", advanced: true, placeholder: "bitrix24-prod", help: "Deprecated — use \"MCP Server\" dropdown instead. Kept for backward-compat with pre-Phase-89 configs; will be removed once every channel is migrated." },
     { key: "mcp_base_url", label: "MCP Base URL (legacy)", type: "text", advanced: true, placeholder: "https://mcp.example.com", help: "Deprecated — see the \"MCP Server\" dropdown. Legacy base URL used only when the new dropdown is empty and the legacy name is set." },
+  ],
+  msteams: [
+    { key: "dm_policy", label: "DM Policy", type: "select", options: dmPolicyOptions, defaultValue: "pairing", help: "How to handle direct messages from unknown users" },
+    { key: "group_policy", label: "Group Policy", type: "select", options: groupPolicyOptions, defaultValue: "pairing", help: "How to handle messages from channels and group chats" },
+    { key: "require_mention", label: "Require @mention in channels", type: "boolean", defaultValue: true, help: "Bot only responds when explicitly @mentioned in channels (recommended)" },
+    { key: "history_limit", label: "Group History Limit", type: "number", defaultValue: 50, help: "Max pending group messages for context (0 = disabled)" },
+    { key: "dm_stream", label: "DM Streaming", type: "boolean", defaultValue: true, help: "Progressively update the reply message as the LLM generates (DMs)" },
+    { key: "group_stream", label: "Group Streaming", type: "boolean", defaultValue: false, help: "Progressively update the reply message as the LLM generates (channels)" },
+    { key: "thread_ttl", label: "Thread Participation TTL (hours)", type: "number", defaultValue: 24, help: "Hours before bot stops auto-replying in threads it participated in. 0 = always require @mention." },
+    { key: "allow_from", label: "Allowed Users", type: "tags", help: "Teams user AAD object IDs or UPNs allowed to interact; empty = no allowlist filter" },
+    { key: "allowed_site_ids", label: "Allowed SharePoint Site IDs", type: "tags", help: "SharePoint site IDs the bot may read files from" },
+    { key: "allowed_hosts", label: "Allowed Hosts", type: "tags", help: "Additional hostnames allowed for resource access" },
+    { key: "webhook_url_help", label: "Webhook URL", type: "text", advanced: true, defaultValue: "<public>/v1/channels/msteams/messages", help: "Register this endpoint as your Azure Bot messaging URL. Replace <public> with your gateway's public URL." },
+    ...chatBehaviorOverrideFields,
   ],
 };
 
