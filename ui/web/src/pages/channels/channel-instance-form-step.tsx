@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AgentSelector } from "@/components/chat/agent-selector";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { ChannelInstanceData } from "./hooks/use-channel-instances";
@@ -120,16 +121,19 @@ export function ChannelInstanceFormStep({
           <Controller
             control={control}
             name="agentId"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger><SelectValue placeholder={t("form.selectAgent")} /></SelectTrigger>
-                <SelectContent>
-                  {agents.map((a) => (
-                    <SelectItem key={a.id} value={a.id}>{a.display_name || a.agent_key}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+            render={({ field }) => {
+              // AgentSelector works with agent_key; form stores UUID — convert both ways.
+              const agentKey = agents.find((a) => a.id === field.value)?.agent_key ?? "";
+              return (
+                <AgentSelector
+                  value={agentKey}
+                  onChange={(key) => {
+                    const id = agents.find((a) => a.agent_key === key)?.id ?? "";
+                    field.onChange(id);
+                  }}
+                />
+              );
+            }}
           />
           {errors.agentId && <p className="text-xs text-destructive">{errors.agentId.message}</p>}
         </div>

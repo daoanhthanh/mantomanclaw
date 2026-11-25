@@ -54,8 +54,8 @@
     "confirmLabel": "Xóa"
   },
   "form": {
-    "createTitle": "Tạo phiên bản channel",
-    "editTitle": "Chỉnh sửa phiên bản channel",
+    "createTitle": "Tạo kênh giao tiếp",
+    "editTitle": "Chỉnh sửa thông tin kênh giao tiếp",
     "key": "Khóa *",
     "keyPlaceholder": "my-telegram-bot",
     "keyHint": "Slug duy nhất dùng làm định danh channel",
