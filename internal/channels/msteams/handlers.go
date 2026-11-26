@@ -200,6 +200,9 @@ func (ch *Channel) handleMessage(ctx context.Context, act *Activity) {
 
 	// Files are fetched only after policy passes so denied senders cannot make
 	// the gateway download anything.
+	// Show "typing" right away so the user sees the bot is working; Send stops it.
+	ch.startTypingIndicator(ctx, chatID, act.ServiceURL, act.Conversation.ID)
+
 	mediaFiles := ch.collectInboundMedia(ctx, act)
 	ch.BaseChannel.HandleAuthorizedMessageMedia(senderID, chatID, text, mediaFiles, metadata, peerKind)
 }
@@ -333,10 +336,15 @@ func (ch *Channel) upsertConvRef(ctx context.Context, act *Activity) {
 		msTenantID = act.Conversation.TenantID
 	}
 
+	// Channel activities carry ";messageid=<root>" on conversation.id. Store the
+	// base ID: Send looks the reference up by the channel ID without the thread
+	// suffix (see splitLocalKey) and re-appends the suffix when posting.
+	convID, _, _ := strings.Cut(act.Conversation.ID, ";messageid=")
+
 	conv := &store.MSTeamsConversation{
 		TenantID:        ch.TenantID(),
 		ChannelInstance: ch.Name(),
-		ConversationID:  act.Conversation.ID,
+		ConversationID:  convID,
 		Kind:            convKind,
 		ServiceURL:      act.ServiceURL,
 		MSTenantID:      msTenantID,

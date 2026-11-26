@@ -5,7 +5,7 @@ Dành cho bot **single-tenant, dùng nội bộ** (DM, group chat, thread trong 
 ```mermaid
 flowchart LR
     A["1. Entra app registration<br/>+ certificate"] --> B["2. Azure Bot resource<br/>+ messaging endpoint"]
-    B --> C["3. Teams app package<br/>(sideload)"]
+    B --> C["3. Teams app package<br/>(sideload / admin upload)"]
     A --> D["4. Graph Sites.Selected<br/>(đọc SharePoint)"]
     A --> E["5. Channel instance<br/>trong mantomanagent"]
     B --> E
@@ -27,7 +27,7 @@ flowchart LR
 
 ## 1. Entra app registration
 
-1. Azure Portal, **Microsoft Entra ID**, **App registrations**, **New registration**.
+1. [Azure Portal](https://portal.azure.com), **Microsoft Entra ID**, [App registrations](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade), **New registration**.
 2. Name: `mantomanclaw-teams-bot`. Supported account types: **Single tenant only**. Không cần redirect URI. Bấm **Register**.
 3. Ghi lại **Application (client) ID** và **Directory (tenant) ID**.
 
@@ -41,14 +41,14 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 36500 \
   -subj "/CN=mantomanclaw-teams-bot"
 ```
 
-1. App registration, **Certificates & secrets**, tab **Certificates**, **Upload certificate**, chọn `ms-teams-bot-cert.pem`.
+1. Mở app trong [App registrations](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade), **Certificates & secrets**, tab **Certificates**, **Upload certificate**, chọn `ms-teams-bot-cert.pem`.
 2. Giữ `ms-teams-bot-private.key` bí mật. Không commit 2 file này vào git (hiện chúng đang untracked trong repo, thêm vào `.gitignore` hoặc chuyển ra ngoài repo).
 
 Có thể dùng **client secret** thay cho cert (đơn giản hơn nhưng hết hạn tối đa 24 tháng). Chỉ cần một trong hai.
 
 ## 2. Azure Bot resource
 
-1. Azure Portal, **Create a resource**, tìm **Azure Bot**, **Create**.
+1. [Azure Portal](https://portal.azure.com), [**Create a resource**](https://portal.azure.com/#create/Microsoft.AzureBot) (trực tiếp tới form **Azure Bot**), **Create**.
 2. Bot handle: `mantomanclaw-teams-bot`. Chọn subscription và resource group. Pricing: **F0** (free) đủ cho nội bộ, hoặc S1.
 3. **Type of App**: **Single Tenant**. **Creation type**: **Use existing app registration**, nhập `app_id` và `tenant_id` ở bước 1.
 4. Sau khi tạo: vào bot, **Settings**, **Configuration**, đặt **Messaging endpoint**:
@@ -63,7 +63,7 @@ Lưu ý: nút **Test in Web Chat** của Azure không phản ánh đúng luồng
 
 ## 3. Teams app package (sideload)
 
-Bot chỉ dùng được trong Teams khi có app package. Với bot nội bộ, **sideload** thay vì publish lên org catalog (publish cần admin duyệt và có thể kẹt ở trạng thái pending).
+Bot chỉ dùng được trong Teams khi có app package. Test cá nhân thì **sideload**. Cho cả tổ chức thì admin **upload zip thẳng ở Teams admin center** (xem "Triển khai cho cả tổ chức" bên dưới). Không publish qua [Developer Portal](https://dev.teams.microsoft.com/apps): nó hay kẹt pending hoặc báo "Failed to create publish request".
 
 Tạo thư mục gồm 3 file: `manifest.json`, `color.png` (192x192), `outline.png` (32x32, nền trong). Nén thành `teams-app.zip` (3 file nằm ở gốc zip, không nằm trong thư mục con).
 
@@ -101,19 +101,30 @@ Tạo thư mục gồm 3 file: `manifest.json`, `color.png` (192x192), `outline.
 - Thông báo "Update your manifest to include `supportsChannelFeatures=tier1`" chỉ là gợi ý cho tính năng channel mới, cần manifest từ 1.24. Không bắt buộc cho bot này.
 - Mặc định Teams chỉ gửi cho bot các tin có @mention trong group/channel. Muốn bot nhận mọi tin trong channel/chat cần khai báo RSC permission trong manifest (`authorization.permissions.resourceSpecific`). Việc này chưa được kiểm chứng trong repo, nên cứ dùng @mention trước.
 
-### Cài đặt
+### Cài đặt cá nhân (sideload, để test)
 
-Cách 1, Developer Portal: https://dev.teams.microsoft.com/apps, **Import app**, chọn zip, rồi **Preview in Teams**, **Add**.
+Trong Teams: **Apps**, **Manage your apps**, **Upload an app**, **Upload a custom app**. Chỉ người upload thấy app. Cần policy **Upload custom apps** bật trong [Teams admin center](https://admin.teams.microsoft.com) ([Setup policies](https://admin.teams.microsoft.com/policies/app-setup), Global).
 
-Cách 2, trong Teams: **Apps**, **Manage your apps**, **Upload an app**, **Upload a custom app**. Cần policy **Upload custom apps** được bật trong Teams admin center (Teams apps, Setup policies, Global).
+### Triển khai cho cả tổ chức
 
-Nếu ở admin center còn entry cũ kẹt "Pending approval", có thể xóa ở Manage apps, hoặc bỏ qua vì sideload không cần entry đó.
+Cần role Teams Administrator hoặc Global Administrator.
+
+1. [Teams admin center](https://admin.teams.microsoft.com), **Teams apps**, [**Manage apps**](https://admin.teams.microsoft.com/policies/manage-apps), **Actions**, **Upload new app**, chọn zip. (Zip cũng có thể tải từ [Developer Portal](https://dev.teams.microsoft.com/apps): **Apps**, chọn app, **Download app package**.)
+2. Mở app vừa upload, tab **Users and groups**: **Available to** = **Everyone**, trạng thái **Allowed**.
+3. Chờ app hiện cho người dùng. Microsoft ghi "vài giờ" cho app upload qua admin center.
+4. Người dùng: Teams, **Apps**, **Built for your org**, **ManToMan Agent**, **Add** để nhắn DM. Group chat/channel: gõ `@ManToMan`, bấm **Add**.
+5. Đặt `dm_policy` và `group_policy` thành `open` ở bước 5 để mọi người trong tenant dùng được (xem bảng ở đó).
+6. Tuỳ chọn, pin sẵn cho người dùng: **Teams apps**, [**Setup policies**](https://admin.teams.microsoft.com/policies/app-setup), mở policy áp dụng, **Installed apps** và **Pinned apps**, **Add apps**, chọn ManToMan Agent, **Save**.
+
+Entry cũ kẹt "Pending approval" ở Manage apps: xóa đi, hoặc bỏ qua.
+
+Nếu **Upload new app** xám hoặc ẩn, kiểm tra theo thứ tự: role của tài khoản ([Microsoft Entra admin center](https://entra.microsoft.com), Roles and administrators), có đang tìm trong menu **Actions** không, thử trình duyệt khác hoặc ẩn danh, policy custom app của tenant và đợi propagate. Chưa có tài liệu xác nhận license Teams Essentials chặn upload này, nên đừng nâng gói trước khi thử hết các bước trên.
 
 ## 4. Đọc file SharePoint (Graph `Sites.Selected`)
 
 Bot tải file qua Microsoft Graph, chỉ cho các site bạn cấp quyền. Cần cả hai lớp: quyền ở Entra và allowlist trong cấu hình mantomanagent.
 
-1. App registration, **API permissions**, **Add a permission**, **Microsoft Graph**, **Application permissions**, chọn **Sites.Selected**.
+1. Mở app trong [App registrations](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade), **API permissions**, **Add a permission**, **Microsoft Graph**, **Application permissions**, chọn **Sites.Selected**.
 2. Bấm **Grant admin consent for <tenant>**.
 3. Lấy site ID. Ví dụ với `https://contoso.sharepoint.com/sites/Team`:
 
@@ -121,8 +132,8 @@ Bot tải file qua Microsoft Graph, chỉ cho các site bạn cấp quyền. C�
    GET https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/Team
    ```
 
-   Trường `id` có dạng `hostname,siteCollectionId,webId`. Có thể chạy trong Graph Explorer.
-4. Cấp quyền đọc cho app trên site đó (cần token có `Sites.FullControl.All`, ví dụ admin chạy trong Graph Explorer):
+   Trường `id` có dạng `hostname,siteCollectionId,webId`. Có thể chạy trong [Graph Explorer](https://developer.microsoft.com/graph/graph-explorer).
+4. Cấp quyền đọc cho app trên site đó (cần token có `Sites.FullControl.All`, ví dụ admin chạy trong [Graph Explorer](https://developer.microsoft.com/graph/graph-explorer)):
 
    ```
    POST https://graph.microsoft.com/v1.0/sites/{site-id}/permissions
@@ -192,6 +203,8 @@ Mẹo tạo chuỗi PEM một dòng: `awk 'NF {printf "%s\\n", $0}' ms-teams-bot
 | `thread_ttl` | **Phút** (mặc định 10). `0` là luôn cần @mention. Muốn bot chỉ chạy khi được @mention thì đặt `0` |
 | `allowed_site_ids` | Site SharePoint bot được đọc (bước 4) |
 
+Triển khai cho cả tổ chức: đặt `dm_policy` và `group_policy` là `open`. Bot vẫn chỉ nhận tin từ `tenant_id` đã cấu hình; người ngoài tenant bị chặn (log `security.msteams.tenant_mismatch`) dù policy là `open`.
+
 Sau khi lưu, channel khởi động và lấy thử token Bot Connector. Nếu sai `app_id`/`tenant_id`/cert, channel báo `token acquisition failed` ngay (xem trạng thái channel trong UI hoặc log `msteams channel started`).
 
 ## 6. Kiểm tra theo thứ tự
@@ -215,6 +228,7 @@ Log đáng chú ý:
 | Triệu chứng | Nguyên nhân thường gặp |
 |---|---|
 | "This app is not available" trong Teams | App chưa sideload, hoặc dùng entry org catalog bị pending. Cài bằng bước 3 |
+| App đã upload nhưng người dùng không thấy ở **Built for your org** | Chưa hết thời gian propagate, **Available to** chưa là Everyone, hoặc App permission policy của user chặn custom app. Thoát hẳn Teams rồi mở lại |
 | Bot không trả lời, log không có gì | Messaging endpoint sai/trống, hoặc chưa bật Teams channel ở Azure Bot |
 | Endpoint trả `401` với tin thật từ Teams | `app_id` trong instance khác với app của Azure Bot, hoặc `serviceUrl` không khớp JWT |
 | Có JWT hợp lệ nhưng không phản hồi | Tin bị dedup, tenant mismatch, hoặc policy `pairing` chưa duyệt |

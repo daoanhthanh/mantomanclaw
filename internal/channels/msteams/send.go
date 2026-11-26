@@ -96,6 +96,11 @@ func (ch *Channel) Send(ctx context.Context, msg bus.OutboundMessage) error {
 		rootID = keyRootID
 	}
 
+	// A placeholder update is a mid-run notice; the agent is still working.
+	if msg.Metadata["placeholder_update"] != "true" {
+		ch.stopTypingIndicator(msg.ChatID)
+	}
+
 	placeholderKey := msg.ChatID
 	if pk := msg.Metadata["placeholder_key"]; pk != "" {
 		placeholderKey = pk

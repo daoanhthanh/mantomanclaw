@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.30/MicrosoftTeams.schema.json",
   "manifestVersion": "1.30",
   "version": "1.0.0",
-  "id": "61840978-16d4-40a6-b700-81332c586003",
+  "id": "88612332-c6af-4c57-a78b-8a0be4e06f12",
   "developer": {
-    "name": "THANHDAO LIMITED",
-    "websiteUrl": "https://teams-agent.daoanhthanh.com",
-    "privacyUrl": "https://teams-agent.daoanhthanh.com/privacy",
-    "termsOfUseUrl": "https://teams-agent.daoanhthanh.com/terms"
+    "name": "Dao Anh Thanh",
+    "websiteUrl": "https://daoanhthanh.com",
+    "privacyUrl": "https://daoanhthanh.com/privacy",
+    "termsOfUseUrl": "https://daoanhthanh.com/terms"
   },
   "name": {
     "short": "ManToMan Agent",
@@ -15,7 +15,7 @@
   },
   "description": {
     "short": "AI agent",
-    "full": "AI agent cua THANHDAO LIMITED"
+    "full": "AI agent của công ty TNHH MAN TO MAN Vietnam"
   },
   "icons": {
     "color": "color.png",
@@ -24,7 +24,7 @@
   "accentColor": "#4F6BED",
   "bots": [
     {
-      "botId": "61840978-16d4-40a6-b700-81332c586003",
+      "botId": "88612332-c6af-4c57-a78b-8a0be4e06f12",
       "scopes": [
         "personal",
         "team",

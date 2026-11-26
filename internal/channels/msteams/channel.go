@@ -42,6 +42,7 @@ type Channel struct {
 
 	placeholders sync.Map // chatID/localKey -> placeholderState (activityID of "Thinking...")
 	pendingFiles sync.Map // uniqueID -> []byte (file consent pending bytes)
+	typingCtrls  sync.Map // localKey -> *typing.Controller (typing indicator while the agent runs)
 
 	stopCh chan struct{}
 }
