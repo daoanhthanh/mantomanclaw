@@ -1,0 +1,45 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.30/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.30",
+  "version": "1.0.0",
+  "id": "61840978-16d4-40a6-b700-81332c586003",
+  "developer": {
+    "name": "THANHDAO LIMITED",
+    "websiteUrl": "https://teams-agent.daoanhthanh.com",
+    "privacyUrl": "https://teams-agent.daoanhthanh.com/privacy",
+    "termsOfUseUrl": "https://teams-agent.daoanhthanh.com/terms"
+  },
+  "name": {
+    "short": "ManToMan Agent",
+    "full": "ManToMan Agent"
+  },
+  "description": {
+    "short": "AI agent",
+    "full": "AI agent cua THANHDAO LIMITED"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "accentColor": "#4F6BED",
+  "bots": [
+    {
+      "botId": "61840978-16d4-40a6-b700-81332c586003",
+      "scopes": [
+        "personal",
+        "team",
+        "groupChat"
+      ],
+      "supportsFiles": false,
+      "isNotificationOnly": false
+    }
+  ],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "teams-agent.daoanhthanh.com"
+  ],
+  "supportsChannelFeatures": "tier1"
+}

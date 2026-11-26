@@ -1,6 +1,7 @@
 package msteams
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"log/slog"
@@ -9,8 +10,8 @@ import (
 )
 
 const (
-	webhookPath   = "/v1/channels/msteams/messages"
-	maxBodySize   = 1 << 20 // 1 MiB
+	webhookPath = "/v1/channels/msteams/messages"
+	maxBodySize = 1 << 20 // 1 MiB
 )
 
 // webhookRouter is the process-wide shared HTTP handler for all msteams channel instances.
@@ -115,18 +116,22 @@ func (r *webhookRouter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	var target *Channel
+	var verifyErrs []string
 	for _, ch := range instances {
-		if err := ch.verifier.Verify(req.Context(), authHeader, partial.ServiceURL); err == nil {
+		err := ch.verifier.Verify(req.Context(), authHeader, partial.ServiceURL)
+		if err == nil {
 			target = ch
 			break
 		}
+		verifyErrs = append(verifyErrs, ch.creds.AppID+": "+err.Error())
 	}
 
 	if target == nil {
 		slog.Warn("security.msteams.jwt_rejected",
 			"remote_addr", req.RemoteAddr,
 			"service_url", partial.ServiceURL,
-			"reason", "no channel accepted the JWT")
+			"reason", "no channel accepted the JWT",
+			"verify_errors", verifyErrs)
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
@@ -137,5 +142,9 @@ func (r *webhookRouter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// Dispatch asynchronously.
 	bodyCopy := make([]byte, len(body))
 	copy(bodyCopy, body)
-	go target.handleActivity(req.Context(), bodyCopy)
+	// Detach from request context so the goroutine is not canceled when the
+	// HTTP handler returns after writing 200. context.WithoutCancel preserves
+	// all values (tenant, user, trace) without inheriting the cancellation.
+	dispatchCtx := context.WithoutCancel(req.Context())
+	go target.handleActivity(dispatchCtx, bodyCopy)
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"html"
 	"io"
 	"log/slog"
 	"net/http"
@@ -17,9 +18,10 @@ import (
 )
 
 const (
-	maxAttachmentsPerMsg = 5
+	maxAttachmentsPerMsg  = 5
 	attachDownloadTimeout = 30 * time.Second
 	attachMaxBytes        = 20 << 20 // 20 MiB
+	inboundMediaTTL       = 30 * time.Minute
 )
 
 // downloadAttachments downloads up to maxAttachmentsPerMsg attachments from an
@@ -100,12 +102,9 @@ func downloadFileDownloadInfo(ctx context.Context, ch *Channel, att Attachment, 
 		return bus.MediaFile{}, nil
 	}
 
-	tok, err := ch.tokens.Token(ctx, graphScope)
-	if err != nil {
-		return bus.MediaFile{}, fmt.Errorf("graph token: %w", err)
-	}
-
-	return downloadURLToFile(ctx, info.DownloadURL, tok, att.Name, info.FileType, tempDir, ch.graph.httpClient)
+	// downloadUrl is pre-signed by SharePoint; no bearer token is needed, and
+	// withholding it avoids leaking the Graph token to a signed-URL host.
+	return downloadURLToFile(ctx, info.DownloadURL, "", att.Name, info.FileType, tempDir, ch.graph.httpClient)
 }
 
 // downloadInlineImage downloads an image attachment hosted on the Bot
@@ -227,4 +226,52 @@ func downloadURLToFile(ctx context.Context, downloadURL, token, name, extHint, t
 	}
 
 	return bus.MediaFile{Path: f.Name(), MimeType: mimeType, Filename: name}, nil
+}
+
+// collectInboundMedia downloads Teams file attachments and SharePoint links
+// found in the message text, returning them as media for the agent. Files land
+// in a private temp dir that is removed after inboundMediaTTL, by which time
+// the agent loop has copied them into the user workspace.
+func (ch *Channel) collectInboundMedia(ctx context.Context, act *Activity) []bus.MediaFile {
+	links := extractSharePointLinks(html.UnescapeString(act.Text))
+	if len(act.Attachments) == 0 && len(links) == 0 {
+		return nil
+	}
+
+	tempDir, err := os.MkdirTemp("", "msteams-media-*")
+	if err != nil {
+		slog.Warn("msteams: create media temp dir failed", "error", err)
+		return nil
+	}
+
+	files := downloadAttachments(ctx, ch, act, tempDir)
+
+	// Links already covered by an attachment are not fetched twice.
+	attached := make(map[string]bool, len(act.Attachments))
+	for _, att := range act.Attachments {
+		attached[att.ContentURL] = true
+	}
+	for _, link := range links {
+		if len(files) >= maxAttachmentsPerMsg {
+			break
+		}
+		if attached[link] {
+			continue
+		}
+		mf, err := downloadViaGraph(ctx, ch, Attachment{ContentURL: link}, tempDir)
+		if err != nil {
+			slog.Warn("msteams: sharepoint link download failed", "error", err)
+			continue
+		}
+		if mf.Path != "" {
+			files = append(files, mf)
+		}
+	}
+
+	if len(files) == 0 {
+		os.RemoveAll(tempDir)
+		return nil
+	}
+	time.AfterFunc(inboundMediaTTL, func() { os.RemoveAll(tempDir) })
+	return files
 }

@@ -137,6 +137,24 @@ type parentReference struct {
 	DriveID string `json:"driveId"`
 }
 
+// siteAllowed reports whether siteID is in the allowlist. Graph returns site
+// IDs in composite form "hostname,siteCollectionId,webId", so a configured
+// entry may be the full composite or any single component of it.
+func (g *graphClient) siteAllowed(siteID string) bool {
+	if siteID == "" {
+		return false
+	}
+	if g.allowedSiteIDs[siteID] {
+		return true
+	}
+	for _, part := range strings.Split(siteID, ",") {
+		if part != "" && g.allowedSiteIDs[part] {
+			return true
+		}
+	}
+	return false
+}
+
 // downloadDriveItem downloads the item content to a temp file.
 // Returns the local file path, the MIME type, and any error.
 func (g *graphClient) downloadDriveItem(ctx context.Context, item *driveItem, tempDir string) (string, string, error) {
@@ -145,7 +163,7 @@ func (g *graphClient) downloadDriveItem(ctx context.Context, item *driveItem, te
 	}
 
 	// Check site allowlist.
-	if !g.allowedSiteIDs[item.ParentReference.SiteID] {
+	if !g.siteAllowed(item.ParentReference.SiteID) {
 		return "", "", fmt.Errorf("site %q not granted to the bot", item.ParentReference.SiteID)
 	}
 

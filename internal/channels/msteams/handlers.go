@@ -37,7 +37,6 @@ func dispatchActivity(ctx context.Context, ch *Channel, body []byte) {
 		ch.handleMessage(ctx, &act)
 	case "conversationUpdate":
 		ch.handleConversationUpdate(ctx, &act)
-	// messageReaction and invoke are handled in Phase 4 (fileConsent).
 	}
 }
 
@@ -199,8 +198,10 @@ func (ch *Channel) handleMessage(ctx context.Context, act *Activity) {
 		"sender_id", senderID, "chat_id", chatID,
 		"peer_kind", peerKind, "preview", channels.Truncate(text, 50))
 
-	// Media is handled in Phase 5; pass nil for now.
-	ch.BaseChannel.HandleAuthorizedMessageMedia(senderID, chatID, text, nil, metadata, peerKind)
+	// Files are fetched only after policy passes so denied senders cannot make
+	// the gateway download anything.
+	mediaFiles := ch.collectInboundMedia(ctx, act)
+	ch.BaseChannel.HandleAuthorizedMessageMedia(senderID, chatID, text, mediaFiles, metadata, peerKind)
 }
 
 // rootMessageID returns the root message ID for a channel-scoped activity.

@@ -12,6 +12,7 @@ import (
 
 	"github.com/nextlevelbuilder/goclaw/internal/bus"
 	"github.com/nextlevelbuilder/goclaw/internal/channels"
+	"github.com/nextlevelbuilder/goclaw/internal/store"
 )
 
 const (
@@ -265,10 +266,18 @@ func readImageAsDataURL(path, mimeType string) (string, error) {
 // serviceURL resolves the Bot Framework service URL for a conversation by
 // looking it up in the conversation store.
 func (ch *Channel) serviceURL(ctx context.Context, convID string) string {
-	if ch.convStore != nil {
-		if conv, err := ch.convStore.Get(ctx, ch.Name(), convID); err == nil && conv != nil {
-			return conv.ServiceURL
-		}
+	if ch.convStore == nil {
+		return ""
 	}
-	return ""
+	// Outbound contexts carry no tenant; the store scopes every query by it.
+	ctx = store.WithTenantID(ctx, ch.TenantID())
+	conv, err := ch.convStore.Get(ctx, ch.Name(), convID)
+	if err != nil {
+		slog.Warn("msteams: conversation lookup failed", "conv_id", convID, "error", err)
+		return ""
+	}
+	if conv == nil {
+		return ""
+	}
+	return conv.ServiceURL
 }
