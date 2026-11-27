@@ -50,7 +50,20 @@
     "dockerHostLabel": "Docker-хост (необязательно)",
     "dockerHostPlaceholder": "unix:///var/run/docker.sock",
     "cancel": "Отмена",
-    "create": "Создать"
+    "create": "Создать",
+    "jumpHostLabel": "Промежуточный хост",
+    "jumpHostOptional": "(необязательно)",
+    "jumpHostHostLabel": "Промежуточный хост",
+    "jumpHostUserLabel": "Пользователь промежуточного хоста",
+    "jumpFingerprintLabel": "Отпечаток ключа промежуточного хоста",
+    "jumpFingerprintHint": "Обязательно. SHA256-отпечаток открытого ключа промежуточного хоста (ssh-keygen -lf). Учётные данные проходят через этот узел, поэтому доверие при первом подключении запрещено.",
+    "errors": {
+      "jumpHostUserRequired": "Укажите промежуточный хост и пользователя.",
+      "jumpPortRange": "Порт промежуточного хоста должен быть от 1 до 65535.",
+      "jumpPrivateKeyRequired": "Для промежуточного хоста нужен закрытый ключ.",
+      "jumpPasswordRequired": "Для промежуточного хоста нужен пароль.",
+      "jumpFingerprintRequired": "Укажите отпечаток ключа промежуточного хоста."
+    }
   },
   "deleteDialog": {
     "title": "Удалить рабочую станцию",

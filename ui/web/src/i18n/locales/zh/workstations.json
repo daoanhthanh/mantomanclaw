@@ -62,6 +62,12 @@
     "socketPathPlaceholder": "unix:///var/run/docker.sock",
     "cancel": "取消",
     "create": "创建",
+    "jumpHostLabel": "跳板机",
+    "jumpHostOptional": "（可选）",
+    "jumpHostHostLabel": "跳板机主机",
+    "jumpHostUserLabel": "跳板机用户",
+    "jumpFingerprintLabel": "跳板机密钥指纹",
+    "jumpFingerprintHint": "必填。跳板机公钥的 SHA256 指纹（ssh-keygen -lf）。凭据会经过此跳点，因此不允许首次使用时信任。",
     "errors": {
       "keyRequired": "请填写工作站键名。",
       "nameRequired": "请填写显示名称。",
@@ -72,7 +78,12 @@
       "sshPasswordRequired": "使用密码认证时必须提供密码。",
       "dockerContainerRequired": "Docker 后端需要填写容器名称。",
       "dockerImageRequired": "Docker 后端需要填写镜像。",
-      "createFailed": "创建工作站失败。"
+      "createFailed": "创建工作站失败。",
+      "jumpHostUserRequired": "请填写跳板机主机及其用户。",
+      "jumpPortRange": "跳板机端口必须在 1 到 65535 之间。",
+      "jumpPrivateKeyRequired": "跳板机需要提供私钥。",
+      "jumpPasswordRequired": "跳板机需要提供密码。",
+      "jumpFingerprintRequired": "请填写跳板机密钥指纹。"
     }
   },
   "deleteDialog": {

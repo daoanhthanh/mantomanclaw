@@ -272,6 +272,7 @@ func init() {
 		MsgWorkstationRequired:     "no workstation bound to agent; pass workstation_id",
 		MsgWorkstationAccessDenied: "agent %s not authorized for workstation %s",
 		MsgBackendNotReady:         "workstation backend not ready: %s",
+		MsgWorkstationSSRFBlocked:  "workstation host blocked by SSRF policy: %s",
 
 		// Webhooks
 		MsgWebhookAuthFailed:                  "webhook authentication failed",

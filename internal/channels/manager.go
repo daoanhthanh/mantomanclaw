@@ -388,6 +388,21 @@ func (m *Manager) ListGroups(ctx context.Context, channelName string) ([]GroupIn
 	return glp.ListGroups(ctx)
 }
 
+// BrowseSharepoint delegates to the channel's SharepointBrowser if available.
+func (m *Manager) BrowseSharepoint(ctx context.Context, channelName, action, driveLabel, path string) (string, error) {
+	m.mu.RLock()
+	ch, ok := m.channels[channelName]
+	m.mu.RUnlock()
+	if !ok {
+		return "", fmt.Errorf("channel %q not found", channelName)
+	}
+	sb, ok := ch.(SharepointBrowser)
+	if !ok {
+		return "", fmt.Errorf("channel %q does not support SharePoint browsing", channelName)
+	}
+	return sb.BrowseSharepoint(ctx, action, driveLabel, path)
+}
+
 // ResolveGroupTitle delegates to the channel's GroupTitleProvider if available.
 func (m *Manager) ResolveGroupTitle(ctx context.Context, channelName, chatID string) (string, error) {
 	m.mu.RLock()

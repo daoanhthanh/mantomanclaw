@@ -6,10 +6,12 @@ Dành cho bot **single-tenant, dùng nội bộ** (DM, group chat, thread trong 
 flowchart LR
     A["1. Entra app registration<br/>+ certificate"] --> B["2. Azure Bot resource<br/>+ messaging endpoint"]
     B --> C["3. Teams app package<br/>(sideload / admin upload)"]
-    A --> D["4. Graph Sites.Selected<br/>(đọc SharePoint)"]
+    A --> D["4a. Graph Sites.Selected<br/>(đọc file share trong chat)"]
+    A --> D2["4b. Graph Files.Read.All<br/>(tool đọc folder SharePoint)"]
     A --> E["5. Channel instance<br/>trong mantomanagent"]
     B --> E
     D --> E
+    D2 --> E
     E --> F["6. Test: DM, group, thread"]
 ```
 
@@ -120,19 +122,31 @@ Entry cũ kẹt "Pending approval" ở Manage apps: xóa đi, hoặc bỏ qua.
 
 Nếu **Upload new app** xám hoặc ẩn, kiểm tra theo thứ tự: role của tài khoản ([Microsoft Entra admin center](https://entra.microsoft.com), Roles and administrators), có đang tìm trong menu **Actions** không, thử trình duyệt khác hoặc ẩn danh, policy custom app của tenant và đợi propagate. Chưa có tài liệu xác nhận license Teams Essentials chặn upload này, nên đừng nâng gói trước khi thử hết các bước trên.
 
-## 4. Đọc file SharePoint (Graph `Sites.Selected`)
+## 4. Đọc file SharePoint
 
-Bot tải file qua Microsoft Graph, chỉ cho các site bạn cấp quyền. Cần cả hai lớp: quyền ở Entra và allowlist trong cấu hình mantomanagent.
+Bot có **hai cơ chế** đọc file SharePoint, cần cấu hình riêng nhau:
+
+| Cơ chế | Khi nào dùng | Permission cần |
+|---|---|---|
+| **4a. File đính kèm / link trong chat** | Người dùng attach file hoặc dán link `https://*.sharepoint.com/...` vào tin nhắn | `Sites.Selected` |
+| **4b. Tool đọc folder chủ động** | Agent tự liệt kê / đọc file từ folder SharePoint mà không cần người dùng share | `Files.Read.All` (hoặc `Sites.Selected` + drive grant) |
+
+> **Lý do file trong folder không đọc được nếu chỉ làm bước 4a:** Bot chỉ tải file khi nhận activity (tin nhắn). Nó không tự duyệt folder. Cần bước 4b để agent có tool chủ động truy vấn Graph API.
+
+### 4a. File đính kèm và link SharePoint trong chat (`Sites.Selected`)
+
+Chỉ cần nếu người dùng attach file hoặc dán link trực tiếp vào chat.
 
 1. Mở app trong [App registrations](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade), **API permissions**, **Add a permission**, **Microsoft Graph**, **Application permissions**, chọn **Sites.Selected**.
-2. Bấm **Grant admin consent for <tenant>**.
+2. Bấm **Grant admin consent for \<tenant\>**.
 3. Lấy site ID. Ví dụ với `https://contoso.sharepoint.com/sites/Team`:
 
    ```
    GET https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/Team
    ```
 
-   Trường `id` có dạng `hostname,siteCollectionId,webId`. Có thể chạy trong [Graph Explorer](https://developer.microsoft.com/graph/graph-explorer).
+   Trường `id` có dạng `hostname,siteCollectionId,webId`. Chạy trong [Graph Explorer](https://developer.microsoft.com/graph/graph-explorer).
+
 4. Cấp quyền đọc cho app trên site đó (cần token có `Sites.FullControl.All`, ví dụ admin chạy trong [Graph Explorer](https://developer.microsoft.com/graph/graph-explorer)):
 
    ```
@@ -159,7 +173,70 @@ Giới hạn:
 
 Cách agent nhận file: file đính kèm Teams hoặc link `https://*.sharepoint.com/...` dán trong tin nhắn sẽ được tải về, rồi gửi cho agent như media của tin nhắn đó. Chỉ tải sau khi qua policy (`dm_policy` / `group_policy`), nên người bị từ chối không kích hoạt tải file.
 
-Ghi chú: Microsoft yêu cầu cert thay cho secret với một số luồng tải file từ 2027-03-01. Thông tin này nằm trong comment của `config.go`, chưa kiểm chứng. Dùng cert ở bước 1 là an toàn nhất.
+Ghi chú: Microsoft yêu cầu cert thay cho secret với một số luồng tải file từ 2027-03-01. Dùng cert ở bước 1 là an toàn nhất.
+
+### 4b. Tool đọc folder SharePoint chủ động (`Files.Read.All`)
+
+Cho phép agent tự liệt kê file trong folder SharePoint mà không cần người dùng share trong chat. Agent nhận tool `sharepoint_read` với các hành động `list_folder` và `read_file`.
+
+**Bước 1 — Cấp permission `Files.Read.All`:**
+
+1. Mở app trong [App registrations](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade), **API permissions**, **Add a permission**, **Microsoft Graph**, **Application permissions**, chọn **Files.Read.All**.
+2. Bấm **Grant admin consent for \<tenant\>**.
+
+> `Files.Read.All` đủ để đọc mọi drive trong tenant. Nếu muốn hạn chế hơn, dùng `Sites.Selected` và làm thêm bước cấp quyền drive riêng (phức tạp hơn, không khuyến khích cho nội bộ).
+
+**Bước 2 — Lấy `drive_id` của SharePoint library:**
+
+SharePoint site có thể có nhiều document library (drive). Mặc định là `Documents`. Lấy danh sách drive của site:
+
+```
+GET https://graph.microsoft.com/v1.0/sites/{site-id}/drives
+```
+
+Ghi lại `id` của drive muốn dùng (ví dụ `b!abc123...`).
+
+**Bước 3 — Điền config ở bước 5:**
+
+Thêm vào config channel:
+
+```json
+{
+  "sharepoint_drives": [
+    {
+      "drive_id": "<drive_id>",
+      "label": "Team Documents",
+      "root_path": "/"
+    }
+  ]
+}
+```
+
+| Trường | Ý nghĩa |
+|---|---|
+| `drive_id` | ID của SharePoint drive lấy ở bước 2 |
+| `label` | Tên hiển thị cho agent biết đây là drive nào |
+| `root_path` | Đường dẫn gốc agent được phép duyệt. `/` = toàn bộ drive. `/General` = chỉ thư mục General |
+
+**Bước 4 — Hướng dẫn agent dùng tool:**
+
+Trong system prompt hoặc context file của agent, thêm:
+
+```
+Bạn có tool `sharepoint_read` để đọc tài liệu từ SharePoint:
+- Dùng action `list_folder` để liệt kê file trong folder (path="/General/Reports")
+- Dùng action `read_file` để đọc nội dung file (path="/General/Reports/Q4.xlsx")
+Mặc định dùng drive "Team Documents". File tối đa 20 MiB.
+```
+
+**Giới hạn tool:**
+
+| Mục | Giá trị |
+|---|---|
+| Kích thước file | tối đa 20 MiB |
+| Số file mỗi lần gọi | 1 (`read_file`) hoặc tối đa 200 entries (`list_folder`) |
+| Đường dẫn | Phải nằm trong `root_path` đã cấu hình |
+| File type hỗ trợ | Mọi loại; nội dung nhị phân sẽ được base64 encode nếu không parse được |
 
 ## 5. Tạo channel instance trong mantomanagent
 
@@ -190,7 +267,14 @@ Mẹo tạo chuỗi PEM một dòng: `awk 'NF {printf "%s\\n", $0}' ms-teams-bot
   "thread_ttl": 0,
   "history_limit": 50,
   "allowed_site_ids": ["<siteCollectionId hoặc composite site id>"],
-  "allowed_hosts": []
+  "allowed_hosts": [],
+  "sharepoint_drives": [
+    {
+      "drive_id": "<drive_id từ bước 4b>",
+      "label": "Team Documents",
+      "root_path": "/"
+    }
+  ]
 }
 ```
 
@@ -201,7 +285,8 @@ Mẹo tạo chuỗi PEM một dòng: `awk 'NF {printf "%s\\n", $0}' ms-teams-bot
 | `allow_from` | Danh sách AAD object ID hoặc UPN được phép |
 | `require_mention` | Group/channel chỉ trả lời khi @mention, hoặc trong `thread_ttl` sau lần trả lời gần nhất |
 | `thread_ttl` | **Phút** (mặc định 10). `0` là luôn cần @mention. Muốn bot chỉ chạy khi được @mention thì đặt `0` |
-| `allowed_site_ids` | Site SharePoint bot được đọc (bước 4) |
+| `allowed_site_ids` | Site SharePoint cho cơ chế 4a (file đính kèm/link trong chat) |
+| `sharepoint_drives` | Danh sách drive cho tool chủ động 4b. Mỗi entry cần `drive_id`, `label`, `root_path` |
 
 Triển khai cho cả tổ chức: đặt `dm_policy` và `group_policy` là `open`. Bot vẫn chỉ nhận tin từ `tenant_id` đã cấu hình; người ngoài tenant bị chặn (log `security.msteams.tenant_mismatch`) dù policy là `open`.
 
@@ -213,7 +298,8 @@ Sau khi lưu, channel khởi động và lấy thử token Bot Connector. Nếu 
 2. **DM**: trong Teams mở app, nhắn tin. Với `dm_policy=pairing`, bot trả mã pairing, duyệt mã trong UI/CLI rồi nhắn lại.
 3. **Group chat**: thêm bot vào group, @mention bot. Duyệt pairing nhóm nếu `group_policy=pairing`.
 4. **Thread trong channel**: thêm app vào team (scope `team`), @mention bot trong một post. Mỗi thread có session riêng.
-5. **SharePoint**: dán link file trong team site đã cấp quyền, hoặc đính kèm file, rồi hỏi agent về nội dung.
+5. **SharePoint (4a)**: dán link file trong team site đã cấp quyền, hoặc đính kèm file, rồi hỏi agent về nội dung.
+6. **SharePoint tool (4b)**: nhắn agent "liệt kê file trong /General" — agent gọi tool `sharepoint_read` trực tiếp.
 
 Log đáng chú ý:
 
@@ -233,4 +319,5 @@ Log đáng chú ý:
 | Endpoint trả `401` với tin thật từ Teams | `app_id` trong instance khác với app của Azure Bot, hoặc `serviceUrl` không khớp JWT |
 | Có JWT hợp lệ nhưng không phản hồi | Tin bị dedup, tenant mismatch, hoặc policy `pairing` chưa duyệt |
 | Group/channel im lặng | Chưa @mention bot (và hết `thread_ttl`) |
-| Không đọc được file SharePoint | Thiếu admin consent `Sites.Selected`, chưa grant site (bước 4.4), site ID chưa có trong `allowed_site_ids`, hoặc file ở OneDrive cá nhân |
+| Không đọc được file SharePoint khi attach/dán link | Thiếu admin consent `Sites.Selected`, chưa grant site (bước 4a.4), site ID chưa có trong `allowed_site_ids`, hoặc file ở OneDrive cá nhân |
+| Agent không tự đọc folder SharePoint | Thiếu `Files.Read.All` admin consent, `sharepoint_drives` chưa điền, hoặc tool `sharepoint_read` chưa được implement (xem bước 4b) |

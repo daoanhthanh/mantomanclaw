@@ -7,13 +7,22 @@ export interface WorkstationCreateFormState {
   key: string;
   name: string;
   backend: WorkstationBackendType;
-  // SSH
+  // SSH target
   host: string;
   port: string;
   user: string;
   authMethod: SshAuthMethod;
   privateKey: string;
   password: string;
+  // SSH jump host
+  jumpEnabled: boolean;
+  jumpHost: string;
+  jumpPort: string;
+  jumpUser: string;
+  jumpAuthMethod: SshAuthMethod;
+  jumpPrivateKey: string;
+  jumpPassword: string;
+  jumpFingerprint: string;
   // Docker
   container: string;
   image: string;
@@ -63,11 +72,39 @@ export function buildWorkstationCreatePayload(
       return { kind: "error", errorKey: "sshPasswordRequired" };
     }
 
+    let jumpMetadata: Record<string, unknown> | undefined;
+    if (form.jumpEnabled) {
+      const jumpHostVal = form.jumpHost.trim();
+      const jumpUserVal = form.jumpUser.trim();
+      if (!jumpHostVal || !jumpUserVal) return { kind: "error", errorKey: "jumpHostUserRequired" };
+      const jumpPort = parseInt(form.jumpPort, 10) || 22;
+      if (jumpPort < 1 || jumpPort > 65535) return { kind: "error", errorKey: "jumpPortRange" };
+      if (form.jumpAuthMethod === "privateKey" && !form.jumpPrivateKey.trim()) {
+        return { kind: "error", errorKey: "jumpPrivateKeyRequired" };
+      }
+      if (form.jumpAuthMethod === "password" && !form.jumpPassword) {
+        return { kind: "error", errorKey: "jumpPasswordRequired" };
+      }
+      if (!form.jumpFingerprint.trim()) {
+        return { kind: "error", errorKey: "jumpFingerprintRequired" };
+      }
+      jumpMetadata = {
+        host: jumpHostVal,
+        port: jumpPort,
+        user: jumpUserVal,
+        knownHostsFingerprint: form.jumpFingerprint.trim(),
+        ...(form.jumpAuthMethod === "privateKey"
+          ? { privateKey: form.jumpPrivateKey.trim() }
+          : { password: form.jumpPassword }),
+      };
+    }
+
     metadata = {
       host,
       port,
       user,
       ...(form.authMethod === "privateKey" ? { privateKey } : { password }),
+      ...(jumpMetadata ? { jumpHost: jumpMetadata } : {}),
     };
   } else {
     // The gateway stores the container name in DockerMetadata.host and surfaces

@@ -48,6 +48,15 @@ export function WorkstationCreateDialog({
   const [authMethod, setAuthMethod] = useState<SshAuthMethod>("privateKey");
   const [privateKeyFile, setPrivateKeyFile] = useState<File | null>(null);
   const [password, setPassword] = useState("");
+  // SSH jump host
+  const [jumpEnabled, setJumpEnabled] = useState(false);
+  const [jumpHost, setJumpHost] = useState("");
+  const [jumpPort, setJumpPort] = useState("22");
+  const [jumpUser, setJumpUser] = useState("");
+  const [jumpAuthMethod, setJumpAuthMethod] = useState<SshAuthMethod>("privateKey");
+  const [jumpPrivateKeyFile, setJumpPrivateKeyFile] = useState<File | null>(null);
+  const [jumpPassword, setJumpPassword] = useState("");
+  const [jumpFingerprint, setJumpFingerprint] = useState("");
   // Docker fields
   const [container, setContainer] = useState("");
   const [image, setImage] = useState("");
@@ -78,28 +87,21 @@ export function WorkstationCreateDialog({
     setSubmitting(true);
     let privateKey = "";
     if (backend === "ssh" && authMethod === "privateKey" && privateKeyFile) {
-      try {
-        privateKey = await privateKeyFile.text();
-      } catch {
-        setFieldError(t("createDialog.errors.privateKeyReadFailed"));
-        setSubmitting(false);
-        return;
-      }
+      try { privateKey = await privateKeyFile.text(); }
+      catch { setFieldError(t("createDialog.errors.privateKeyReadFailed")); setSubmitting(false); return; }
+    }
+    let jumpPrivateKey = "";
+    if (backend === "ssh" && jumpEnabled && jumpAuthMethod === "privateKey" && jumpPrivateKeyFile) {
+      try { jumpPrivateKey = await jumpPrivateKeyFile.text(); }
+      catch { setFieldError(t("createDialog.errors.privateKeyReadFailed")); setSubmitting(false); return; }
     }
 
     const built = buildWorkstationCreatePayload({
-      key,
-      name,
-      backend,
-      host,
-      port,
-      user,
-      authMethod,
-      privateKey,
-      password,
-      container,
-      image,
-      socketPath,
+      key, name, backend,
+      host, port, user, authMethod, privateKey, password,
+      jumpEnabled, jumpHost, jumpPort, jumpUser, jumpAuthMethod,
+      jumpPrivateKey, jumpPassword, jumpFingerprint,
+      container, image, socketPath,
     });
     if (built.kind === "error") {
       setFieldError(t(`createDialog.errors.${built.errorKey}`));
@@ -279,6 +281,7 @@ export function WorkstationCreateDialog({
                 )}
               </>
             )}
+
 
             {backend === "docker" && (
               <>

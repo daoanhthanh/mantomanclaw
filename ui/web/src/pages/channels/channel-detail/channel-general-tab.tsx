@@ -20,6 +20,7 @@ import { channelTypeLabels } from "../channels-status-view";
 const ESSENTIAL_CONFIG_KEYS: Record<string, string[]> = {
   _default: ["dm_policy", "group_policy", "require_mention"],
   telegram: ["dm_policy", "group_policy", "mention_mode", "require_mention"],
+  msteams: ["dm_policy", "group_policy", "require_mention", "thread_ttl", "allowed_site_ids", "allowed_hosts", "sharepoint_drives"],
 };
 
 interface ChannelGeneralTabProps {
@@ -39,11 +40,16 @@ export function ChannelGeneralTab({ instance, agents, onUpdate }: ChannelGeneral
   const allConfigFields = configSchema[instance.channel_type] ?? [];
   const essentialKeys = ESSENTIAL_CONFIG_KEYS[instance.channel_type] ?? ESSENTIAL_CONFIG_KEYS._default ?? [];
   const essentialFields = allConfigFields.filter((f) => essentialKeys.includes(f.key));
+  const jsonValueKeys = new Set(essentialFields.filter((f) => f.type === "textarea" && f.jsonValue).map((f) => f.key));
   const existingConfig = (instance.config ?? {}) as Record<string, unknown>;
   const initialPolicyValues = Object.fromEntries(
     essentialKeys
       .filter((k) => existingConfig[k] !== undefined)
-      .map((k) => [k, existingConfig[k]]),
+      .map((k) => {
+        const v = existingConfig[k];
+        if (jsonValueKeys.has(k) && typeof v !== "string") return [k, JSON.stringify(v, null, 2)];
+        return [k, v];
+      }),
   );
   const [policyValues, setPolicyValues] = useState<Record<string, unknown>>(initialPolicyValues);
 
@@ -58,7 +64,14 @@ export function ChannelGeneralTab({ instance, agents, onUpdate }: ChannelGeneral
     try {
       // Merge policy values into existing config, preserving other keys (groups, advanced)
       const cleanPolicies = Object.fromEntries(
-        Object.entries(policyValues).filter(([, v]) => v !== undefined && v !== "" && v !== null),
+        Object.entries(policyValues)
+          .filter(([, v]) => v !== undefined && v !== "" && v !== null)
+          .map(([k, v]) => {
+            if (jsonValueKeys.has(k) && typeof v === "string" && v.trim()) {
+              try { return [k, JSON.parse(v.trim())]; } catch { /* invalid JSON, send as-is */ }
+            }
+            return [k, v];
+          }),
       );
       const mergedConfig = { ...existingConfig, ...cleanPolicies };
       await onUpdate({

@@ -30,4 +30,20 @@ type msteamsInstanceConfig struct {
 	AllowedSiteIDs []string `json:"allowed_site_ids,omitempty"`
 	// AllowedHosts lists additional SharePoint hosts the bot may access.
 	AllowedHosts []string `json:"allowed_hosts,omitempty"`
+	// SharepointDrives lists SharePoint document libraries the agent may browse
+	// via the sharepoint_read tool (action: list_folder / read_file).
+	// Requires Files.Read.All (or Sites.Selected + drive grant) in Entra.
+	SharepointDrives []SharepointDriveConfig `json:"sharepoint_drives,omitempty"`
+}
+
+// SharepointDriveConfig configures one SharePoint document library the bot
+// may browse via the sharepoint_read tool.
+type SharepointDriveConfig struct {
+	// DriveID is the Microsoft Graph drive ID (e.g. "b!abc123...").
+	DriveID string `json:"drive_id"`
+	// Label is a human-readable name shown to the agent (e.g. "Team Documents").
+	Label string `json:"label"`
+	// RootPath restricts browsing to a subtree. Use "/" for the entire drive.
+	// All agent-supplied paths are validated to stay within this prefix.
+	RootPath string `json:"root_path,omitempty"`
 }

@@ -17,6 +17,8 @@ export interface FieldDef {
   disabledWhen?: { key: string; value: string; hint?: string };
   /** Hide in an "Advanced" collapsible section — for rarely-needed fields */
   advanced?: boolean;
+  /** When true, the textarea value is JSON-parsed before submit (e.g. arrays of objects). */
+  jsonValue?: boolean;
 }
 
 // --- Shared option lists ---
@@ -341,8 +343,9 @@ export const configSchema: Record<string, FieldDef[]> = {
     { key: "group_stream", label: "Group Streaming", type: "boolean", defaultValue: false, help: "Progressively update the reply message as the LLM generates (channels)" },
     { key: "thread_ttl", label: "Thread Participation TTL (minutes)", type: "number", defaultValue: 10, help: "Minutes before bot stops auto-replying in threads it participated in. 0 = always require @mention." },
     { key: "allow_from", label: "Allowed Users", type: "tags", help: "Teams user AAD object IDs or UPNs allowed to interact; empty = no allowlist filter" },
-    { key: "allowed_site_ids", label: "Allowed SharePoint Site IDs", type: "tags", help: "SharePoint site IDs the bot may read files from" },
+    { key: "allowed_site_ids", label: "Allowed SharePoint Site IDs", type: "tags", help: "SharePoint site IDs the bot may read files from (cơ chế 4a: file đính kèm/link trong chat)" },
     { key: "allowed_hosts", label: "Allowed Hosts", type: "tags", help: "Additional hostnames allowed for resource access" },
+    { key: "sharepoint_drives", label: "SharePoint Drives (JSON)", type: "textarea", jsonValue: true, help: 'Danh sách drive để agent chủ động đọc folder SharePoint (tool sharepoint_read). Nhập JSON array, ví dụ:\n[{"drive_id":"b!abc...","label":"Team Documents","root_path":"/"}]' },
     { key: "webhook_url_help", label: "Webhook URL", type: "text", advanced: true, defaultValue: "<public>/v1/channels/msteams/messages", help: "Register this endpoint as your Azure Bot messaging URL. Replace <public> with your gateway's public URL." },
     ...chatBehaviorOverrideFields,
   ],

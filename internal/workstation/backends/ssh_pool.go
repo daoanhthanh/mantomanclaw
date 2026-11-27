@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strings"
 	"sync"
 	"time"
 
@@ -37,9 +38,21 @@ var ErrPoolExhausted = errors.New("ssh client pool exhausted: too many concurren
 // ErrCircuitOpen is returned when the circuit breaker has tripped due to repeated auth failures.
 var ErrCircuitOpen = errors.New("ssh auth circuit open: too many consecutive failures")
 
-// pooledClient tracks a live *ssh.Client with reference counting and last-use timestamp.
+// Jump-connection keepalive tuning. Variables so tests can shorten them.
+var (
+	// keepaliveInterval is how often a jump client is probed.
+	keepaliveInterval = 30 * time.Second
+	// keepaliveReplyTimeout bounds one probe round trip.
+	keepaliveReplyTimeout = 10 * time.Second
+)
+
+// keepaliveMaxFailures consecutive failed probes evict the connection pair.
+const keepaliveMaxFailures = 2
+
+// pooledClient tracks a live connection (target client plus optional jump client)
+// with reference counting and last-use timestamp.
 type pooledClient struct {
-	client  *ssh.Client
+	conn    *sshConn
 	refCnt  int
 	lastUse time.Time
 }
@@ -113,7 +126,7 @@ func (p *clientPool) Get(
 		if pc.refCnt < maxClientsPerWorkstation {
 			pc.refCnt++
 			pc.lastUse = time.Now()
-			client := pc.client
+			client := pc.conn.client
 			p.mu.Unlock()
 			release := func() { p.decRef(ws.ID, client) }
 			return client, release, nil
@@ -132,16 +145,21 @@ func (p *clientPool) Get(
 		return nil, nil, ctx.Err()
 	}
 
-	client, err := dialSSH(ctx, meta, keyMaterial)
+	conn, err := dialSSH(ctx, meta, keyMaterial)
 	if err != nil {
 		sem <- struct{}{} // return slot on dial failure
-		p.recordAuthFailure(ws.ID, ws.WorkstationKey, err)
+		// Only credential failures count toward lockout; network, timeout and SSRF
+		// errors are infrastructure transients, not evidence of a bad credential.
+		if countsTowardCircuit(err) {
+			p.recordAuthFailure(ws.ID, ws.WorkstationKey, err)
+		}
 		return nil, nil, fmt.Errorf("ssh[%s]: dial: %w", ws.WorkstationKey, err)
 	}
+	client := conn.client
 
 	p.mu.Lock()
 	p.circuits[ws.ID] = &circuitState{} // reset on success
-	pc := &pooledClient{client: client, refCnt: 1, lastUse: time.Now()}
+	pc := &pooledClient{conn: conn, refCnt: 1, lastUse: time.Now()}
 	p.clients[ws.ID] = append(p.clients[ws.ID], pc)
 	p.mu.Unlock()
 
@@ -164,7 +182,7 @@ func (p *clientPool) decRef(wsID uuid.UUID, client *ssh.Client) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	for _, pc := range p.clients[wsID] {
-		if pc.client == client {
+		if pc.conn.client == client {
 			pc.refCnt--
 			pc.lastUse = time.Now()
 			return
@@ -211,7 +229,7 @@ func (p *clientPool) CloseWorkstation(wsID uuid.UUID) {
 	delete(p.sem, wsID)
 	p.mu.Unlock()
 	for _, pc := range clients {
-		_ = pc.client.Close()
+		pc.conn.Close()
 	}
 }
 
@@ -226,7 +244,7 @@ func (p *clientPool) Close() {
 	p.mu.Unlock()
 	for _, pcs := range all {
 		for _, pc := range pcs {
-			_ = pc.client.Close()
+			pc.conn.Close()
 		}
 	}
 }
@@ -252,7 +270,7 @@ func (p *clientPool) prune() {
 		kept := pcs[:0]
 		for _, pc := range pcs {
 			if pc.refCnt == 0 && time.Since(pc.lastUse) > idleTTL {
-				_ = pc.client.Close()
+				pc.conn.Close()
 			} else {
 				kept = append(kept, pc)
 			}

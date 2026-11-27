@@ -62,6 +62,12 @@
     "socketPathPlaceholder": "unix:///var/run/docker.sock",
     "cancel": "Cancel",
     "create": "Create",
+    "jumpHostLabel": "Jump host",
+    "jumpHostOptional": "(optional)",
+    "jumpHostHostLabel": "Jump host",
+    "jumpHostUserLabel": "Jump host user",
+    "jumpFingerprintLabel": "Jump host key fingerprint",
+    "jumpFingerprintHint": "Required. SHA256 fingerprint of the jump host's public key (ssh-keygen -lf). Credentials cross this hop, so trust-on-first-use is not allowed.",
     "errors": {
       "keyRequired": "Workstation key is required.",
       "nameRequired": "Display name is required.",
@@ -72,7 +78,12 @@
       "sshPasswordRequired": "A password is required for password authentication.",
       "dockerContainerRequired": "Container name is required for the Docker backend.",
       "dockerImageRequired": "Image is required for the Docker backend.",
-      "createFailed": "Failed to create workstation."
+      "createFailed": "Failed to create workstation.",
+      "jumpHostUserRequired": "Jump host and its user are required.",
+      "jumpPortRange": "Jump host port must be between 1 and 65535.",
+      "jumpPrivateKeyRequired": "A private key is required for the jump host.",
+      "jumpPasswordRequired": "A password is required for the jump host.",
+      "jumpFingerprintRequired": "The jump host key fingerprint is required."
     }
   },
   "deleteDialog": {

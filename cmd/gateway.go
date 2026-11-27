@@ -902,6 +902,12 @@ func runGateway() {
 			}
 		}
 	}
+	// Wire SharePoint browse func on sharepoint_read tool (MS Teams).
+	if t, ok := toolsReg.Get("sharepoint_read"); ok {
+		if sp, ok := t.(tools.SharepointBrowseFuncAware); ok {
+			sp.SetSharepointBrowseFunc(channelMgr.BrowseSharepoint)
+		}
+	}
 
 	// Load channel instances from DB.
 	var instanceLoader *channels.InstanceLoader

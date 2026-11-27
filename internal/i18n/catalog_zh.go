@@ -298,6 +298,7 @@ func init() {
 		MsgWorkstationRequired:     "Agent 未绑定工作站，请提供 workstation_id",
 		MsgWorkstationAccessDenied: "Agent %s 无权访问工作站 %s",
 		MsgBackendNotReady:         "工作站后端未就绪：%s",
+		MsgWorkstationSSRFBlocked:  "工作站主机被 SSRF 策略拦截：%s",
 
 		MsgHookInvalidMatcher:          "无效的匹配器正则表达式: %s",
 		MsgHookCommandDisabledStandard: "命令类型钩子仅在 Lite 版本可用",

@@ -260,6 +260,20 @@ func IsBlocked(ip net.IP) bool {
 	return isBlocked(ip)
 }
 
+// IsAlwaysBlocked reports whether ip falls in a range that is never a valid
+// outbound destination: link-local (incl. cloud metadata 169.254.169.254),
+// multicast, or unspecified. Unlike IsBlocked it allows loopback and RFC 1918 /
+// ULA ranges and ignores the operator allowlist, so it suits callers whose
+// legitimate targets live on private networks (e.g. SSH workstations).
+func IsAlwaysBlocked(ip net.IP) bool {
+	for _, cidr := range neverAllowlistableCIDRs {
+		if cidr.Contains(ip) {
+			return true
+		}
+	}
+	return false
+}
+
 // redactURL strips query string and userinfo for safe logging.
 func redactURL(rawURL string) string {
 	u, err := url.Parse(rawURL)

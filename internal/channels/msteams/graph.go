@@ -214,3 +214,162 @@ func (g *graphClient) downloadDriveItem(ctx context.Context, item *driveItem, te
 
 	return f.Name(), mimeType, nil
 }
+
+// SharepointItem describes one entry returned by listFolder.
+type SharepointItem struct {
+	Name     string `json:"name"`
+	IsFolder bool   `json:"is_folder"`
+	Size     int64  `json:"size,omitempty"`
+	Modified string `json:"modified,omitempty"`
+}
+
+const maxListFolderItems = 200
+
+// listFolder lists up to maxListFolderItems children of folderPath inside driveID.
+// folderPath "/" or "" means the drive root.
+func (g *graphClient) listFolder(ctx context.Context, driveID, folderPath string) ([]SharepointItem, error) {
+	tok, err := g.tokens.Token(ctx, graphScope)
+	if err != nil {
+		return nil, fmt.Errorf("graph: get token: %w", err)
+	}
+
+	var apiURL string
+	cleanPath := strings.Trim(folderPath, "/")
+	if cleanPath == "" {
+		apiURL = fmt.Sprintf(
+			"https://graph.microsoft.com/v1.0/drives/%s/root/children?$select=name,size,file,folder,lastModifiedDateTime&$top=%d",
+			driveID, maxListFolderItems,
+		)
+	} else {
+		apiURL = fmt.Sprintf(
+			"https://graph.microsoft.com/v1.0/drives/%s/root:/%s:/children?$select=name,size,file,folder,lastModifiedDateTime&$top=%d",
+			driveID, strings.TrimPrefix(cleanPath, "/"), maxListFolderItems,
+		)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, apiURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("graph: build list request: %w", err)
+	}
+	req.Header.Set("Authorization", "Bearer "+tok)
+
+	resp, err := g.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(io.LimitReader(resp.Body, 2<<20))
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("graph list HTTP %d: %s", resp.StatusCode, body)
+	}
+
+	var page struct {
+		Value []struct {
+			Name     string `json:"name"`
+			Size     int64  `json:"size"`
+			Modified string `json:"lastModifiedDateTime"`
+			File     *struct {
+				MimeType string `json:"mimeType"`
+			} `json:"file"`
+			Folder *struct{} `json:"folder"`
+		} `json:"value"`
+	}
+	if err := json.Unmarshal(body, &page); err != nil {
+		return nil, fmt.Errorf("graph: parse list response: %w", err)
+	}
+
+	items := make([]SharepointItem, len(page.Value))
+	for i, v := range page.Value {
+		items[i] = SharepointItem{
+			Name:     v.Name,
+			IsFolder: v.Folder != nil,
+			Size:     v.Size,
+			Modified: v.Modified,
+		}
+	}
+	return items, nil
+}
+
+// readFileContent fetches the content of the file at filePath inside driveID.
+// Returns raw bytes and the MIME type. Errors if the item is a folder or exceeds maxFileSize.
+func (g *graphClient) readFileContent(ctx context.Context, driveID, filePath string) ([]byte, string, error) {
+	tok, err := g.tokens.Token(ctx, graphScope)
+	if err != nil {
+		return nil, "", fmt.Errorf("graph: get token: %w", err)
+	}
+
+	// Fetch metadata first to check size and confirm it is a file.
+	cleanPath := strings.TrimLeft(strings.Trim(filePath, "/"), "/")
+	metaURL := fmt.Sprintf(
+		"https://graph.microsoft.com/v1.0/drives/%s/root:/%s?$select=id,name,size,file",
+		driveID, cleanPath,
+	)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, metaURL, nil)
+	if err != nil {
+		return nil, "", fmt.Errorf("graph: build meta request: %w", err)
+	}
+	req.Header.Set("Authorization", "Bearer "+tok)
+
+	resp, err := g.httpClient.Do(req)
+	if err != nil {
+		return nil, "", err
+	}
+	defer resp.Body.Close()
+	metaBody, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, "", fmt.Errorf("graph meta HTTP %d: %s", resp.StatusCode, metaBody)
+	}
+
+	var meta struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+		Size int64  `json:"size"`
+		File *struct {
+			MimeType string `json:"mimeType"`
+		} `json:"file"`
+	}
+	if err := json.Unmarshal(metaBody, &meta); err != nil {
+		return nil, "", fmt.Errorf("graph: parse meta response: %w", err)
+	}
+	if meta.File == nil {
+		return nil, "", fmt.Errorf("%q is a folder, not a file", filePath)
+	}
+	if meta.Size > maxFileSize {
+		return nil, "", fmt.Errorf("file too large: %d bytes (max %d)", meta.Size, maxFileSize)
+	}
+
+	mimeType := "application/octet-stream"
+	if meta.File.MimeType != "" {
+		mimeType = meta.File.MimeType
+	}
+
+	// Download content via drives/{id}/items/{itemID}/content.
+	contentURL := fmt.Sprintf(
+		"https://graph.microsoft.com/v1.0/drives/%s/items/%s/content",
+		driveID, meta.ID,
+	)
+	req2, err := http.NewRequestWithContext(ctx, http.MethodGet, contentURL, nil)
+	if err != nil {
+		return nil, "", fmt.Errorf("graph: build content request: %w", err)
+	}
+	req2.Header.Set("Authorization", "Bearer "+tok)
+
+	resp2, err := g.httpClient.Do(req2)
+	if err != nil {
+		return nil, "", err
+	}
+	defer resp2.Body.Close()
+
+	if resp2.StatusCode != http.StatusOK {
+		preview, _ := io.ReadAll(io.LimitReader(resp2.Body, 256))
+		return nil, "", fmt.Errorf("graph content HTTP %d: %s", resp2.StatusCode, preview)
+	}
+
+	content, err := io.ReadAll(io.LimitReader(resp2.Body, maxFileSize+1))
+	if err != nil {
+		return nil, "", fmt.Errorf("graph: read content: %w", err)
+	}
+	return content, mimeType, nil
+}

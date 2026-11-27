@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MonitorCog, Plus, RefreshCw, Trash2, ChevronDown, ChevronRight } from "lucide-react";
+import { MonitorCog, Plus, RefreshCw, Trash2, Pencil, ChevronDown, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,7 @@ export function WorkstationsPage() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Workstation | null>(null);
+  const [editTarget, setEditTarget] = useState<Workstation | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   function toggleExpand(id: string) {
@@ -107,6 +108,15 @@ export function WorkstationsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
+                            onClick={() => setEditTarget(ws)}
+                            className="gap-1"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                            {t("actions.edit")}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => setDeleteTarget(ws)}
                             className="gap-1"
                           >
@@ -118,6 +128,14 @@ export function WorkstationsPage() {
                       {isExpanded && (
                         <tr key={`${ws.id}-detail`} className="bg-muted/10">
                           <td colSpan={7} className="px-4 py-4">
+                            {ws.metadataSummary?.jumpHost && (
+                              <p className="mb-3 text-xs text-muted-foreground">
+                                {t("createDialog.jumpHostLabel")}:{" "}
+                                <span className="font-mono">
+                                  {ws.metadataSummary.jumpHost.user}@{ws.metadataSummary.jumpHost.host}:{ws.metadataSummary.jumpHost.port}
+                                </span>
+                              </p>
+                            )}
                             <Tabs defaultValue="activity">
                               <TabsList className="mb-3">
                                 <TabsTrigger value="activity">{t("activity.title")}</TabsTrigger>

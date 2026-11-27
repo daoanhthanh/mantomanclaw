@@ -108,6 +108,16 @@ export function ChannelInstanceFormDialog({
         if (typeof merged[key] === "boolean") merged[key] = String(merged[key]);
         else if (merged[key] === undefined || merged[key] === null) merged[key] = "inherit";
       }
+      // Serialize JSON-value textarea fields back to string for display.
+      const jsonValueKeys = new Set(
+        schema.filter((f: FieldDef) => f.type === "textarea" && f.jsonValue).map((f: FieldDef) => f.key),
+      );
+      for (const key of jsonValueKeys) {
+        const v = merged[key];
+        if (v !== undefined && typeof v !== "string") {
+          merged[key] = JSON.stringify(v, null, 2);
+        }
+      }
       setConfigValues(merged);
       setError("");
       setStep("form");
@@ -151,6 +161,25 @@ export function ChannelInstanceFormDialog({
     }
   };
 
+  // Parse textarea fields that hold JSON arrays/objects before submit.
+  // e.g. sharepoint_drives is stored as a JSON string in the textarea but
+  // the backend expects a parsed array.
+  const coerceJsonTextareas = (cfg: Record<string, unknown>, schema: FieldDef[]) => {
+    const jsonKeys = new Set(
+      schema.filter((f) => f.type === "textarea" && f.jsonValue).map((f) => f.key),
+    );
+    for (const key of jsonKeys) {
+      const v = cfg[key];
+      if (typeof v === "string" && v.trim()) {
+        try {
+          cfg[key] = JSON.parse(v.trim());
+        } catch {
+          // leave as-is; backend will reject with a clear error
+        }
+      }
+    }
+  };
+
   const handleSubmit = form.handleSubmit(async (values) => {
     if (!instance) {
       const schema = credentialsSchema[values.channelType] ?? [];
@@ -165,6 +194,7 @@ export function ChannelInstanceFormDialog({
       Object.entries(configValues).filter(([, v]) => v !== undefined && v !== "" && v !== null),
     );
     coerceSelects(cleanConfig, configSchema[values.channelType] ?? []);
+    coerceJsonTextareas(cleanConfig, configSchema[values.channelType] ?? []);
 
     // Drop the legacy bitrix24 public_url field if it leaked from an older
     // channel row's config — gateway now derives the URL from the portal's
@@ -250,6 +280,7 @@ export function ChannelInstanceFormDialog({
       Object.entries(configValues).filter(([, v]) => v !== undefined && v !== "" && v !== null),
     );
     coerceSelects(cleanConfig, configSchema[channelType] ?? []);
+    coerceJsonTextareas(cleanConfig, configSchema[channelType] ?? []);
     setLoading(true);
     setError("");
     try {

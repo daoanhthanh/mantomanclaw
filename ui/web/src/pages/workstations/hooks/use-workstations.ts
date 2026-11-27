@@ -11,6 +11,23 @@ export type WorkstationBackendType = "ssh" | "docker";
  * verbatim, so any divergence here silently yields undefined rather than a
  * decode error.
  */
+export interface SSHJumpHostSummary {
+  host: string;
+  port: number;
+  user: string;
+  hasKey: boolean;
+}
+
+export interface MetadataSummary {
+  host?: string;
+  port?: number;
+  user?: string;
+  hasKey?: boolean;
+  jumpHost?: SSHJumpHostSummary;
+  image?: string;
+  containerName?: string;
+}
+
 export interface Workstation {
   id: string;
   workstationKey: string;
@@ -19,6 +36,7 @@ export interface Workstation {
   active: boolean;
   createdAt: string;
   updatedAt: string;
+  metadataSummary?: MetadataSummary;
 }
 
 export interface CreateWorkstationParams {

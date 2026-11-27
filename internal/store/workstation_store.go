@@ -1,12 +1,16 @@
 package store
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/nextlevelbuilder/goclaw/internal/security"
 )
 
 // SanitizedWorkstation is the safe API view of a Workstation — no secret fields.
@@ -121,6 +125,32 @@ type SSHMetadata struct {
 	KnownHostsFingerprint string `json:"knownHostsFingerprint,omitempty"`
 	// ConnectTimeoutSec overrides the default 10s TCP dial timeout.
 	ConnectTimeoutSec int `json:"connectTimeoutSec,omitempty"`
+	// JumpHost is an optional single bastion the gateway dials first; the target is
+	// then reached through a direct-tcpip channel opened on it.
+	JumpHost *SSHJumpHost `json:"jumpHost,omitempty"`
+}
+
+// SSHJumpHost describes the bastion hop. It intentionally has no JumpHost field of
+// its own: nested/multi-hop chains are rejected by shape (unknown keys are refused
+// when parsing). KnownHostsFingerprint is mandatory — credentials cross this hop, so
+// TOFU is not acceptable.
+type SSHJumpHost struct {
+	Host                  string `json:"host"`
+	Port                  int    `json:"port"`
+	User                  string `json:"user"`
+	PrivateKey            string `json:"privateKey,omitempty"`
+	Password              string `json:"password,omitempty"`
+	KnownHostsFingerprint string `json:"knownHostsFingerprint"`
+}
+
+// checkLiteralHost rejects literal IPs that are never valid SSH destinations
+// (link-local/cloud-metadata, multicast, unspecified). Hostnames are not resolved here;
+// the dial layer re-checks the resolved address.
+func checkLiteralHost(field, host string) error {
+	if ip := net.ParseIP(host); ip != nil && security.IsAlwaysBlocked(ip) {
+		return fmt.Errorf("%s %s is a cloud-metadata or link-local address", field, host)
+	}
+	return nil
 }
 
 // DockerMetadata contains Docker-specific connection parameters.
@@ -152,7 +182,54 @@ func UnmarshalSSHMetadata(raw []byte) (*SSHMetadata, error) {
 	if m.PrivateKey == "" && m.Password == "" {
 		return nil, fmt.Errorf("privateKey or password is required")
 	}
+	if err := checkLiteralHost("host", m.Host); err != nil {
+		return nil, err
+	}
+	if m.JumpHost != nil {
+		if err := validateJumpHost(raw, m.JumpHost); err != nil {
+			return nil, err
+		}
+	}
 	return &m, nil
+}
+
+// validateJumpHost enforces the jump host shape: strict keys (no nesting), required
+// fields, a credential, and a pinned fingerprint. Defaults the port to 22.
+func validateJumpHost(raw []byte, j *SSHJumpHost) error {
+	var envelope struct {
+		JumpHost json.RawMessage `json:"jumpHost"`
+	}
+	if err := json.Unmarshal(raw, &envelope); err != nil {
+		return fmt.Errorf("jumpHost: %w", err)
+	}
+	dec := json.NewDecoder(bytes.NewReader(envelope.JumpHost))
+	dec.DisallowUnknownFields()
+	var strict SSHJumpHost
+	if err := dec.Decode(&strict); err != nil {
+		return fmt.Errorf("jumpHost: %w", err)
+	}
+	if j.Host == "" {
+		return fmt.Errorf("jumpHost: host is required")
+	}
+	if j.User == "" {
+		return fmt.Errorf("jumpHost: user is required")
+	}
+	if j.Port == 0 {
+		j.Port = 22
+	}
+	if j.Port < 1 || j.Port > 65535 {
+		return fmt.Errorf("jumpHost: port %d out of range", j.Port)
+	}
+	if j.PrivateKey == "" && j.Password == "" {
+		return fmt.Errorf("jumpHost: privateKey or password is required")
+	}
+	if j.KnownHostsFingerprint == "" {
+		return fmt.Errorf("jumpHost: knownHostsFingerprint is required (TOFU is not allowed for jump hosts)")
+	}
+	if err := checkLiteralHost("jumpHost.host", j.Host); err != nil {
+		return err
+	}
+	return nil
 }
 
 // UnmarshalDockerMetadata parses and validates Docker metadata bytes.

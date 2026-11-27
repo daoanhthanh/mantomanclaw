@@ -16,6 +16,14 @@ function form(overrides: Partial<WorkstationCreateFormState> = {}): WorkstationC
     authMethod: "privateKey",
     privateKey: "-----BEGIN OPENSSH PRIVATE KEY-----\nabc\n-----END OPENSSH PRIVATE KEY-----",
     password: "",
+    jumpEnabled: false,
+    jumpHost: "",
+    jumpPort: "22",
+    jumpUser: "",
+    jumpAuthMethod: "privateKey",
+    jumpPrivateKey: "",
+    jumpPassword: "",
+    jumpFingerprint: "",
     container: "",
     image: "",
     socketPath: "",
@@ -99,6 +107,64 @@ describe("workstation create payload contract", () => {
       kind: "error",
       errorKey: "keyRequired",
     });
+  });
+});
+
+describe("workstation jump host payload", () => {
+  const jump = {
+    jumpEnabled: true,
+    jumpHost: "bastion.example.com",
+    jumpPort: "2222",
+    jumpUser: "jumper",
+    jumpAuthMethod: "password" as const,
+    jumpPassword: "s3cret",
+    jumpFingerprint: "SHA256:abcdef",
+  };
+
+  it("omits jumpHost entirely when the section is disabled", () => {
+    const result = buildWorkstationCreatePayload(form({ jumpHost: "ignored", jumpEnabled: false }));
+    if (result.kind !== "ok") throw new Error("expected ok");
+    expect(result.payload.metadata).not.toHaveProperty("jumpHost");
+  });
+
+  // The same JSON is asserted by TestUnmarshalSSHMetadata_JumpHost in internal/store.
+  it("emits the metadata.jumpHost shape the gateway validator accepts", () => {
+    const result = buildWorkstationCreatePayload(form(jump));
+    if (result.kind !== "ok") throw new Error("expected ok");
+    expect(result.payload.metadata).toMatchObject({
+      jumpHost: {
+        host: "bastion.example.com",
+        port: 2222,
+        user: "jumper",
+        password: "s3cret",
+        knownHostsFingerprint: "SHA256:abcdef",
+      },
+    });
+  });
+
+  it("blocks submission without a jump fingerprint (TOFU is not allowed)", () => {
+    expect(buildWorkstationCreatePayload(form({ ...jump, jumpFingerprint: " " }))).toEqual({
+      kind: "error",
+      errorKey: "jumpFingerprintRequired",
+    });
+  });
+
+  it("validates jump host, user, port and credential", () => {
+    expect(buildWorkstationCreatePayload(form({ ...jump, jumpUser: "" }))).toEqual({
+      kind: "error",
+      errorKey: "jumpHostUserRequired",
+    });
+    expect(buildWorkstationCreatePayload(form({ ...jump, jumpPort: "70000" }))).toEqual({
+      kind: "error",
+      errorKey: "jumpPortRange",
+    });
+    expect(buildWorkstationCreatePayload(form({ ...jump, jumpPassword: "" }))).toEqual({
+      kind: "error",
+      errorKey: "jumpPasswordRequired",
+    });
+    expect(
+      buildWorkstationCreatePayload(form({ ...jump, jumpAuthMethod: "privateKey", jumpPrivateKey: "" })),
+    ).toEqual({ kind: "error", errorKey: "jumpPrivateKeyRequired" });
   });
 });
 

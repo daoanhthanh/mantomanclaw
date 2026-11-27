@@ -845,3 +845,13 @@ func Truncate(s string, maxLen int) string {
 	}
 	return s[:maxLen] + "..."
 }
+
+// SharepointBrowser is optionally implemented by channels that support
+// proactive SharePoint folder browsing via the sharepoint_read tool.
+type SharepointBrowser interface {
+	// BrowseSharepoint performs a list_folder or read_file action on a configured drive.
+	// action: "list_drives" | "list_folder" | "read_file"
+	// driveLabel: label from sharepoint_drives config (empty = first drive)
+	// path: folder or file path relative to the drive root
+	BrowseSharepoint(ctx context.Context, action, driveLabel, path string) (string, error)
+}

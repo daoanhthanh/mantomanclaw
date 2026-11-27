@@ -62,6 +62,12 @@
     "socketPathPlaceholder": "unix:///var/run/docker.sock",
     "cancel": "Hủy",
     "create": "Tạo",
+    "jumpHostLabel": "Jump host",
+    "jumpHostOptional": "(tùy chọn)",
+    "jumpHostHostLabel": "Jump host",
+    "jumpHostUserLabel": "User của jump host",
+    "jumpFingerprintLabel": "Fingerprint khóa của jump host",
+    "jumpFingerprintHint": "Bắt buộc. Fingerprint SHA256 của khóa công khai jump host (ssh-keygen -lf). Thông tin xác thực đi qua chặng này nên không cho phép tin tưởng ở lần kết nối đầu.",
     "errors": {
       "keyRequired": "Vui lòng nhập khóa workstation.",
       "nameRequired": "Vui lòng nhập tên hiển thị.",
@@ -72,7 +78,12 @@
       "sshPasswordRequired": "Cần mật khẩu khi xác thực bằng mật khẩu.",
       "dockerContainerRequired": "Backend Docker yêu cầu tên container.",
       "dockerImageRequired": "Backend Docker yêu cầu image.",
-      "createFailed": "Tạo workstation thất bại."
+      "createFailed": "Tạo workstation thất bại.",
+      "jumpHostUserRequired": "Cần nhập jump host và user của nó.",
+      "jumpPortRange": "Cổng jump host phải nằm trong khoảng 1 đến 65535.",
+      "jumpPrivateKeyRequired": "Cần khóa riêng tư cho jump host.",
+      "jumpPasswordRequired": "Cần mật khẩu cho jump host.",
+      "jumpFingerprintRequired": "Cần fingerprint khóa của jump host."
     }
   },
   "deleteDialog": {

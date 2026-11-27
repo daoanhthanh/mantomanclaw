@@ -271,6 +271,7 @@ func init() {
 		MsgWorkstationRequired:     "к агенту не привязана рабочая станция; передайте workstation_id",
 		MsgWorkstationAccessDenied: "агент %s не имеет доступа к рабочей станции %s",
 		MsgBackendNotReady:         "бэкенд рабочей станции не готов: %s",
+		MsgWorkstationSSRFBlocked:  "хост рабочей станции заблокирован политикой SSRF: %s",
 
 		// Webhooks
 		MsgWebhookAuthFailed:                  "аутентификация вебхука не удалась",
