@@ -199,8 +199,7 @@ func (h *WorkstationsHandler) handleUpdate(w http.ResponseWriter, r *http.Reques
 			i18n.T(locale, i18n.MsgNoUpdatesProvided))
 		return
 	}
-	// I2 fix: validate metadata shape when metadata is being updated.
-	// Fetch current workstation to obtain backend_type for validation.
+	// Validate metadata shape and merge stored credentials when metadata is being updated.
 	if _, hasMetadata := updates["metadata"]; hasMetadata {
 		current, err := h.wsStore.GetByID(ctx, id)
 		if err != nil {
@@ -218,6 +217,19 @@ func (h *WorkstationsHandler) handleUpdate(w http.ResponseWriter, r *http.Reques
 			writeError(w, http.StatusBadRequest, protocol.ErrInvalidRequest,
 				i18n.T(locale, i18n.MsgInvalidMetadataShape, string(current.BackendType), err.Error()))
 			return
+		}
+		if current.BackendType == store.BackendSSH {
+			var incoming store.SSHMetadata
+			if err := json.Unmarshal(metaBytes, &incoming); err == nil {
+				storedMeta, serr := store.UnmarshalSSHMetadata(current.Metadata)
+				if serr == nil {
+					store.MergeSSHMetadataCredentials(&incoming, storedMeta)
+					if merged, merr := json.Marshal(incoming); merr == nil {
+						updates["metadata"] = json.RawMessage(merged)
+						metaBytes = merged
+					}
+				}
+			}
 		}
 		if err := store.ValidateMetadata(current.BackendType, metaBytes); err != nil {
 			writeError(w, http.StatusBadRequest, protocol.ErrInvalidRequest,

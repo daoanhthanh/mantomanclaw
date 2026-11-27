@@ -207,13 +207,13 @@ func wireWorkstationTools(
 	pgStores *store.Stores,
 	toolsReg *tools.Registry,
 	domainBus eventbus.DomainEventBus,
-) func() {
+) (*workstation.BackendCache, func()) {
 	if edition.Current().Name != "standard" {
-		return func() {}
+		return nil, func() {}
 	}
 	if pgStores.Workstations == nil || pgStores.WorkstationLinks == nil {
 		slog.Warn("workstation tools skipped: workstation stores not initialised")
-		return func() {}
+		return nil, func() {}
 	}
 
 	backendCache := workstation.NewBackendCache(pgStores.Workstations, 10*time.Minute)
@@ -285,11 +285,11 @@ func wireWorkstationTools(
 		if pgStores.WorkstationActivity != nil {
 			stopSink := workstation.WireActivitySink(domainBus, pgStores.WorkstationActivity)
 			slog.Info("workstation activity audit sink registered")
-			return func() {
+			return backendCache, func() {
 				stopSink()
 				pgStores.WorkstationActivity.Stop()
 			}
 		}
 	}
-	return func() {}
+	return backendCache, func() {}
 }

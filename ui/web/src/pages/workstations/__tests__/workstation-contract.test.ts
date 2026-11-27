@@ -27,6 +27,8 @@ function form(overrides: Partial<WorkstationCreateFormState> = {}): WorkstationC
     container: "",
     image: "",
     socketPath: "",
+    knownHostsFingerprint: "",
+    connectTimeoutSec: "",
     ...overrides,
   };
 }

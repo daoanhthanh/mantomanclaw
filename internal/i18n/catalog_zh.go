@@ -299,6 +299,8 @@ func init() {
 		MsgWorkstationAccessDenied: "Agent %s 无权访问工作站 %s",
 		MsgBackendNotReady:         "工作站后端未就绪：%s",
 		MsgWorkstationSSRFBlocked:  "工作站主机被 SSRF 策略拦截：%s",
+		MsgWorkstationTestOK:       "连接成功",
+		MsgWorkstationTestFailed:   "连接测试失败：%s",
 
 		MsgHookInvalidMatcher:          "无效的匹配器正则表达式: %s",
 		MsgHookCommandDisabledStandard: "命令类型钩子仅在 Lite 版本可用",

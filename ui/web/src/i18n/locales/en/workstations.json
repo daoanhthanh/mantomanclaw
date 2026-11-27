@@ -91,6 +91,21 @@
     "description": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
     "confirmLabel": "Delete"
   },
+  "editDialog": {
+    "title": "Edit Workstation",
+    "description": "Update the workstation name, active state, or connection details. SSH keys and passwords are never returned by the API — a green badge means a credential is stored; leave the field blank to keep it.",
+    "activeLabel": "Active",
+    "metadataNote": "SSH keys, passwords and jump host credentials are not shown and cannot be edited here.",
+    "save": "Save",
+    "saveFailed": "Failed to save workstation.",
+    "keyStored": "SSH key stored — upload a new file only to replace it.",
+    "keyReplace": "Upload a new key to replace the stored one (optional).",
+    "passwordStored": "Password stored — enter a new value only to replace it.",
+    "credentialKeepPlaceholder": "Leave blank to keep stored value",
+    "testConnection": "Test connection",
+    "testing": "Testing…",
+    "failed": "Connection failed"
+  },
   "testResult": {
     "success": "Connection successful",
     "notImplemented": "Connection test is not yet available"

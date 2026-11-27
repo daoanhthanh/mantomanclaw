@@ -17,9 +17,81 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-// dialSSH establishes a new *ssh.Client using the provided metadata and key material.
-// Context cancellation aborts the dial; the spawned goroutine cleans up on its own.
-func dialSSH(ctx context.Context, meta *store.SSHMetadata, keyMaterial []byte) (*ssh.Client, error) {
+const (
+	hopTarget = "target"
+	hopJump   = "jump"
+)
+
+var (
+	// errWorkstationSSRFBlocked marks a dial refused because the hop resolved to a
+	// link-local, cloud-metadata, multicast or unspecified address.
+	errWorkstationSSRFBlocked = errors.New("workstation host blocked by SSRF policy")
+	// errHostKeyMismatch marks a pinned host-key fingerprint that did not match.
+	errHostKeyMismatch = errors.New("ssh host key mismatch")
+)
+
+// lookupHost resolves a hostname to IP strings. A variable so tests can stub DNS.
+var lookupHost = func(ctx context.Context, host string) ([]string, error) {
+	return net.DefaultResolver.LookupHost(ctx, host)
+}
+
+// ssrfError carries the localized message while matching errWorkstationSSRFBlocked.
+type ssrfError struct{ msg string }
+
+func (e *ssrfError) Error() string        { return e.msg }
+func (e *ssrfError) Is(target error) bool { return target == errWorkstationSSRFBlocked }
+
+// hopError attributes a dial failure to a hop (jump/target) and a stage.
+type hopError struct {
+	hop   string
+	stage string
+	err   error
+}
+
+func (e *hopError) Error() string { return e.stage + ": " + e.err.Error() }
+func (e *hopError) Unwrap() error { return e.err }
+
+// sshConn owns every SSH client opened for one logical connection. For a jump
+// workstation, client rides on a channel of jump; Close tears down target first.
+type sshConn struct {
+	client *ssh.Client
+	jump   *ssh.Client // nil for direct connections
+	// closeTarget and closeJump are the close steps, run in that order. closeJump is
+	// nil for direct connections.
+	closeTarget func() error
+	closeJump   func() error
+	// done is closed by Close; the keepalive goroutine exits on it.
+	done      chan struct{}
+	closeOnce sync.Once
+}
+
+func newSSHConn(client, jump *ssh.Client) *sshConn {
+	c := &sshConn{client: client, jump: jump, done: make(chan struct{}), closeTarget: client.Close}
+	if jump != nil {
+		c.closeJump = jump.Close
+	}
+	return c
+}
+
+// Close closes the target client first, then the jump client. Idempotent.
+func (c *sshConn) Close() {
+	c.closeOnce.Do(func() {
+		close(c.done)
+		_ = c.closeTarget()
+		if c.closeJump != nil {
+			_ = c.closeJump()
+		}
+	})
+}
+
+// dialSSH establishes a new SSH connection, through the jump host when configured.
+// Every hop is SSRF-checked (resolve once, dial the pinned IP) and host-key pinned.
+// Cancelling ctx or exceeding the connect timeout aborts the handshake and closes
+// every connection opened so far.
+//
+// Key material for the jump host is read from meta.JumpHost; Go cannot guarantee
+// the strings are zeroed after use.
+func dialSSH(ctx context.Context, meta *store.SSHMetadata, keyMaterial []byte) (*sshConn, error) {
 	timeout := time.Duration(meta.ConnectTimeoutSec) * time.Second
 	if timeout <= 0 {
 		timeout = 10 * time.Second

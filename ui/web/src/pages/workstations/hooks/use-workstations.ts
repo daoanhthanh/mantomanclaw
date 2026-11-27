@@ -16,16 +16,24 @@ export interface SSHJumpHostSummary {
   port: number;
   user: string;
   hasKey: boolean;
+  hasPassword: boolean;
+  knownHostsFingerprint: string;
 }
 
 export interface MetadataSummary {
+  // SSH
   host?: string;
   port?: number;
   user?: string;
   hasKey?: boolean;
+  hasPassword?: boolean;
+  knownHostsFingerprint?: string;
+  connectTimeoutSec?: number;
   jumpHost?: SSHJumpHostSummary;
+  // Docker
   image?: string;
   containerName?: string;
+  socketPath?: string;
 }
 
 export interface Workstation {
@@ -104,6 +112,13 @@ export function useWorkstations() {
     [ws, load],
   );
 
+  const testWorkstation = useCallback(
+    async (id: string): Promise<void> => {
+      await ws.call(Methods.WORKSTATIONS_TEST, { id });
+    },
+    [ws],
+  );
+
   return {
     workstations,
     loading,
@@ -112,5 +127,6 @@ export function useWorkstations() {
     createWorkstation,
     updateWorkstation,
     deleteWorkstation,
+    testWorkstation,
   };
 }

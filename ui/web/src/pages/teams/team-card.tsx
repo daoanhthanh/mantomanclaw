@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Users, Trash2, Bot, Crown } from "lucide-react";
+import { Users, Trash2, Crown } from "lucide-react";
+import { AgentIcon } from "@/components/agents/agent-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatRelativeTime } from "@/lib/format";
@@ -18,13 +19,7 @@ function MemberChip({ member, isLead }: { member: TeamMemberData; isLead: boolea
   const name = member.display_name || member.agent_key || "?";
   return (
     <div className="flex items-start gap-2 rounded-lg bg-muted/50 px-2.5 py-1.5">
-      {member.emoji ? (
-        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center text-sm leading-none">
-          {member.emoji}
-        </span>
-      ) : (
-        <Bot className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-      )}
+      <AgentIcon emoji={member.emoji ?? undefined} size="sm" className="mt-0.5 shrink-0 text-muted-foreground" />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1">
           <span className="truncate text-xs font-medium">{name}</span>

@@ -147,7 +147,7 @@ func (g *graphClient) siteAllowed(siteID string) bool {
 	if g.allowedSiteIDs[siteID] {
 		return true
 	}
-	for _, part := range strings.Split(siteID, ",") {
+	for part := range strings.SplitSeq(siteID, ",") {
 		if part != "" && g.allowedSiteIDs[part] {
 			return true
 		}

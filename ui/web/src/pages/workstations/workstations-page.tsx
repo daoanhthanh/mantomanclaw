@@ -17,7 +17,7 @@ import { WorkstationActivityTab } from "./workstation-activity-tab";
 
 export function WorkstationsPage() {
   const { t } = useTranslation("workstations");
-  const { workstations, loading, refresh, createWorkstation, deleteWorkstation } = useWorkstations();
+  const { workstations, loading, refresh, createWorkstation, updateWorkstation, deleteWorkstation, testWorkstation } = useWorkstations();
 
   const spinning = useMinLoading(loading);
   const isEmpty = workstations.length === 0;
@@ -157,10 +157,21 @@ export function WorkstationsPage() {
       </div>
 
       <WorkstationCreateDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
+        open={createOpen || !!editTarget}
+        onOpenChange={(v) => {
+          if (!v) { setCreateOpen(false); setEditTarget(null); }
+          else setCreateOpen(true);
+        }}
         onCreate={async (params) => {
           await createWorkstation(params);
+        }}
+        editTarget={editTarget}
+        onUpdate={async (id, params) => {
+          await updateWorkstation(id, params);
+          setEditTarget(null);
+        }}
+        onTest={async (id) => {
+          await testWorkstation(id);
         }}
       />
 

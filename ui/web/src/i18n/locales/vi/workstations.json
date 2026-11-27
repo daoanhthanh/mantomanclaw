@@ -91,6 +91,21 @@
     "description": "Bạn có chắc muốn xóa \"{{name}}\"? Thao tác này không thể hoàn tác.",
     "confirmLabel": "Xóa"
   },
+  "editDialog": {
+    "title": "Sửa Workstation",
+    "description": "Cập nhật tên, trạng thái hoặc thông tin kết nối của workstation. Khóa SSH và mật khẩu không được trả về qua API — huy hiệu xanh nghĩa là thông tin xác thực đã được lưu; để trống để giữ nguyên.",
+    "activeLabel": "Hoạt động",
+    "metadataNote": "Khóa SSH, mật khẩu và thông tin jump host không hiển thị và không thể sửa tại đây.",
+    "save": "Lưu",
+    "saveFailed": "Lưu workstation thất bại.",
+    "keyStored": "Đã lưu khóa SSH — tải lên tệp mới chỉ khi muốn thay thế.",
+    "keyReplace": "Tải lên khóa mới để thay thế khóa đã lưu (tùy chọn).",
+    "passwordStored": "Đã lưu mật khẩu — nhập giá trị mới chỉ khi muốn thay thế.",
+    "credentialKeepPlaceholder": "Để trống để giữ giá trị đã lưu",
+    "testConnection": "Kiểm tra kết nối",
+    "testing": "Đang kiểm tra…",
+    "failed": "Kết nối thất bại"
+  },
   "testResult": {
     "success": "Kết nối thành công",
     "notImplemented": "Tính năng kiểm tra kết nối chưa khả dụng"

@@ -526,7 +526,7 @@ func runGateway() {
 
 	// Register workstation_exec + claude_remote tools (Standard edition only; deny-all until Phase 6).
 	// cleanupWorkstation stops the activity sink retention goroutine and drains the write buffer.
-	cleanupWorkstation := wireWorkstationTools(pgStores, toolsReg, domainBus)
+	wsBackendCache, cleanupWorkstation := wireWorkstationTools(pgStores, toolsReg, domainBus)
 	defer cleanupWorkstation()
 
 	// Create all agents — resolved lazily from database by the managed resolver.
@@ -782,6 +782,9 @@ func runGateway() {
 		}
 		if pgStores.WorkstationActivity != nil {
 			wsMethods.SetActivityStore(pgStores.WorkstationActivity)
+		}
+		if wsBackendCache != nil {
+			wsMethods.SetBackendCache(wsBackendCache)
 		}
 		wsMethods.Register(server.Router())
 		slog.Info("registered workstations RPC methods")

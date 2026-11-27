@@ -91,6 +91,21 @@
     "description": "确定要删除「{{name}}」吗？此操作无法撤销。",
     "confirmLabel": "删除"
   },
+  "editDialog": {
+    "title": "编辑工作站",
+    "description": "更新工作站名称、活跃状态或连接信息。SSH 密钥和密码不会通过 API 返回 — 绿色徽章表示已存储凭据；留空表示保留现有值。",
+    "activeLabel": "活跃",
+    "metadataNote": "SSH 密钥、密码及跳板机凭据不显示，也无法在此处编辑。",
+    "save": "保存",
+    "saveFailed": "保存工作站失败。",
+    "keyStored": "SSH 密钥已存储 — 仅在需要替换时上传新文件。",
+    "keyReplace": "上传新密钥以替换已存储的密钥（可选）。",
+    "passwordStored": "密码已存储 — 仅在需要替换时输入新值。",
+    "credentialKeepPlaceholder": "留空以保留已存储的值",
+    "testConnection": "测试连接",
+    "testing": "测试中…",
+    "failed": "连接失败"
+  },
   "testResult": {
     "success": "连接成功",
     "notImplemented": "连接测试功能暂未开放"

@@ -273,6 +273,8 @@ func init() {
 		MsgWorkstationAccessDenied: "agent %s not authorized for workstation %s",
 		MsgBackendNotReady:         "workstation backend not ready: %s",
 		MsgWorkstationSSRFBlocked:  "workstation host blocked by SSRF policy: %s",
+		MsgWorkstationTestOK:       "Connection successful",
+		MsgWorkstationTestFailed:   "Connection test failed: %s",
 
 		// Webhooks
 		MsgWebhookAuthFailed:                  "webhook authentication failed",

@@ -82,10 +82,24 @@ func (ws *Workstation) SanitizedView() *SanitizedWorkstation {
 	case BackendSSH:
 		if m, err := UnmarshalSSHMetadata(ws.Metadata); err == nil {
 			sv.MetadataSummary = map[string]any{
-				"host":   m.Host,
-				"port":   m.Port,
-				"user":   m.User,
-				"hasKey": m.PrivateKey != "",
+				"host":                  m.Host,
+				"port":                  m.Port,
+				"user":                  m.User,
+				"hasKey":                m.PrivateKey != "",
+				"hasPassword":           m.Password != "",
+				"knownHostsFingerprint": m.KnownHostsFingerprint,
+				"connectTimeoutSec":     m.ConnectTimeoutSec,
+			}
+			// Never include key/password/fingerprint values for the jump host.
+			if m.JumpHost != nil {
+				sv.MetadataSummary["jumpHost"] = map[string]any{
+					"host":                  m.JumpHost.Host,
+					"port":                  m.JumpHost.Port,
+					"user":                  m.JumpHost.User,
+					"hasKey":                m.JumpHost.PrivateKey != "",
+					"hasPassword":           m.JumpHost.Password != "",
+					"knownHostsFingerprint": m.JumpHost.KnownHostsFingerprint,
+				}
 			}
 		}
 	case BackendDocker:
@@ -93,6 +107,7 @@ func (ws *Workstation) SanitizedView() *SanitizedWorkstation {
 			sv.MetadataSummary = map[string]any{
 				"image":         m.Image,
 				"containerName": m.Host,
+				"socketPath":    m.SocketPath,
 			}
 		}
 	}
@@ -259,6 +274,40 @@ func ValidateMetadata(backend WorkstationBackend, raw []byte) error {
 		return err
 	default:
 		return fmt.Errorf("unknown backend: %s", backend)
+	}
+}
+
+// MergeSSHMetadataCredentials fills blank credential fields in incoming with the
+// corresponding values from stored. This lets an edit request omit credentials
+// that haven't changed: the UI sends an empty string; the server keeps the old value.
+//
+// Fields merged: PrivateKey, Password, KnownHostsFingerprint.
+// If incoming has a non-empty value it is kept; stored value fills only blanks.
+// For JumpHost, the same rule applies field-by-field; a nil incoming JumpHost
+// leaves the stored jump host intact, an explicit incoming JumpHost overrides it.
+func MergeSSHMetadataCredentials(incoming *SSHMetadata, stored *SSHMetadata) {
+	if stored == nil {
+		return
+	}
+	if incoming.PrivateKey == "" {
+		incoming.PrivateKey = stored.PrivateKey
+	}
+	if incoming.Password == "" {
+		incoming.Password = stored.Password
+	}
+	if incoming.KnownHostsFingerprint == "" {
+		incoming.KnownHostsFingerprint = stored.KnownHostsFingerprint
+	}
+	if incoming.JumpHost != nil && stored.JumpHost != nil {
+		if incoming.JumpHost.PrivateKey == "" {
+			incoming.JumpHost.PrivateKey = stored.JumpHost.PrivateKey
+		}
+		if incoming.JumpHost.Password == "" {
+			incoming.JumpHost.Password = stored.JumpHost.Password
+		}
+		if incoming.JumpHost.KnownHostsFingerprint == "" {
+			incoming.JumpHost.KnownHostsFingerprint = stored.JumpHost.KnownHostsFingerprint
+		}
 	}
 }
 

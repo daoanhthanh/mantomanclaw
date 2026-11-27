@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 
+	"time"
+
 	"github.com/google/uuid"
 
 	"github.com/nextlevelbuilder/goclaw/internal/gateway"
@@ -23,6 +25,7 @@ type WorkstationsMethods struct {
 	linkStore     store.AgentWorkstationLinkStore
 	permStore     store.WorkstationPermissionStore     // may be nil if Phase 6 not wired
 	activityStore store.WorkstationActivityStore       // may be nil if Phase 7 not wired
+	backendCache  *workstation.BackendCache             // may be nil; wired via SetBackendCache
 }
 
 // NewWorkstationsMethods creates WorkstationsMethods with the given stores.
@@ -38,6 +41,12 @@ func (m *WorkstationsMethods) SetPermStore(ps store.WorkstationPermissionStore) 
 // SetActivityStore wires the activity store for audit log methods (Phase 7).
 func (m *WorkstationsMethods) SetActivityStore(as store.WorkstationActivityStore) {
 	m.activityStore = as
+}
+
+// SetBackendCache wires the BackendCache so handleTestConnection can reuse
+// the same pool that the exec tool uses, avoiding redundant dial overhead.
+func (m *WorkstationsMethods) SetBackendCache(c *workstation.BackendCache) {
+	m.backendCache = c
 }
 
 // Register wires the workstations.* methods onto the router.
@@ -204,8 +213,9 @@ func (m *WorkstationsMethods) handleUpdate(ctx context.Context, client *gateway.
 			i18n.T(locale, i18n.MsgNoUpdatesProvided)))
 		return
 	}
-	// I2 fix: validate metadata shape when metadata is being updated.
-	// Fetch current workstation to obtain backend_type for validation.
+	// Validate metadata shape and merge stored credentials when metadata is being updated.
+	// Merge: blank credential fields in the incoming metadata are filled from the stored
+	// record so the UI can send an empty string for fields that haven't changed.
 	if _, hasMetadata := params.Updates["metadata"]; hasMetadata {
 		current, err := m.wsStore.GetByID(ctx, id)
 		if err != nil {
@@ -223,6 +233,19 @@ func (m *WorkstationsMethods) handleUpdate(ctx context.Context, client *gateway.
 			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest,
 				i18n.T(locale, i18n.MsgInvalidMetadataShape, string(current.BackendType), err.Error())))
 			return
+		}
+		if current.BackendType == store.BackendSSH {
+			var incoming store.SSHMetadata
+			if err := json.Unmarshal(metaBytes, &incoming); err == nil {
+				storedMeta, serr := store.UnmarshalSSHMetadata(current.Metadata)
+				if serr == nil {
+					store.MergeSSHMetadataCredentials(&incoming, storedMeta)
+					if merged, merr := json.Marshal(incoming); merr == nil {
+						params.Updates["metadata"] = json.RawMessage(merged)
+						metaBytes = merged
+					}
+				}
+			}
 		}
 		if err := store.ValidateMetadata(current.BackendType, metaBytes); err != nil {
 			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest,
@@ -263,11 +286,75 @@ func (m *WorkstationsMethods) handleDelete(ctx context.Context, client *gateway.
 	client.SendResponse(protocol.NewOKResponse(req.ID, map[string]any{"id": id}))
 }
 
-// handleTestConnection is a stub — real implementation in Phase 2/3.
+// handleTestConnection dials the workstation (via its BackendCache entry) and
+// runs a lightweight health check. If the BackendCache is not wired it falls back
+// to opening a fresh backend directly so the method works even without the exec tool.
 func (m *WorkstationsMethods) handleTestConnection(ctx context.Context, client *gateway.Client, req *protocol.RequestFrame) {
 	locale := store.LocaleFromContext(ctx)
-	client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrNotImplemented,
-		i18n.T(locale, i18n.MsgNotImplemented, "workstations.testConnection")))
+
+	var params struct {
+		ID string `json:"id"`
+	}
+	if req.Params != nil {
+		if err := json.Unmarshal(req.Params, &params); err != nil {
+			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest,
+				i18n.T(locale, i18n.MsgInvalidID, "workstation")))
+			return
+		}
+	}
+	wsID, err := uuid.Parse(params.ID)
+	if err != nil {
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest,
+			i18n.T(locale, i18n.MsgInvalidID, "workstation")))
+		return
+	}
+
+	// Verify the workstation belongs to this tenant.
+	ws, err := m.wsStore.GetByID(ctx, wsID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrNotFound,
+				i18n.T(locale, i18n.MsgWorkstationNotFound, params.ID)))
+			return
+		}
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInternal,
+			i18n.T(locale, i18n.MsgInternalError, err.Error())))
+		return
+	}
+	if !ws.Active {
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInvalidRequest,
+			i18n.T(locale, i18n.MsgWorkstationInactive, ws.WorkstationKey)))
+		return
+	}
+
+	// 15-second timeout — enough for a slow bastion chain, not so long it blocks the UI.
+	tctx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	defer cancel()
+
+	var backend workstation.Backend
+	if m.backendCache != nil {
+		backend, err = m.backendCache.Get(tctx, wsID)
+	} else {
+		backend, err = workstation.Open(ws)
+		if err == nil {
+			defer backend.Close()
+		}
+	}
+	if err != nil {
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInternal,
+			i18n.T(locale, i18n.MsgWorkstationTestFailed, err.Error())))
+		return
+	}
+
+	if err := backend.HealthCheck(tctx); err != nil {
+		client.SendResponse(protocol.NewErrorResponse(req.ID, protocol.ErrInternal,
+			i18n.T(locale, i18n.MsgWorkstationTestFailed, err.Error())))
+		return
+	}
+
+	client.SendResponse(protocol.NewOKResponse(req.ID, map[string]any{
+		"message": i18n.T(locale, i18n.MsgWorkstationTestOK),
+	}))
 }
 
 func (m *WorkstationsMethods) handleLinkAgent(ctx context.Context, client *gateway.Client, req *protocol.RequestFrame) {

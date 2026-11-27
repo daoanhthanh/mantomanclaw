@@ -162,6 +162,9 @@ func (p *clientPool) Get(
 	pc := &pooledClient{conn: conn, refCnt: 1, lastUse: time.Now()}
 	p.clients[ws.ID] = append(p.clients[ws.ID], pc)
 	p.mu.Unlock()
+	if conn.jump != nil {
+		go p.keepalive(ws.ID, ws.WorkstationKey, pc, keepaliveInterval, keepaliveReplyTimeout)
+	}
 
 	// I4 fix: wrap release in sync.Once so double-call (e.g. defer + explicit) is idempotent.
 	// Without Once, a double-call would return an extra token to the semaphore, inflating
@@ -190,6 +193,86 @@ func (p *clientPool) decRef(wsID uuid.UUID, client *ssh.Client) {
 	}
 }
 
+// countsTowardCircuit reports whether a dial error is credential evidence: an SSH
+// auth failure (x/crypto reports it as a plain error containing "unable to
+// authenticate") or a pinned host-key mismatch.
+func countsTowardCircuit(err error) bool {
+	if errors.Is(err, errHostKeyMismatch) {
+		return true
+	}
+	return strings.Contains(err.Error(), "unable to authenticate")
+}
+
+// hopOf returns the hop (jump/target) a dial error is attributed to.
+func hopOf(err error) string {
+	if he, ok := errors.AsType[*hopError](err); ok {
+		return he.hop
+	}
+	return hopTarget
+}
+
+// keepalive probes the jump client until the connection closes. After
+// keepaliveMaxFailures consecutive failures it evicts and closes the pair so the
+// next Get dials fresh instead of waiting for the idle TTL.
+func (p *clientPool) keepalive(wsID uuid.UUID, wsKey string, pc *pooledClient, interval, replyTimeout time.Duration) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	failures := 0
+	for {
+		select {
+		case <-pc.conn.done:
+			return
+		case <-p.stopCh:
+			return
+		case <-ticker.C:
+		}
+		if probeJump(pc.conn, replyTimeout) {
+			failures = 0
+			continue
+		}
+		failures++
+		if failures >= keepaliveMaxFailures {
+			slog.Warn("workstation.ssh_jump_keepalive_failed", "workstation_id", wsID, "workstation_key", wsKey)
+			p.evict(wsID, pc)
+			return
+		}
+	}
+}
+
+// probeJump sends one keepalive request on the jump client within replyTimeout.
+func probeJump(c *sshConn, replyTimeout time.Duration) bool {
+	ok := make(chan bool, 1)
+	go func() {
+		_, _, err := c.jump.SendRequest("keepalive@openssh.com", true, nil)
+		ok <- err == nil
+	}()
+	timer := time.NewTimer(replyTimeout)
+	defer timer.Stop()
+	select {
+	case r := <-ok:
+		return r
+	case <-timer.C:
+		return false
+	case <-c.done:
+		return true
+	}
+}
+
+// evict removes pc from the pool and closes it. In-flight sessions see EOF; their
+// release functions tolerate the entry being gone (decRef finds nothing).
+func (p *clientPool) evict(wsID uuid.UUID, pc *pooledClient) {
+	p.mu.Lock()
+	pcs := p.clients[wsID]
+	for i, c := range pcs {
+		if c == pc {
+			p.clients[wsID] = append(pcs[:i:i], pcs[i+1:]...)
+			break
+		}
+	}
+	p.mu.Unlock()
+	pc.conn.Close()
+}
+
 // circuitFor returns (and lazily creates) the circuit state for a workstation.
 // Caller must hold p.mu.
 func (p *clientPool) circuitFor(wsID uuid.UUID) *circuitState {
@@ -214,6 +297,7 @@ func (p *clientPool) recordAuthFailure(wsID uuid.UUID, wsKey string, dialErr err
 			"workstation_id", wsID,
 			"workstation_key", wsKey,
 			"failures", cs.failures,
+			"hop", hopOf(dialErr),
 			"lockout_minutes", circuitLockoutDuration.Minutes(),
 			"err", dialErr,
 		)

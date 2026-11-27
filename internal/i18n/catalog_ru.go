@@ -272,6 +272,8 @@ func init() {
 		MsgWorkstationAccessDenied: "агент %s не имеет доступа к рабочей станции %s",
 		MsgBackendNotReady:         "бэкенд рабочей станции не готов: %s",
 		MsgWorkstationSSRFBlocked:  "хост рабочей станции заблокирован политикой SSRF: %s",
+		MsgWorkstationTestOK:       "Подключение успешно",
+		MsgWorkstationTestFailed:   "Проверка соединения не удалась: %s",
 
 		// Webhooks
 		MsgWebhookAuthFailed:                  "аутентификация вебхука не удалась",

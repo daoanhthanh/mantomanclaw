@@ -360,6 +360,8 @@ const (
 	MsgWorkstationAccessDenied = "error.workstation_access_denied" // "agent %s not authorized for workstation %s"
 	MsgBackendNotReady         = "error.backend_not_ready"         // "workstation backend not ready: %s"
 	MsgWorkstationSSRFBlocked  = "error.workstation_ssrf_blocked"  // "workstation host blocked by SSRF policy: %s"
+	MsgWorkstationTestOK       = "ui.workstation_test_ok"           // "Connection successful"
+	MsgWorkstationTestFailed   = "error.workstation_test_failed"    // "Connection test failed: %s"
 
 	// --- Hooks ---
 	MsgHookInvalidMatcher          = "hook.invalid_matcher"           // "invalid matcher regex: %s"
